@@ -1,11 +1,9 @@
 package iit.uvip.psysuite.core.common.subjects_parcel
 
 import android.content.Context
-import android.os.Build
 import android.os.Parcel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
@@ -26,11 +24,12 @@ open class SubjectBasicListParcel(
     override var age: Int = -1,
     override var gender: Int = -1,
     override var nextTrailModality: Int = -1,
-    override var taskcodes: List<TaskCode> = listOf(),
+    override var canRecordAudio:Boolean = false,
+    override var testClass:String = "",
     open var spinner_sel: Int = -1,
     open var spinner_label: String = "",
     open var spinner_data_resource: Int = -1
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, taskcodes) {
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass) {
 
     private constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -38,11 +37,8 @@ open class SubjectBasicListParcel(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
-        listOf<TaskCode>().apply {
-            if (Build.VERSION.SDK_INT >= 29)    parcel.readParcelableList(this, TaskCode::class.java.classLoader)
-            else                                parcel.readList(this, TaskCode::class.java.classLoader)
-        },
-
+        parcel.readInt() > 0,
+        parcel.readString()!!,
         parcel.readInt(),
         parcel.readString()!!,
         parcel.readInt()
@@ -56,9 +52,9 @@ open class SubjectBasicListParcel(
             parcel.writeInt(age)
             parcel.writeInt(gender)
             parcel.writeInt(nextTrailModality)
-
-            if (Build.VERSION.SDK_INT >= 29)    parcel.writeParcelableList(taskcodes, flags)
-            else                                parcel.writeList(taskcodes)
+            if (canRecordAudio) parcel.writeInt(1)
+            else                parcel.writeInt(0)
+            parcel.writeString(testClass)
             parcel.writeInt(spinner_sel)
             parcel.writeString(spinner_label)
             parcel.writeInt(spinner_data_resource)

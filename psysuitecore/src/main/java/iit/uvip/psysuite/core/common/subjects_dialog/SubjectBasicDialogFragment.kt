@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
@@ -16,26 +15,22 @@ import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
+import org.albaspazio.core.accessory.getCompanionObjectMethod
 
 import org.albaspazio.core.accessory.showToast
 
 open class SubjectBasicDialogFragment: DialogFragment()
 {
     open val LOG_TAG: String = SubjectBasicDialogFragment::class.java.simpleName
-    protected var nConditions: Int = 0
+    private var nConditions: Int = 0
+    private var selCondition: Int = -1
 
+    private lateinit var mTaskCodes: List<TaskCode>
+    private lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
 
     companion object {
-        fun newInstance(title: String): SubjectBasicDialogFragment {
-            val frag = SubjectBasicDialogFragment()
-            val args = Bundle()
-            args.putString("title", title)
-            frag.arguments = args
-            return frag
-        }
-        @JvmStatic val EVENT_SUBJECT:String                             = "subject"
-
+        @JvmStatic val EVENT_SUBJECT:String = "subject"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +41,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val subj: SubjectBasicParcel? = arguments?.getParcelable("subject")
+        val subj: SubjectBasicParcel? = arguments?.getParcelable(EVENT_SUBJECT)
 
         if (subj == null) {
             showToast("ERRORE IRRECUPERABILE. SOGGETTO E' VUOTO", requireContext())
@@ -54,43 +49,92 @@ open class SubjectBasicDialogFragment: DialogFragment()
             return
         } else subject = subj
 
-        // Fetch arguments from bundle and set title
-        val title       = requireArguments().getString("title", "Enter Name")
+        val ntm         = getCompanionObjectMethod(subject.testClass, "getNextTrialModes")
+        mNextTrialModes = ntm.first?.call(ntm.second) as List<List<Int>>
 
-        dialog?.setTitle(title)
+        val ci          = getCompanionObjectMethod(subject.testClass, "getConditionsInfo")
+        mTaskCodes      = ci.first?.call(ci.second, requireContext()) as List<TaskCode>
 
-        initData()
-
-        updateGUI(subject)
+        initData(subject)
     }
 
-    protected open fun initData() {
+    protected open fun initData(subj: SubjectBasicParcel) {
 
-        val adapter: ArrayAdapter<TaskCode> = ArrayAdapter<TaskCode>(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            subject.taskcodes
-        )
+        //------------------------------------------------------
+        // SUB TASKS
+        //------------------------------------------------------
+        val adapter: ArrayAdapter<TaskCode> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
         spCondition.adapter = adapter
-        nConditions = adapter.count
+        nConditions         = adapter.count
 
         if (nConditions == 1) {
             // do not show condition spinner & set subject.type
             labCondition.visibility = View.GONE
-            spCondition.visibility = View.GONE
-            subject.type = subject.taskcodes[0].id
+            spCondition.visibility  = View.GONE
+            subject.type            = mTaskCodes[0].id
+            selCondition            = 0
         }
+        else if (nConditions > 1) {
+            if(subject.type != -1) {
+                // set condition spinner to subject.type
+                mTaskCodes.mapIndexed { index, taskCode ->
+                    if (taskCode.id == subject.type){
+                        spCondition.setSelection(index)
+                        selCondition            = index
+                    }
+                }
+            }
+            else {
+                // set condition spinner to first sub-task
+                selCondition = 0
+                spCondition.setSelection(selCondition)
+                subject.type            = mTaskCodes[0].id
+            }
+        }
+
+        //------------------------------------------------------
+        // NEXT TRIAL MODALITY
+        //------------------------------------------------------
+        // swInteractive is visible only in TEST_NEXTTRIAL_BUTTON & TEST_NEXTTRIAL_AUTO
+
+        subject.nextTrailModality = mNextTrialModes[selCondition][0]
+
+        when (subject.nextTrailModality) {
+
+            TestBasic.TEST_NEXTTRIAL_BUTTON -> {
+                showInteractive(true)
+                swInteractive?.isChecked = true
+            }
+            TestBasic.TEST_NEXTTRIAL_AUTO -> {
+                showInteractive(true)
+                swInteractive?.isChecked = false
+            }
+            TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
+            TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER,
+            TestBasic.TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER,
+            TestBasic.TEST_NEXTTRIAL_ANSWER -> showInteractive(false)
+        }
+
+        //------------------------------------------------------
+        // SUBJECT DEMOGRAPHIC
+        //------------------------------------------------------
+        txtName.setText(subj.label)
+
+        if (subj.age != -1) txtAge.setText(subj.age.toString())
+        else txtAge.setText("")
+
+        if (subj.gender != -1) radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
+        else radioGroupGender.clearCheck()
+        //------------------------------------------------------
     }
+
 
     override fun onResume() {
 
-        val params =
-            dialog?.window!!.attributes               // Get existing layout params for the window
-        params.width =
-            WindowManager.LayoutParams.MATCH_PARENT   // Assign window properties to fill the parent
-        params.height = WindowManager.LayoutParams.MATCH_PARENT
+        val params                  = dialog?.window!!.attributes               // Get existing layout params for the window
+        params.width                = WindowManager.LayoutParams.MATCH_PARENT   // Assign window properties to fill the parent
+        params.height               = WindowManager.LayoutParams.MATCH_PARENT
         dialog?.window!!.attributes = params as WindowManager.LayoutParams
 
         super.onResume()
@@ -118,31 +162,6 @@ open class SubjectBasicDialogFragment: DialogFragment()
                 false   -> TestBasic.TEST_NEXTTRIAL_AUTO
             }
         }
-
-        spCondition.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if ((spCondition.selectedItem as TaskCode).id == TestBasic.TEST_ATB_TIME) {
-                    swInteractive.visibility = View.GONE
-                    labInteractive.visibility = View.GONE
-                    subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_ANSWER
-                } else {
-                    swInteractive.visibility = View.VISIBLE
-                    labInteractive.visibility = View.VISIBLE
-                    if (subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE && subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER) {
-                        swInteractive?.isChecked = false
-                        subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
-                    }
-                }
-            }
-        }
-
     }
 
     private fun showInteractive(show: Boolean) {
@@ -155,37 +174,6 @@ open class SubjectBasicDialogFragment: DialogFragment()
         }
     }
 
-    protected open fun updateGUI(subj: SubjectBasicParcel){
-
-        when (subject.nextTrailModality) {
-            TestBasic.TEST_NEXTTRIAL_BUTTON -> {
-                showInteractive(true)
-                swInteractive?.isChecked = true
-            }
-            TestBasic.TEST_NEXTTRIAL_AUTO -> {
-                showInteractive(true)
-                swInteractive?.isChecked = false
-            }
-            TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
-            TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER,
-            TestBasic.TEST_NEXTTRIAL_ANSWER -> showInteractive(false)
-        }
-        txtName.setText(subj.label)
-
-        if (subj.age != -1) txtAge.setText(subj.age.toString())
-        else txtAge.setText("")
-
-        if (subj.gender != -1) radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
-        else radioGroupGender.clearCheck()
-
-        if (nConditions > 1)
-            if (subject.type != -1) {
-                subject.taskcodes.mapIndexed { index, taskCode ->
-                    if (taskCode.id == subject.type) spCondition.setSelection(index)
-                }
-            } else spCondition.setSelection(-1)
-    }
-
     protected open fun clear(){
 
         if (nConditions > 1)
@@ -195,7 +183,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
         txtAge.setText("")
         radioGroupGender.clearCheck()
 
-        if (subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_NOCHOOSE && subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_ANSWER) {
+        if (subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_AUTO || subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_BUTTON) {
             swInteractive?.isChecked = false
             subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
         }
@@ -203,8 +191,8 @@ open class SubjectBasicDialogFragment: DialogFragment()
 
     protected open fun updateSubject(): SubjectBasicParcel?{
 
-        val name = txtName.text.toString()
-        val age = txtAge.text.toString()
+        val name    = txtName.text.toString()
+        val age     = txtAge.text.toString()
 
         if(SubjectBasicParcel.validate(name, age).isNotBlank()){
             showToast("Avviso: indicare le informazioni del soggetto", requireContext())
@@ -226,7 +214,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
         if (spCondition.selectedItemPosition == -1) {
             showToast("Seleziona una condizione sperimentale", requireContext())
             return null
-        } else subject.type = subject.taskcodes[spCondition.selectedItemPosition].id
+        } else subject.type = mTaskCodes[spCondition.selectedItemPosition].id
 
         subject.label = name
         subject.age = age.toInt()

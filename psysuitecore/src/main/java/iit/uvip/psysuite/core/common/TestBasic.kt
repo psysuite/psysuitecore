@@ -40,6 +40,7 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
         @JvmStatic val TEST_NEXTTRIAL_BUTTON            = 1         //  user can select to wait and then press a NEXT button
         @JvmStatic val TEST_NEXTTRIAL_ANSWER            = 2         //  wait for ANSWER dialog
         @JvmStatic val TEST_NEXTTRIAL_VOICE_ANSWER      = 3         //  wait for VOICE ANSWER dialog through speech recognition
+        @JvmStatic val TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER = 4       //  wait for either ANSWER dialog or VOICE ANSWER through speech recognition
 
         //-----------------------------------------------------------------------------------------
         //
@@ -48,7 +49,6 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
         @JvmStatic val EVENT_STIMULI_END                = 201
         @JvmStatic val EVENT_GIVE_ANSWER                = 202
         @JvmStatic val EVENT_GIVE_VOCAL_ANSWER          = 203
-        @JvmStatic val EVENT_GIVE_VOCAL_NORMAL_ANSWER   = 204
         @JvmStatic val EVENT_ANSWER_GIVEN               = 205
         @JvmStatic val EVENT_TRIAL_REPEAT               = 206
         @JvmStatic val EVENT_TRIAL_ABORT                = 207
@@ -129,44 +129,44 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
         saveText(ctx, mResultFile, header)
     }
 
+    protected fun setTrialsID(){
+
+        // set trial id according to its order in the list
+        mTrials.mapIndexed { index, trialBasic ->
+            trialBasic.id = index
+        }
+//        for (i in 0 until mTrials.size)
+//            mTrials[i].id = i
+    }
+
     open fun nextTrial(prev_result: String = "", elapsed: Int = -1): Int {
 
-        if(currTrial == (nTrials - 1))
-        {
-            // END !
-            if (prev_result != "")
-                setResponse(prev_result, elapsed, true, true)
-            return EVENT_TEST_END
+        if (prev_result != "")  mTrial.setResponse(prev_result, elapsed)
+
+        if(currTrial == (nTrials - 1)) {
+            saveText(ctx, mResultFile, mTrial.Log(), overwrite = false, notifyDm = true)
+            return EVENT_TEST_END            // END !
         }
         else
         {
-            if (prev_result != "")
-                setResponse(prev_result, elapsed, true, false)
+            saveText(ctx, mResultFile, mTrial.Log(), overwrite = false, notifyDm = false)
             currTrial++
             show(currTrial)
         }
         return currTrial
     }
 
-    // calculate test result (== 0 first button || == 1 second button)
-    open fun setResponse(result: String, elapsed: Int, writeit: Boolean, notifyDM: Boolean) {
-        mTrial.setResponse(result, elapsed)
-
-        if(writeit)
-            saveText(ctx, mResultFile, mTrial.Log(), notifyDm = notifyDM)
-    }
-
-    open fun abortTest(){
+    open fun abortTest(deletelog:Boolean=false){
         mStimuliHandler.removeCallbacksAndMessages(null)
-        deleteFile(mResultFile)
+        if(deletelog)   deleteFile(mResultFile)
     }
 }
 
 data class TaskCode(val label: String, val id: Int) : Parcelable {
 
     private constructor(parcel: Parcel) : this(
-        label = parcel.readString()!!,
-        id = parcel.readInt()
+        label   = parcel.readString()!!,
+        id      = parcel.readInt()
     )
 
     companion object {
@@ -192,3 +192,5 @@ data class TaskCode(val label: String, val id: Int) : Parcelable {
         dest.writeInt(id)
     }
 }
+
+data class Stimulus(val type: Int, val delay: Long) {}

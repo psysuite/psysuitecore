@@ -1,12 +1,10 @@
 package iit.uvip.psysuite.core.common.subjects_parcel
 
 import android.content.Context
-import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
@@ -29,7 +27,8 @@ open class SubjectBasicParcel(
     open var age: Int = -1,
     open var gender: Int = -1,
     open var nextTrailModality: Int = -1,
-    open var taskcodes: List<TaskCode> = listOf()
+    open var canRecordAudio:Boolean = false,
+    open var testClass:String = ""
 ) : Parcelable {
 
     private constructor(parcel: Parcel) : this(
@@ -38,13 +37,8 @@ open class SubjectBasicParcel(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
-        listOf<TaskCode>().apply {
-            if (Build.VERSION.SDK_INT >= 29) parcel.readParcelableList(
-                this,
-                TaskCode::class.java.classLoader
-            )
-            else parcel.readList(this, TaskCode::class.java.classLoader)
-        }
+        parcel.readInt() > 0,
+        parcel.readString()!!
     )
 
     companion object : Parceler<SubjectBasicParcel> {
@@ -55,8 +49,9 @@ open class SubjectBasicParcel(
             parcel.writeInt(age)
             parcel.writeInt(gender)
             parcel.writeInt(nextTrailModality)
-            if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
-            else parcel.writeList(taskcodes)
+            if (canRecordAudio) parcel.writeInt(1)
+            else                parcel.writeInt(0)
+            parcel.writeString(testClass)
         }
 
         override fun create(parcel: Parcel) = SubjectBasicParcel(parcel)

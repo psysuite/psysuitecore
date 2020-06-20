@@ -3,7 +3,7 @@ package iit.uvip.psysuite.core.tests.tid
 import iit.uvip.psysuite.core.common.TrialBasic
 
 
-class TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:String, var delta1:Int, var delta2:Int, val ref_first:Int, val duration:Int): TrialBasic(id, type,""){
+class TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:String, var delta1:Int, var delta2:Int, val ref_first:Int, val duration:Int): TrialBasic(id, type,"", ""){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tblock\tsession\ttype\tmodality\trt\tuser_ans\tcor_ans\ttestinterv\tref_first\n"
@@ -11,8 +11,8 @@ class TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality
 
     init {
         correct_answer = when (delta2 > delta1) {
-            true -> 1
-            false -> 0
+            true    -> "1"
+            false   -> "0"
         }
     }
 

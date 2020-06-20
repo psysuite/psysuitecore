@@ -11,32 +11,16 @@ import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
 import org.albaspazio.core.accessory.showToast
 
-class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment() {
+class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment()
+{
     override val LOG_TAG: String = SubjectTIDDialogFragment::class.java.simpleName
-//    private var subject: SubjectTIDParcel? = null
 
-
-    companion object {
-        fun newInstance(title: String): SubjectTIDDialogFragment {
-            val frag = SubjectTIDDialogFragment()
-            val args        = Bundle()
-            args.putString("title", title)
-            frag.arguments = args
-            return frag
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_subject_info_tid, container)
     }
 
-    override fun updateGUI(subj: SubjectBasicParcel) {
-
-        super.updateGUI(subj)
+    override fun initData(subj: SubjectBasicParcel) {
+        super.initData(subj)
         radioGroupFirstModality.check(radioGroupFirstModality.getChildAt((subj as SubjectTIDParcel).first_modality).id)
     }
 
@@ -53,8 +37,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment() {
             true -> {
                 val id = radioGroupFirstModality.checkedRadioButtonId
                 val radioButton: RadioButton = radioGroupFirstModality.findViewById(id)
-                (subject as SubjectTIDParcel).first_modality =
-                    radioGroupFirstModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
+                (subject as SubjectTIDParcel).first_modality = radioGroupFirstModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
             }
             false -> {
                 showToast("Seleziona un'opzione per la modalità iniziale di training", requireContext())

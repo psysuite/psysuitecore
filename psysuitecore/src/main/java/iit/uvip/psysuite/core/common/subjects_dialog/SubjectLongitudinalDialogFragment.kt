@@ -10,53 +10,27 @@ import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectLongitParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
 
-open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment() {
+open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment()
+{
     override val LOG_TAG: String = SubjectLongitudinalDialogFragment::class.java.simpleName
-
     private var nSessions: Int = 0
 
-    companion object {
-        fun newInstance(title: String): SubjectLongitudinalDialogFragment {
-            val frag = SubjectLongitudinalDialogFragment()
-            val args = Bundle()
-            args.putString("title", title)
-            frag.arguments = args
-            return frag
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_subject_info_basic_spinner, container)
     }
 
-    override fun initData() {
+    override fun initData(subj: SubjectBasicParcel) {
 
-        super.initData()
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            (subject as SubjectLongitParcel).test_sessions_array,
-            android.R.layout.simple_spinner_item
-        )
+        super.initData(subj)
+        ArrayAdapter.createFromResource(requireContext(), (subject as SubjectLongitParcel).test_sessions_array, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner.adapter = adapter
                 nSessions = adapter.count
             }
-        labSpinner.text = resources.getString(R.string.session)
-    }
-
-    override fun updateGUI(subj: SubjectBasicParcel) {
-        super.updateGUI(subj)
         spinner.setSelection((subj as SubjectLongitParcel).session)
-    }
 
-    override fun clear() {
-        super.clear()
-        spinner.setSelection(-1)
+        labSpinner.text = resources.getString(R.string.session)
     }
 
     override fun updateSubject(): SubjectLongitParcel? {

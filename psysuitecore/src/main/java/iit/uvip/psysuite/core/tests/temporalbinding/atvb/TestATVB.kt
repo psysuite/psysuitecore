@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.widget.ImageView
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.common.Stimulus
 import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
@@ -113,6 +114,11 @@ class TestATVB(
             return mutableListOf(TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single), TEST_ATVB_TIME_SINGLESTIM),
                                  TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_double), TEST_ATVB_TIME_DOUBLESTIM))
         }
+
+        fun getNextTrialModes():List<List<Int>>{
+            return listOf(listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON),
+                listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+        }
     }
     // =============================================================================================================================
 
@@ -198,15 +204,15 @@ class TestATVB(
         noise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       -> testEvent.accept(EVENT_SHOW_NEXT_BUTTON)
-            TEST_NEXTTRIAL_ANSWER       -> testEvent.accept(EVENT_GIVE_ANSWER)
-            TEST_NEXTTRIAL_AUTO         -> testEvent.accept(EVENT_SHOW_1SECABORT)
-            TEST_NEXTTRIAL_VOICE_ANSWER -> testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)
-            EVENT_GIVE_VOCAL_NORMAL_ANSWER -> {
-                                            testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)
-                                            testEvent.accept(EVENT_GIVE_ANSWER)
-            }
+            TEST_NEXTTRIAL_BUTTON               ->  testEvent.accept(EVENT_SHOW_NEXT_BUTTON)
+            TEST_NEXTTRIAL_AUTO                 ->  testEvent.accept(EVENT_SHOW_1SECABORT)
 
+            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)
+            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(EVENT_GIVE_ANSWER)
+            TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER -> {
+                                                    testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)
+                                                    testEvent.accept(EVENT_GIVE_ANSWER)
+            }
         }
     }
 
@@ -278,62 +284,56 @@ class TestATVB(
         for (i in 0 until NUM_REPETITIONS) {
 
             val trials: MutableList<TrialATVB> = mutableListOf()
-            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay, validAnswers[0]))
+            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay,validAnswers[0]))
+            trials.add(TrialATVB(++cnt, lStimuli[0].type, lStimuli[0].delay,validAnswers[0]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[1].type, lStimuli[1].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[2].type, lStimuli[2].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[3].type, lStimuli[3].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[4].type, lStimuli[4].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[5].type, lStimuli[5].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[6].type, lStimuli[6].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[1].type, lStimuli[1].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[2].type, lStimuli[2].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[3].type, lStimuli[3].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[4].type, lStimuli[4].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[5].type, lStimuli[5].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[6].type, lStimuli[6].delay, validAnswers[1]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[7].type, lStimuli[7].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[8].type, lStimuli[8].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[9].type, lStimuli[9].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[10].type, lStimuli[10].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[11].type, lStimuli[11].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[12].type, lStimuli[12].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[7].type, lStimuli[7].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[8].type, lStimuli[8].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[9].type, lStimuli[9].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[10].type, lStimuli[10].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[11].type, lStimuli[11].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[12].type, lStimuli[12].delay, validAnswers[1]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[13].type, lStimuli[13].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[14].type, lStimuli[14].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[15].type, lStimuli[15].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[16].type, lStimuli[16].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[17].type, lStimuli[17].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[18].type, lStimuli[18].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[13].type, lStimuli[13].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[14].type, lStimuli[14].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[15].type, lStimuli[15].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[16].type, lStimuli[16].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[17].type, lStimuli[17].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[18].type, lStimuli[18].delay, validAnswers[1]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[19].type, lStimuli[19].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[20].type, lStimuli[20].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[21].type, lStimuli[21].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[22].type, lStimuli[22].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[23].type, lStimuli[23].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[24].type, lStimuli[24].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[19].type, lStimuli[19].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[20].type, lStimuli[20].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[21].type, lStimuli[21].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[22].type, lStimuli[22].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[23].type, lStimuli[23].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[24].type, lStimuli[24].delay, validAnswers[1]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[25].type, lStimuli[25].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[26].type, lStimuli[26].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[27].type, lStimuli[27].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[28].type, lStimuli[28].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[29].type, lStimuli[29].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[30].type, lStimuli[30].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[25].type, lStimuli[25].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[26].type, lStimuli[26].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[27].type, lStimuli[27].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[28].type, lStimuli[28].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[29].type, lStimuli[29].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[30].type, lStimuli[30].delay, validAnswers[1]))
 
-            trials.add(TrialATVB(++cnt, lStimuli[31].type, lStimuli[31].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[32].type, lStimuli[32].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[33].type, lStimuli[33].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[34].type, lStimuli[34].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[35].type, lStimuli[35].delay))
-            trials.add(TrialATVB(++cnt, lStimuli[36].type, lStimuli[36].delay))
+            trials.add(TrialATVB(++cnt, lStimuli[31].type, lStimuli[31].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[32].type, lStimuli[32].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[33].type, lStimuli[33].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[34].type, lStimuli[34].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[35].type, lStimuli[35].delay, validAnswers[1]))
+            trials.add(TrialATVB(++cnt, lStimuli[36].type, lStimuli[36].delay, validAnswers[1]))
 
             trials.shuffle()
             mTrials.addAll(trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trialBasic ->
-            trialBasic.id = index
-        }
-        for (i in 0 until mTrials.size)
-            mTrials[i].id = (i + 1)
+        setTrialsID()   // set id according to their order
     }
 
     private fun showStimuliSingle(type: Int, delay: Long, sendTrialEnd:Boolean=true) {
@@ -402,7 +402,6 @@ class TestATVB(
         }
     }
 
-    data class Stimulus(val type: Int, val delay: Long) {}
 }
 
 /*

@@ -19,18 +19,17 @@ class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(c
         fun getConditionsInfo(ctx: Context): List<TaskCode> {
             return mutableListOf(TaskCode(TEST_BASIC_LABEL, TEST_MUSICAL_METERS))
         }
+
+        fun getNextTrialModes():List<List<Int>>{
+            return listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+        }        
     }
 
 
     // =============================================================================================================================
 
     init{
-
-        validAnswers = mutableListOf(
-            ctx.resources.getString(R.string.mmeters_rb1_text),
-            ctx.resources.getString(R.string.mmeters_rb3_text)
-        )
-
+        validAnswers = mutableListOf(ctx.resources.getString(R.string.mmeters_rb1_text), ctx.resources.getString(R.string.mmeters_rb3_text))
         initTest()
     }
 

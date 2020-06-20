@@ -4,21 +4,20 @@ import iit.uvip.psysuite.core.common.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialATB(id:Int=-1, type:Int): TrialBasic(id, type, ""){
+class TrialATB(id:Int=-1, type:Int, val delay:Long=0L, correct_answer:String=""): TrialBasic(id, type, "", correct_answer){
 
     companion object {
-        @JvmStatic val LOG_HEADER           = "id\ttype\n"
+        @JvmStatic
+        val LOG_HEADER = "id\ttype\tdelay\tanswer\tsuccess\telapsed\n"
     }
 
-    init {}
-
     // all class exported as string
-    override fun toString():String{
-        return id.toString() + "\t" + type.toString() + "\n"
+    override fun toString(): String {
+        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\n"
     }
 
     // data exported to log file
-    override fun Log():String{
-        return id.toString() +  "\t" + type.toString() + "\n"
+    override fun Log(): String {
+        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() +"\n"
     }
 }

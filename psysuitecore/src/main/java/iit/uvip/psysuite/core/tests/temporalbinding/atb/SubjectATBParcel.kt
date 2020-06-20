@@ -1,11 +1,9 @@
 package iit.uvip.psysuite.core.tests.temporalbinding.atb
 
 import android.content.Context
-import android.os.Build
 import android.os.Parcel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.parcel.Parceler
@@ -27,9 +25,11 @@ open class SubjectATBParcel(
     override var age: Int = -1,
     override var gender: Int = -1,
     override var nextTrailModality: Int = -1,
-    override var taskcodes: List<TaskCode> = listOf(),
+    override var canRecordAudio:Boolean = false,
+    override var testClass:String = "",
     var whitenoise: Boolean = true
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, taskcodes) {
+
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass) {
 
     private constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -37,18 +37,12 @@ open class SubjectATBParcel(
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
-        listOf<TaskCode>().apply {
-            if (Build.VERSION.SDK_INT >= 29) parcel.readParcelableList(
-                this,
-                TaskCode::class.java.classLoader
-            )
-            else parcel.readList(this, TaskCode::class.java.classLoader)
-        },
+        parcel.readInt() > 0,
+        parcel.readString()!!,
         parcel.readInt() > 0
     )
 
     companion object : Parceler<SubjectATBParcel> {
-
 
         override fun SubjectATBParcel.write(parcel: Parcel, flags: Int) {
             parcel.writeInt(type)
@@ -56,8 +50,9 @@ open class SubjectATBParcel(
             parcel.writeInt(age)
             parcel.writeInt(gender)
             parcel.writeInt(nextTrailModality)
-            if (Build.VERSION.SDK_INT >= 29) parcel.writeParcelableList(taskcodes, flags)
-            else parcel.writeList(taskcodes)
+            if (canRecordAudio)                 parcel.writeInt(1)
+            else                                parcel.writeInt(0)
+            parcel.writeString(testClass)
 
             if (whitenoise) parcel.writeInt(1)
             else parcel.writeInt(0)
@@ -83,7 +78,6 @@ open class SubjectATBParcel(
             }
             return SubjectATBParcel()
         }
-
     }
 
     // =============================================================================================================

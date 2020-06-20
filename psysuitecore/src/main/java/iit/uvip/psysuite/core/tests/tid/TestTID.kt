@@ -81,6 +81,10 @@ class TestTID(ctx: Context,
                 )
             )
         }
+
+        fun getNextTrialModes():List<List<Int>>{
+            return listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+        }        
     }
 
     private var mToneGen    = ToneGenerator(AudioManager.STREAM_SYSTEM, ToneGenerator.MAX_VOLUME)
@@ -99,6 +103,7 @@ class TestTID(ctx: Context,
         initTest()
     }
 
+   
     override fun initTest(){
 
         mQuest      = QuestObject()

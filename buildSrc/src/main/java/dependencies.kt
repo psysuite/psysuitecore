@@ -28,7 +28,7 @@ object Dependencies {
 
     object Kotlin {
         const val stdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
-
+        const val reflect   = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     }
 
     object Moshi {

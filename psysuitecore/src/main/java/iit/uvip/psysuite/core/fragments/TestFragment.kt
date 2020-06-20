@@ -3,6 +3,7 @@ package iit.uvip.psysuite.core.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
@@ -56,6 +57,8 @@ class TestFragment : BaseFragment(
     private var mHandler: Handler                   = Handler()
 
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
+    private var abortRecognition:Boolean            = false  // set true when I answer manually and speech rec is going to be restarted (e.g. rec busy or error)
+
     private lateinit var speechManager: SpeechManager
 
     lateinit var onsetDate: Date
@@ -169,8 +172,8 @@ class TestFragment : BaseFragment(
         Navigation.findNavController(requireView()).popBackStack()
     }
 
-    private fun onAbortTest(){
-        mTest.abortTest()
+    private fun onAbortTest(deletelog:Boolean=true){
+        mTest.abortTest(deletelog)
         mHandler.removeCallbacksAndMessages(null)
         Navigation.findNavController(requireView()).popBackStack()
     }
@@ -219,8 +222,11 @@ class TestFragment : BaseFragment(
     //---------------------------------------------------------------------------------------------------------------------------------------
     private fun onNext(prev_result: String = "", elapsed: Int = -1){
 
-        // dont' know whether an answer dialog was present or it was listening for vocal response. stop both!
+        // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
+        abortRecognition = true
         speechRecognitionManager.stop()
+        speechManager.stop()
+
         closeAnswerDialog()
 
         // call next trial & check whether it was the last => test ended
@@ -300,7 +306,7 @@ class TestFragment : BaseFragment(
     //---------------------------------------------------------------------------------------------------------------------------------------
     // create answer dialog and process response (repeat same trial or show next one
     private fun listenForVocalAnswer(valid_results:List<String> = listOf()) {
-
+        abortRecognition = false
         bt_abort?.visibility = View.VISIBLE
         onsetDate           = Date()
         speechRecognitionManager.getSpeechInput()
@@ -318,17 +324,22 @@ class TestFragment : BaseFragment(
 
                             if (res) {
                                 bt_abort.visibility = View.INVISIBLE
-                                val elapsedTime     =
-                                    getTimeDifference(onsetDate)
+                                val elapsedTime     = getTimeDifference(onsetDate)
                                 onNext(it.second!!, elapsedTime)
 
                             } else
                                 // text recognized but not allowed
-                                speechManager.speak(resources.getString(org.albaspazio.core.R.string.char_recognition_wrong), TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results)})
+                                speechManager.speak(resources.getString(org.albaspazio.core.R.string.char_recognition_wrong), TextToSpeech.QUEUE_FLUSH, clb={ if(!abortRecognition)   listenForVocalAnswer(valid_results)})
                         }
                         else ->
+
+                            if(it.first == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
+                                if (!abortRecognition)
+                                    listenForVocalAnswer(valid_results)
+                            }
+                            else
                             // RECOGNIZER ERROR
-                            speechManager.speak(it.second!!, TextToSpeech.QUEUE_FLUSH, clb={ listenForVocalAnswer(valid_results) })
+                                speechManager.speak(it.second!!, TextToSpeech.QUEUE_FLUSH, clb={ if(!abortRecognition)   listenForVocalAnswer(valid_results) })
                     }
                 }
             )

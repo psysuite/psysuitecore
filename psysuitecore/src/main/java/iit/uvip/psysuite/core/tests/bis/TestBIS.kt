@@ -21,8 +21,7 @@ class TestBIS(
 
     companion object {
 
-        @JvmStatic
-        val TEST_BASIC_LABEL = "BIS"
+        @JvmStatic val TEST_BASIC_LABEL             = "BIS"
 
         @JvmStatic var NUM_TRIALS                   = 32
         @JvmStatic val STIMULUS_DURATION_VISUAL     = 150
@@ -37,18 +36,14 @@ class TestBIS(
 
         @JvmStatic val AV_STIMULUS_DELTA            = 200       // ms between the AV stimuli
 
-        @JvmStatic
-        val STIMULUS_TYPE_AUDIO = "AUDIO"
-        @JvmStatic
-        val STIMULUS_TYPE_TACTILE = "TACTILE"
-        @JvmStatic
-        val STIMULUS_TYPE_AUDIO_TACTILE = "AUDIO_TACTILE"
-        @JvmStatic
-        val STIMULUS_TYPE_AUDIO_VIDEO = "AUDIO_VIDEO"
+        @JvmStatic val STIMULUS_TYPE_AUDIO          = "AUDIO"
+        @JvmStatic val STIMULUS_TYPE_TACTILE        = "TACTILE"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_TACTILE  = "AUDIO_TACTILE"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_VIDEO    = "AUDIO_VIDEO"
 
-        @JvmStatic val CONFLICT_TYPE_NONE               = "none"
-        @JvmStatic val CONFLICT_TYPE_AV                 = "av"
-        @JvmStatic val CONFLICT_TYPE_VA                 = "va"
+        @JvmStatic val CONFLICT_TYPE_NONE           = "none"
+        @JvmStatic val CONFLICT_TYPE_AV             = "av"
+        @JvmStatic val CONFLICT_TYPE_VA             = "va"
 
         fun getConditionsInfo(ctx: Context): List<TaskCode> {
             return mutableListOf(
@@ -63,6 +58,10 @@ class TestBIS(
                     TEST_BISECTION_AUDIO_VIDEO
                 )
             )
+        }
+        
+        fun getNextTrialModes():List<List<Int>>{
+            return listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
         }
     }
 
@@ -98,11 +97,7 @@ class TestBIS(
     // =======================================================================================================================================
 
     init{
-        validAnswers = mutableListOf(
-            ctx.resources.getString(R.string.bisection_rb1_text),
-            ctx.resources.getString(R.string.bisection_rb3_text)
-        )
-
+        validAnswers = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
         initTest()
     }
 
@@ -110,10 +105,10 @@ class TestBIS(
         // set question & create mTrials list
         when(data.type)
         {
-            TEST_BISECTION_AUDIO -> initBisectionAudio()
-            TEST_BISECTION_TACTILE -> initBisectionTactile()
-            TEST_BISECTION_AUDIO_TACTILE -> initBisectionAudioTactile()
-            TEST_BISECTION_AUDIO_VIDEO -> initBisectionAudioVideo()
+            TEST_BISECTION_AUDIO            -> initBisectionAudio()
+            TEST_BISECTION_TACTILE          -> initBisectionTactile()
+            TEST_BISECTION_AUDIO_TACTILE    -> initBisectionAudioTactile()
+            TEST_BISECTION_AUDIO_VIDEO      -> initBisectionAudioVideo()
         }
         nTrials     = mTrials.size
         currTrial   = 0

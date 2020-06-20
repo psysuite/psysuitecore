@@ -20,6 +20,7 @@ class AnswerDialogFragment: DialogFragment()
 {
     val LOG_TAG = AnswerDialogFragment::class.java.simpleName
 
+    private lateinit var mAnswers:ArrayList<String>
     lateinit var onsetDate:Date
 
     companion object {
@@ -47,7 +48,6 @@ class AnswerDialogFragment: DialogFragment()
         val question    = requireArguments().getString("question", "Enter Name")
         val answers = requireArguments().getStringArrayList("answers")
 
-
         dialog?.setTitle(title)
 
         txt_trials.text     = str_trial
@@ -55,8 +55,11 @@ class AnswerDialogFragment: DialogFragment()
 
         if (answers != null)
             if (answers.isNotEmpty()) {
-                rb1.text = answers[0]
-                rb3.text = answers[1]
+
+                mAnswers = answers
+
+                rb1.text = mAnswers[0]
+                rb3.text = mAnswers[1]
             }
 
         onsetDate           = Date()
@@ -81,7 +84,7 @@ class AnswerDialogFragment: DialogFragment()
                     val radioButton:RadioButton = radioGroupIntervals.findViewById(id)
                     val radioId                 = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
 
-                    sendResult(radioId.toString(), elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+                    sendResult(mAnswers[radioId], elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
                 }
                 false -> showToast("Seleziona un'opzione", requireContext())
             }
