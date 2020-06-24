@@ -210,7 +210,7 @@ class TestATB(ctx: Context,
                                             // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
                                             mStimuliHandler.postDelayed({
                                                 testEvent.accept(EVENT_SHOW_1SECABORT)
-                                            }, curISI)
+                                            }, curStimDuration)
             }
 
             TEST_NEXTTRIAL_VOICE_ANSWER ->  testEvent.accept(EVENT_GIVE_VOCAL_ANSWER)

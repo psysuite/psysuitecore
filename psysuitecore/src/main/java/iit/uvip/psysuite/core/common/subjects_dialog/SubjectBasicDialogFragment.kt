@@ -166,11 +166,11 @@ open class SubjectBasicDialogFragment: DialogFragment()
 
     private fun showInteractive(show: Boolean) {
         if (show) {
-            swInteractive?.visibility = View.VISIBLE
-            labInteractive?.visibility = View.VISIBLE
+            swInteractive?.visibility   = View.VISIBLE
+            labInteractive?.visibility  = View.VISIBLE
         } else {
-            swInteractive?.visibility = View.GONE
-            labInteractive?.visibility = View.GONE
+            swInteractive?.visibility   = View.GONE
+            labInteractive?.visibility  = View.GONE
         }
     }
 

@@ -48,6 +48,7 @@
 
     <string name="atvb_subtask_time_single">Stimolo singolo</string>
     <string name="atvb_subtask_time_double">Stimilo doppio</string>
+    <string name="atvb_subtask_time_double2">Stimilo doppio bilanciato</string>
 
 
     <string name="atvb_rb1_text">si</string>

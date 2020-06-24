@@ -10,6 +10,7 @@ import android.view.View
 import androidx.navigation.Navigation
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.TestResult
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.bis.TestBIS
 import iit.uvip.psysuite.core.tests.mmd.TestMMD
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.fragment_test.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.accessory.showToast
 import org.albaspazio.core.fragments.BaseFragment
+import org.albaspazio.core.fragments.setNavigationResult
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.speech.SpeechRecognitionManager
 import java.util.*
@@ -93,7 +95,7 @@ class TestFragment : BaseFragment(
 
         vibrator                    = org.albaspazio.core.accessory.VibrationManager(requireContext()).init()
 
-        val test: SubjectBasicParcel? = arguments?.getParcelable("test") ?: return
+        val test: SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
         when(test!!.type)
         {
             TestBasic.TEST_BISECTION_AUDIO,
@@ -115,7 +117,8 @@ class TestFragment : BaseFragment(
             TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), test as SubjectATBParcel, vibrator)
 
             TestBasic.TEST_ATVB_TIME_SINGLESTIM,
-            TestBasic.TEST_ATVB_TIME_DOUBLESTIM     -> mTest = TestATVB(requireContext(), test as SubjectATBParcel, vibrator, circleView)
+            TestBasic.TEST_ATVB_TIME_DOUBLESTIM,
+            TestBasic.TEST_ATVB_TIME_DOUBLESTIM2    -> mTest = TestATVB(requireContext(), test as SubjectATBParcel, vibrator, circleView)
 
         }
         bt_next.visibility  = View.INVISIBLE
@@ -169,12 +172,19 @@ class TestFragment : BaseFragment(
 
     private fun onTestEnded(){
         showToast(getText(R.string.test_ended).toString(),requireContext())
-        Navigation.findNavController(requireView()).popBackStack()
+        navigateBack(TestBasic.TEST_COMPLETED, mTest.getAbsoluteResultFilePath())
     }
 
-    private fun onAbortTest(deletelog:Boolean=true){
+    private fun onAbortTest(deletelog:Boolean=false){
         mTest.abortTest(deletelog)
         mHandler.removeCallbacksAndMessages(null)
+        navigateBack(TestBasic.TEST_ABORT, mTest.getAbsoluteResultFilePath())
+    }
+
+    // if result_file != "".... means it really exists
+    private fun navigateBack(result_code:Int, result_file:String){
+
+        setNavigationResult(TestResult(result_code, arrayListOf(result_file)), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
     }
 
@@ -279,11 +289,10 @@ class TestFragment : BaseFragment(
     }
 
     private fun closeAnswerDialog(){
-//        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
-        (answerDialogFragment as AnswerDialogFragment).dismiss()
+
+        (answerDialogFragment as AnswerDialogFragment).dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
         isAnswerDialogOn = false
     }
-
 
     // answer !
     override fun onActivityResult(requestCode:Int, resultCode:Int, data:Intent?) {
