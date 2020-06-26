@@ -41,7 +41,7 @@ class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(c
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(data.label, TrialMMD.LOG_HEADER)
+        createResultFile(data, TrialMMD.LOG_HEADER)
     }
 
     override fun show(trialid:Int, isRepeat:Boolean){

@@ -43,6 +43,7 @@ class SubjectATBDialogFragment : SubjectBasicDialogFragment(), AdapterView.OnIte
         when((spCondition.selectedItem as TaskCode).id){
              TestBasic.TEST_ATB_TIME,
              TestBasic.TEST_ATVB_TIME_DOUBLESTIM,
+             TestBasic.TEST_ATVB_TIME_DOUBLESTIM2,
              TestBasic.TEST_ATVB_TIME_SINGLESTIM    -> {
                 swInteractive.visibility = View.GONE
                 labInteractive.visibility = View.GONE
@@ -58,20 +59,23 @@ class SubjectATBDialogFragment : SubjectBasicDialogFragment(), AdapterView.OnIte
         }
     }
 
-    override fun updateSubject(): SubjectATBParcel? {
+    override fun updateSubject(): SubjectATBParcel {
+
         subject = super.updateSubject() as SubjectATBParcel
+
         (subject as SubjectATBParcel).whitenoise = swWhiteNoise.isChecked
 
         subject.nextTrailModality = when(subject.type) {                // could choose whether pausing each trial
-            TestBasic.TEST_ATB_TIME_INF ->  if(swInteractive.isChecked) TestBasic.TEST_NEXTTRIAL_BUTTON
-                                            else                        TestBasic.TEST_NEXTTRIAL_AUTO
+            TestBasic.TEST_ATB_TIME_INF         ->  if(swInteractive.isChecked) TestBasic.TEST_NEXTTRIAL_BUTTON
+                                                    else                        TestBasic.TEST_NEXTTRIAL_AUTO
 
             TestBasic.TEST_ATB_TIME,
             TestBasic.TEST_ATVB_TIME_DOUBLESTIM,
-            TestBasic.TEST_ATVB_TIME_SINGLESTIM ->      if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
-                                                        else                        TestBasic.TEST_NEXTTRIAL_ANSWER
+            TestBasic.TEST_ATVB_TIME_DOUBLESTIM2,
+            TestBasic.TEST_ATVB_TIME_SINGLESTIM ->   if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
+                                                     else                        TestBasic.TEST_NEXTTRIAL_ANSWER
 
-            else                    ->      subject.nextTrailModality
+            else                                ->   subject.nextTrailModality
         }
 
         return subject as SubjectATBParcel

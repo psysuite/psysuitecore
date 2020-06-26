@@ -1,6 +1,8 @@
 package iit.uvip.psysuite.core.common
 
+import android.app.DownloadManager
 import android.content.Context
+import android.os.Environment
 import android.os.Handler
 import android.os.Parcel
 import android.os.Parcelable
@@ -11,6 +13,7 @@ import org.albaspazio.core.accessory.deleteFile
 import org.albaspazio.core.accessory.existFile
 import org.albaspazio.core.accessory.getAbsoluteFilePath
 import org.albaspazio.core.accessory.saveText
+import java.io.File
 import java.util.*
 
 
@@ -120,18 +123,8 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
     abstract fun show(trialid:Int, isRepeat:Boolean=false)
 
     // ===============================================================================================================
-    protected fun createResultFile(subj_label:String, header:String){
-
-        val c = Calendar.getInstance()
-        mResultFile = subj_label + "_" +
-                c.get(Calendar.YEAR).toString() +
-                c.get(Calendar.MONTH).toString() +
-                c.get(Calendar.DAY_OF_MONTH).toString() +
-                c.get(Calendar.HOUR).toString() +
-                c.get(Calendar.MINUTE).toString() +
-                c.get(Calendar.SECOND).toString()
-        mResultFile += RES_EXTENSION
-
+    protected fun createResultFile(subj:SubjectBasicParcel, header:String){
+        mResultFile = subj.composeResultFileName()
         saveText(ctx, mResultFile, header)
     }
 
@@ -141,7 +134,7 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
     }
 
     fun getAbsoluteResultFilePath(): String{
-        return  getAbsoluteFilePath(mResultFile).second
+        return getAbsoluteFilePath(mResultFile).second
     }
 
     protected fun setTrialsID(){
@@ -166,9 +159,15 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
         return currTrial
     }
 
-    open fun abortTest(deletelog:Boolean=false){
+    fun abortTest(deletelog:Boolean=false, dir:String= Environment.DIRECTORY_DOWNLOADS){
         mStimuliHandler.removeCallbacksAndMessages(null)
         if(deletelog)   deleteFile(mResultFile)
+        else{
+            val path    = Environment.getExternalStoragePublicDirectory(dir)
+            val file    = File(path, mResultFile)
+            val down    = ctx.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            down.addCompletedDownload(file.name, "User file", false, "text/plain", file.path, file.length(), true)
+        }
     }
 }
 

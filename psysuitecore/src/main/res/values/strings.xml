@@ -18,10 +18,24 @@
     <string name="frequency">frequenza</string>
     <string name="condition">condizione sperimentale</string>
 
+    <string name="warning">Attenzione</string>
+
+    <string name="subject_present">Il nome scelto è già esistente. Vuoi continuare ad usare questo nome?</string>
+    <string name="select_subject_info">Indicare nome ed età</string>
+    <string name="select_gender">Indicare il sesso</string>
+    <string name="select_condition">Seleziona una condizione sperimentale</string>
+    <string name="select_session">Seleziona una sessione sperimentale</string>
+    <string name="select_spinner">Seleziona %1$s</string>
+    <string name="subject_info_notcorrected">Le seguenti informazioni del soggetto sono errate:\n\n%1$s</string>
+
     <string name="yes">yes</string>
     <string name="no">no</string>
 
     <string name="session">sessione</string>
+
+    <string name="empty_subject_parcel">SOGGETTO E\' VUOTO</string>
+    <string name="critical_error">ERRORE IRRECUPERABILE</string>
+    <string name="restart_app_suggestion">E\' consigliabile riavviare l\'app</string>
 
 
     <!-- ATB -->
@@ -72,6 +86,8 @@
 
     <string name="tid_rb_audio_text">audio</string>
     <string name="tid_rb_vibro_text">vibro</string>
+
+    <string name="tid_select_training_first_modality">Seleziona un\'opzione per la modalità iniziale di training</string>
 
     <string-array name="tid_sessions_array">
         <item>test iniziale</item>

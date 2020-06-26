@@ -113,7 +113,7 @@ class TestBIS(
         nTrials     = mTrials.size
         currTrial   = 0
 
-        createResultFile(data.label, TrialBIS.LOG_HEADER)
+        createResultFile(data, TrialBIS.LOG_HEADER)
     }
 
     // a trial has this temporal line:

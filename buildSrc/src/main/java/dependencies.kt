@@ -13,7 +13,7 @@ object Versions {
     const val ktx = "1.4.0-alpha01"
     const val gradlePlugin = "4.0.0"
 
-    const val navVersion = "2.2.2"
+    const val navVersion = "2.3.0-rc01"
     const val navSafeArgsGradlePlugin = "1.0.0"
     const val moshi = "1.9.2"
 }

@@ -146,11 +146,11 @@ class TestATB(ctx: Context,
         when (data.type) {
             TEST_ATB_TIME       -> {
                 createTrials_Time()
-                createResultFile(data.label, TrialATB.LOG_HEADER)
+                createResultFile(data, TrialATB.LOG_HEADER)
             }
             TEST_ATB_TIME_INF   -> {
                 createTrials_Time_Infants()
-                createResultFile(data.label, TrialATBInfants.LOG_HEADER)
+                createResultFile(data, TrialATBInfants.LOG_HEADER)
             }
         }
 

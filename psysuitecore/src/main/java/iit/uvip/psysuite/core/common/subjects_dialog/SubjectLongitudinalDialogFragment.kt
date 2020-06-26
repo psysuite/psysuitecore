@@ -33,8 +33,17 @@ open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment
         labSpinner.text = resources.getString(R.string.session)
     }
 
-    override fun updateSubject(): SubjectLongitParcel? {
+    override fun checkData():List<String>{
+
+        val errors = super.checkData() as MutableList<String>
+        if (spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_session))
+        return errors
+    }
+
+    override fun updateSubject(): SubjectLongitParcel {
+
         subject = super.updateSubject() as SubjectLongitParcel
+
         (subject as SubjectLongitParcel).session = spinner.selectedItemPosition
         return subject as SubjectLongitParcel
     }

@@ -116,7 +116,7 @@ class TestTID(ctx: Context,
         }
         setFirstDelta()
         nTrials     = mTrials.size
-        createResultFile(data.label, TrialTID.LOG_HEADER)
+        createResultFile(data, TrialTID.LOG_HEADER)
     }
 
     private fun vars2code(): Int {

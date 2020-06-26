@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectLongitudinalDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
-import org.albaspazio.core.accessory.showToast
 
 class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment()
 {
@@ -29,21 +27,19 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment()
         radioGroupFirstModality.clearCheck()
     }
 
-    override fun updateSubject(): SubjectTIDParcel? {
+    override fun checkData():List<String>{
+        val errors = super.checkData() as MutableList<String>
 
-        subject = super.updateSubject() as SubjectTIDParcel
+        if(radioGroupFirstModality.checkedRadioButtonId == -1) errors.add(resources.getString(R.string.tid_select_training_first_modality))
 
-        when(radioGroupFirstModality.checkedRadioButtonId != -1) {
-            true -> {
-                val id = radioGroupFirstModality.checkedRadioButtonId
-                val radioButton: RadioButton = radioGroupFirstModality.findViewById(id)
-                (subject as SubjectTIDParcel).first_modality = radioGroupFirstModality.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
-            }
-            false -> {
-                showToast("Seleziona un'opzione per la modalità iniziale di training", requireContext())
-                return null
-            }
-        }
+        return errors
+    }
+
+    override fun updateSubject(): SubjectTIDParcel{
+
+        subject                                         = super.updateSubject() as SubjectTIDParcel
+        (subject as SubjectTIDParcel).first_modality    = radioGroupFirstModality.indexOfChild(radioGroupFirstModality.findViewById(radioGroupFirstModality.checkedRadioButtonId))
+
         return subject as SubjectTIDParcel
     }
 }

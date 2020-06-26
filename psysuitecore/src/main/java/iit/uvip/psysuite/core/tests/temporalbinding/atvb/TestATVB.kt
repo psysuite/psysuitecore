@@ -234,13 +234,13 @@ class TestATVB(
                 curISI          = ISI           // 2000L
                 curStimDuration = STIM_DURATION // 1000L
                 createTrials_Time()
-                createResultFile(data.label, TrialATVB.LOG_HEADER)
+                createResultFile(data, TrialATVB.LOG_HEADER)
             }
             TEST_ATVB_TIME_DOUBLESTIM2   -> {
                 curISI          = ISI           // 2000L
                 curStimDuration = STIM_DURATION // 1000L
                 createTrials_Time2()
-                createResultFile(data.label, TrialATVB2.LOG_HEADER)
+                createResultFile(data, TrialATVB2.LOG_HEADER)
             }
         }
         // mTrials list

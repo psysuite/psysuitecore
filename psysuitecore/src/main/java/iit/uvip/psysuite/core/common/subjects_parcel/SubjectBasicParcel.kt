@@ -5,11 +5,9 @@ import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import iit.uvip.psysuite.core.common.TestBasic
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
-import org.albaspazio.core.accessory.Device
-import org.albaspazio.core.accessory.existFile
-import org.albaspazio.core.accessory.readText
-import org.albaspazio.core.accessory.saveText
+import org.albaspazio.core.accessory.*
 
 /*
 This class manage simple subjects that participate in tests with only one condition.
@@ -33,8 +31,14 @@ open class SubjectBasicParcel(
 
 ) : Parcelable {
 
+    @IgnoredOnParcel
+    private var subjectFileName:String = ""
+
     companion object  {
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
+
+        @JvmStatic val SUBJECTFILE_EXIST:Int = 1
+        @JvmStatic val ERROR:Int = 2
 
         fun validate(lab:String, ag:String):String{
             var res = ""
@@ -80,21 +84,38 @@ open class SubjectBasicParcel(
         return label.hashCode()
     }
 
+    fun existSubjectFile():Boolean{
+        return existFileStartingWith(label, allowedext = listOf(".json"))
+    }
+
+    fun composeResultFileName():String{
+        return "${label}_${type}_${getFullDateString()}${TestBasic.RES_EXTENSION}"
+    }
+
+    fun composeSubjectFileName():String{
+        return "${label}_${type}_${getDateString()}${TestBasic.FILE_EXTENSION}"
+    }
+
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
-    open fun writeJson(context:Context, filename:String = CURR_SUBJ_FILE){
+    open fun writeJson(context:Context):Int{
 
         val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val jsonAdapter = moshi.adapter(this.javaClass)
 
         return try {
-            val json_subject = jsonAdapter.toJson(this)
-            saveText(context, filename + TestBasic.FILE_EXTENSION, json_subject)        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+                    subjectFileName = composeSubjectFileName()
+
+                    if(existSubjectFile()) SUBJECTFILE_EXIST
+                    else {
+                            saveText(context, subjectFileName, jsonAdapter.toJson(this))        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+                            0
+                    }
         }
         catch (e: Exception){
             e.printStackTrace()
-            return
+            throw(e)
         }
     }
     // =============================================================================================================

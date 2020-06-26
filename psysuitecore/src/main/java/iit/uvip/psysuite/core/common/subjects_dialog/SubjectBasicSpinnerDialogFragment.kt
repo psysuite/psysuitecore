@@ -39,8 +39,17 @@ open class SubjectBasicSpinnerDialogFragment : SubjectBasicDialogFragment()
         spinner.setSelection(-1)
     }
 
-    override fun updateSubject(): SubjectBasicListParcel?{
+    override fun checkData():List<String>{
+
+        val errors = super.checkData() as MutableList<String>
+        if (spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_spinner, labSpinner.text) )
+        return errors
+    }
+
+    override fun updateSubject(): SubjectBasicListParcel{
+
         subject = super.updateSubject() as SubjectBasicListParcel
+
         (subject as SubjectBasicListParcel).spinner_sel = spinner.selectedItemPosition
         return subject as SubjectBasicListParcel
     }

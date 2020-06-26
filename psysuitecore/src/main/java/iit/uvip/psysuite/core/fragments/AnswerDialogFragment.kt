@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.RadioButton
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TestBasic
@@ -80,10 +79,7 @@ class AnswerDialogFragment: DialogFragment()
             val elapsedms = getTimeDifference(onsetDate)
             when(radioGroupIntervals.checkedRadioButtonId != -1) {
                 true -> {
-                    val id                      = radioGroupIntervals.checkedRadioButtonId
-                    val radioButton:RadioButton = radioGroupIntervals.findViewById(id)
-                    val radioId                 = radioGroupIntervals.indexOfChild(radioButton)      // val btn = radioGroup.getChildAt(radioId) as RadioButton
-
+                    val radioId = radioGroupIntervals.indexOfChild(radioGroupIntervals.findViewById(radioGroupIntervals.checkedRadioButtonId))
                     sendResult(mAnswers[radioId], elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
                 }
                 false -> showToast("Seleziona un'opzione", requireContext())
