@@ -6,6 +6,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import org.albaspazio.core.accessory.showToast
 
 class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(ctx, data) {
     var LOG_TAG: String = TestMMD::class.java.simpleName
@@ -40,6 +41,12 @@ class TestMMD(ctx: Context, override val data: SubjectBasicParcel) : TestBasic(c
 
         nTrials     = mTrials.size
         currTrial   = 0
+
+        mTestLabel = ""
+        getConditionsInfo(ctx).map {
+            if (it.id == data.type) mTestLabel = it.label
+        }
+        if(mTestLabel.isEmpty())    showToast("Should not happen. given test code was not recognized", ctx)
 
         createResultFile(data, TrialMMD.LOG_HEADER)
     }

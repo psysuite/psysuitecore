@@ -4,12 +4,13 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.widget.ImageView
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.Stimulus
-import iit.uvip.psysuite.core.common.Stimulus2
+import iit.uvip.psysuite.core.common.Stimulus3delay
+import iit.uvip.psysuite.core.common.StimulusTypeDelay
 import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
 import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.showToast
 import java.util.Collections.max
 
 class TestATVB(
@@ -53,131 +54,131 @@ class TestATVB(
     private val STIM_TYPE_TIME_Tx_AV = 6
 
     // 37 different elements
-    private val lStimuli: List<Stimulus> = listOf(
-        Stimulus(STIM_TYPE_TIME_ATV, 0),
+    private val lStimuli: List<StimulusTypeDelay> = listOf(
+        StimulusTypeDelay(STIM_TYPE_TIME_ATV, 0),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 100),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 100),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 100),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 100),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 100),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 100),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 200),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 200),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 200),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 200),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 200),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 200),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 300),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 300),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 300),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 300),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 300),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 300),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 400),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 400),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 400),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 400),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 400),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 400),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 800),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 800),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 800),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 800),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 800),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 800),
 
-        Stimulus(STIM_TYPE_TIME_A_TVx, 1200),
-        Stimulus(STIM_TYPE_TIME_Ax_TV, 1200),
-        Stimulus(STIM_TYPE_TIME_V_ATx, 1200),
-        Stimulus(STIM_TYPE_TIME_Vx_AT, 1200),
-        Stimulus(STIM_TYPE_TIME_T_AVx, 1200),
-        Stimulus(STIM_TYPE_TIME_Tx_AV, 1200)
+        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 1200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 1200),
+        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 1200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 1200),
+        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 1200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 1200)
     )
     // 37 different elements
-    private val lStimuli2: List<Stimulus2> = listOf(
+    private val lStimuli3delay: List<Stimulus3delay> = listOf(
 
-        Stimulus2( 100, 200, 0),
-        Stimulus2( 100, 0, 200),
-        Stimulus2( 200, 100, 0),
-        Stimulus2( 0, 100, 200),
-        Stimulus2( 0, 200, 100),
-        Stimulus2( 200, 0, 100),
-        Stimulus2( 200, 100, 0),
-        Stimulus2( 200, 0, 100),
-        Stimulus2( 0, 200, 100),
-        Stimulus2( 100, 200, 0),
-        Stimulus2( 0, 100, 200),
-        Stimulus2( 100, 0, 200),
+        Stimulus3delay( 100, 200, 0),
+        Stimulus3delay( 100, 0, 200),
+        Stimulus3delay( 200, 100, 0),
+        Stimulus3delay( 0, 100, 200),
+        Stimulus3delay( 0, 200, 100),
+        Stimulus3delay( 200, 0, 100),
+        Stimulus3delay( 200, 100, 0),
+        Stimulus3delay( 200, 0, 100),
+        Stimulus3delay( 0, 200, 100),
+        Stimulus3delay( 100, 200, 0),
+        Stimulus3delay( 0, 100, 200),
+        Stimulus3delay( 100, 0, 200),
 
-        Stimulus2( 200, 400, 0),
-        Stimulus2( 200, 0, 400),
-        Stimulus2( 400, 200, 0),
-        Stimulus2( 0, 200, 400),
-        Stimulus2( 0, 400, 200),
-        Stimulus2( 400, 0, 200),
-        Stimulus2( 400, 200, 0),
-        Stimulus2( 400, 0, 200),
-        Stimulus2( 0, 400, 200),
-        Stimulus2( 200, 400, 0),
-        Stimulus2( 0, 200, 400),
-        Stimulus2( 200, 0, 400),
+        Stimulus3delay( 200, 400, 0),
+        Stimulus3delay( 200, 0, 400),
+        Stimulus3delay( 400, 200, 0),
+        Stimulus3delay( 0, 200, 400),
+        Stimulus3delay( 0, 400, 200),
+        Stimulus3delay( 400, 0, 200),
+        Stimulus3delay( 400, 200, 0),
+        Stimulus3delay( 400, 0, 200),
+        Stimulus3delay( 0, 400, 200),
+        Stimulus3delay( 200, 400, 0),
+        Stimulus3delay( 0, 200, 400),
+        Stimulus3delay( 200, 0, 400),
 
-        Stimulus2( 300, 600, 0),
-        Stimulus2( 300, 0, 600),
-        Stimulus2( 600, 300, 0),
-        Stimulus2( 0, 300, 600),
-        Stimulus2( 0, 600, 300),
-        Stimulus2( 600, 0, 300),
-        Stimulus2( 600, 300, 0),
-        Stimulus2( 600, 0, 300),
-        Stimulus2( 0, 600, 300),
-        Stimulus2( 300, 600, 0),
-        Stimulus2( 0, 300, 600),
-        Stimulus2( 300, 0, 600),
+        Stimulus3delay( 300, 600, 0),
+        Stimulus3delay( 300, 0, 600),
+        Stimulus3delay( 600, 300, 0),
+        Stimulus3delay( 0, 300, 600),
+        Stimulus3delay( 0, 600, 300),
+        Stimulus3delay( 600, 0, 300),
+        Stimulus3delay( 600, 300, 0),
+        Stimulus3delay( 600, 0, 300),
+        Stimulus3delay( 0, 600, 300),
+        Stimulus3delay( 300, 600, 0),
+        Stimulus3delay( 0, 300, 600),
+        Stimulus3delay( 300, 0, 600),
 
-        Stimulus2( 400, 800, 0),
-        Stimulus2( 400, 0, 800),
-        Stimulus2( 800, 400, 0),
-        Stimulus2( 0, 400, 800),
-        Stimulus2( 0, 800, 400),
-        Stimulus2( 800, 0, 400),
-        Stimulus2( 800, 400, 0),
-        Stimulus2( 800, 0, 400),
-        Stimulus2( 0, 800, 400),
-        Stimulus2( 400, 800, 0),
-        Stimulus2( 0, 400, 800),
-        Stimulus2( 400, 0, 800),
+        Stimulus3delay( 400, 800, 0),
+        Stimulus3delay( 400, 0, 800),
+        Stimulus3delay( 800, 400, 0),
+        Stimulus3delay( 0, 400, 800),
+        Stimulus3delay( 0, 800, 400),
+        Stimulus3delay( 800, 0, 400),
+        Stimulus3delay( 800, 400, 0),
+        Stimulus3delay( 800, 0, 400),
+        Stimulus3delay( 0, 800, 400),
+        Stimulus3delay( 400, 800, 0),
+        Stimulus3delay( 0, 400, 800),
+        Stimulus3delay( 400, 0, 800),
 
-        Stimulus2( 800, 1600, 0),
-        Stimulus2( 800, 0, 1600),
-        Stimulus2( 1600, 800, 0),
-        Stimulus2( 0, 800, 1600),
-        Stimulus2( 0, 1600, 800),
-        Stimulus2( 1600, 0, 800),
-        Stimulus2( 1600, 800, 0),
-        Stimulus2( 1600, 0, 800),
-        Stimulus2( 0, 1600, 800),
-        Stimulus2( 800, 1600, 0),
-        Stimulus2( 0, 800, 1600),
-        Stimulus2( 800, 0, 1600),
+        Stimulus3delay( 800, 1600, 0),
+        Stimulus3delay( 800, 0, 1600),
+        Stimulus3delay( 1600, 800, 0),
+        Stimulus3delay( 0, 800, 1600),
+        Stimulus3delay( 0, 1600, 800),
+        Stimulus3delay( 1600, 0, 800),
+        Stimulus3delay( 1600, 800, 0),
+        Stimulus3delay( 1600, 0, 800),
+        Stimulus3delay( 0, 1600, 800),
+        Stimulus3delay( 800, 1600, 0),
+        Stimulus3delay( 0, 800, 1600),
+        Stimulus3delay( 800, 0, 1600),
 
-        Stimulus2( 1200, 2400, 0),
-        Stimulus2( 1200, 0, 2400),
-        Stimulus2( 2400, 1200, 0),
-        Stimulus2( 0, 1200, 2400),
-        Stimulus2( 0, 2400, 1200),
-        Stimulus2( 2400, 0, 1200),
-        Stimulus2( 2400, 1200, 0),
-        Stimulus2( 2400, 0, 1200),
-        Stimulus2( 0, 2400, 1200),
-        Stimulus2( 1200, 2400, 0),
-        Stimulus2( 0, 1200, 2400),
-        Stimulus2( 1200, 0, 2400)
+        Stimulus3delay( 1200, 2400, 0),
+        Stimulus3delay( 1200, 0, 2400),
+        Stimulus3delay( 2400, 1200, 0),
+        Stimulus3delay( 0, 1200, 2400),
+        Stimulus3delay( 0, 2400, 1200),
+        Stimulus3delay( 2400, 0, 1200),
+        Stimulus3delay( 2400, 1200, 0),
+        Stimulus3delay( 2400, 0, 1200),
+        Stimulus3delay( 0, 2400, 1200),
+        Stimulus3delay( 1200, 2400, 0),
+        Stimulus3delay( 0, 1200, 2400),
+        Stimulus3delay( 1200, 0, 2400)
 
     )
 
@@ -189,6 +190,8 @@ class TestATVB(
     private val amplitude = 100
 
     companion object {
+
+        @JvmStatic val recipients:Array<String> = arrayOf(  "uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
 
         @JvmStatic val TEST_BASIC_LABEL     = "ATVB"
         @JvmStatic val NUM_REPETITIONS      = 10
@@ -204,6 +207,10 @@ class TestATVB(
             return listOf(  listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON),
                             listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+        }
+
+        fun getEmailRecipients():Array<String>{
+            return recipients
         }
     }
     // =============================================================================================================================
@@ -248,6 +255,12 @@ class TestATVB(
 
         nTrials = mTrials.size
         currTrial = 0
+
+        mTestLabel = ""
+        getConditionsInfo(ctx).map {
+            if (it.id == data.type) mTestLabel = it.label
+        }
+        if(mTestLabel.isEmpty())    showToast("Should not happen. given test code was not recognized", ctx)
     }
 
     // get new trial info. start noise. schedule stimulations
@@ -409,7 +422,7 @@ class TestATVB(
             trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
             trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
 
-            lStimuli2.map {
+            lStimuli3delay.map {
                 trials.add(TrialATVB2(++cnt, it.a, it.t, it.v,  validAnswers[1]))
             }
             trials.shuffle()

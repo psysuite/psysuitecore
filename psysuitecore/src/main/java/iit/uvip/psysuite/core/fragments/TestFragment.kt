@@ -48,10 +48,14 @@ class TestFragment : BaseFragment(
     hideAndroidControls = true
 ){
 
-    private lateinit var mTest: TestBasic
+    private lateinit var mTest:TestBasic
+    private var mSubjectParcel:SubjectBasicParcel?  = null
+
     override val LOG_TAG                            = TestFragment::class.java.simpleName
-    private val disposable                          = CompositeDisposable()
+    private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
     private val TARGET_FRAGMENT_REQUEST_CODE:Int    = 1
+
+    private val disposable                          = CompositeDisposable()
 
     private var answerDialogFragment:AnswerDialogFragment?      = null
     private var isAnswerDialogOn:Boolean            = false
@@ -61,14 +65,10 @@ class TestFragment : BaseFragment(
 
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
     private var abortRecognition:Boolean            = false  // set true when I answer manually and speech rec is going to be restarted (e.g. rec busy or error)
-
     private lateinit var speechManager: SpeechManager
+    private var vibrator:VibrationManager?          = null
 
     lateinit var onsetDate: Date
-
-    private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
-
-    var vibrator: org.albaspazio.core.accessory.VibrationManager? = null
 
     // ==========================================================================================================================
     // ==========================================================================================================================
@@ -96,30 +96,30 @@ class TestFragment : BaseFragment(
 
         vibrator                    = VibrationManager(requireContext()).init()
 
-        val test: SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
-        when(test!!.type)
+        mSubjectParcel              = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
+        when(mSubjectParcel!!.type)
         {
             TestBasic.TEST_BISECTION_AUDIO,
             TestBasic.TEST_BISECTION_TACTILE,
             TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-            TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), test, vibrator, circleView)
+            TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), mSubjectParcel!!, vibrator, circleView)
 
-            TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), test)
+            TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), mSubjectParcel!!)
 
             TestBasic.TEST_TID_SHORT_AUDIO,
             TestBasic.TEST_TID_SHORT_TACTILE,
             TestBasic.TEST_TID_LONG_AUDIO,
-            TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), test as SubjectTIDParcel, vibrator)
+            TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), mSubjectParcel as SubjectTIDParcel, vibrator)
 
             TestBasic.TEST_ATB_TIME,
             TestBasic.TEST_ATB_FREQUENCY,           // to be coded
             TestBasic.TEST_ATB_FREQUENCY_INF,       // to be coded
             TestBasic.TEST_ATB_TIME_INF_15s,
-            TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), test as SubjectATBParcel, vibrator)
+            TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), mSubjectParcel as SubjectATBParcel, vibrator)
 
             TestBasic.TEST_ATVB_TIME_SINGLESTIM,
             TestBasic.TEST_ATVB_TIME_DOUBLESTIM,
-            TestBasic.TEST_ATVB_TIME_DOUBLESTIM2    -> mTest = TestATVB(requireContext(), test as SubjectATBParcel, vibrator, circleView)
+            TestBasic.TEST_ATVB_TIME_DOUBLESTIM2    -> mTest = TestATVB(requireContext(), mSubjectParcel as SubjectATBParcel, vibrator, circleView)
 
         }
         bt_next.visibility  = View.INVISIBLE
@@ -185,7 +185,7 @@ class TestFragment : BaseFragment(
     // if result_file != "".... means it really exists
     private fun navigateBack(result_code:Int, result_file:String){
 
-        setNavigationResult(TestResult(result_code, arrayListOf(result_file)), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(), arrayListOf(result_file), mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
     }
 

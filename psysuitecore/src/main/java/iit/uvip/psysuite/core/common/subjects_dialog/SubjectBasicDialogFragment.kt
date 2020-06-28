@@ -21,10 +21,10 @@ import org.albaspazio.core.accessory.showAlert
 open class SubjectBasicDialogFragment: DialogFragment()
 {
     open val LOG_TAG: String = SubjectBasicDialogFragment::class.java.simpleName
-    private var nConditions: Int = 0
-    private var selCondition: Int = -1
+    protected var nConditions: Int = 0
+    protected var selCondition: Int = -1
 
-    private lateinit var mTaskCodes: List<TaskCode>
+    protected lateinit var mTaskCodes: List<TaskCode>
     private lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
 
@@ -85,35 +85,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
         //------------------------------------------------------
         // SUB TASKS
         //------------------------------------------------------
-        val adapter: ArrayAdapter<TaskCode> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodes)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spCondition.adapter = adapter
-        nConditions         = adapter.count
-
-        if (nConditions == 1) {
-            // do not show condition spinner & set subject.type
-            labCondition.visibility = View.GONE
-            spCondition.visibility  = View.GONE
-            subject.type            = mTaskCodes[0].id
-            selCondition            = 0
-        }
-        else if (nConditions > 1) {
-            if(subject.type != -1) {
-                // set condition spinner to subject.type
-                mTaskCodes.mapIndexed { index, taskCode ->
-                    if (taskCode.id == subject.type){
-                        spCondition.setSelection(index)
-                        selCondition            = index
-                    }
-                }
-            }
-            else {
-                // set condition spinner to first sub-task
-                selCondition = 0
-                spCondition.setSelection(selCondition)
-                subject.type            = mTaskCodes[0].id
-            }
-        }
+        setConditions(mTaskCodes)
 
         //------------------------------------------------------
         // NEXT TRIAL MODALITY
@@ -149,6 +121,39 @@ open class SubjectBasicDialogFragment: DialogFragment()
         if (subj.gender != -1)  radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
         else                    radioGroupGender.clearCheck()
         //------------------------------------------------------
+    }
+
+    protected fun setConditions(tc:List<TaskCode>){
+
+        val adapter: ArrayAdapter<TaskCode> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spCondition.adapter = adapter
+        nConditions         = adapter.count
+
+        if (nConditions == 1) {
+            // do not show condition spinner & set subject.type
+            labCondition.visibility = View.GONE
+            spCondition.visibility  = View.GONE
+            subject.type            = mTaskCodes[0].id
+            selCondition            = 0
+        }
+        else if (nConditions > 1) {
+            if(subject.type != -1) {
+                // set condition spinner to subject.type
+                mTaskCodes.mapIndexed { index, taskCode ->
+                    if (taskCode.id == subject.type){
+                        spCondition.setSelection(index)
+                        selCondition            = index
+                    }
+                }
+            }
+            else {
+                // set condition spinner to first sub-task
+                selCondition = 0
+                spCondition.setSelection(selCondition)
+                subject.type            = mTaskCodes[0].id
+            }
+        }
     }
 
     //  ---- UI presses ----------------------------------------------------------------

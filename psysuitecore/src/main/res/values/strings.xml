@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="app_name">PsySuite</string>
+    <string name="lab_test_res">Risultati Test</string>
+
     <!--    parte comune-->
     <string name="next">CONTINUA</string>
     <string name="session_text">sessione</string>
@@ -13,6 +16,7 @@
     <string name="name">NOME</string>
     <string name="gender">SESSO</string>
     <string name="age">ETA\'</string>
+    <string name="group">GRUPPO</string>
 
     <string name="time">tempo</string>
     <string name="frequency">frequenza</string>
@@ -60,9 +64,9 @@
     <!-- ATVB -->
     <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
 
-    <string name="atvb_subtask_time_single">Stimolo singolo</string>
-    <string name="atvb_subtask_time_double">Stimilo doppio</string>
-    <string name="atvb_subtask_time_double2">Stimilo doppio bilanciato</string>
+    <string name="atvb_subtask_time_single">Singolo Stimolo</string>
+    <string name="atvb_subtask_time_double">Doppio Stimolo</string>
+    <string name="atvb_subtask_time_double2">Doppio Stimolo bilanciato</string>
 
 
     <string name="atvb_rb1_text">si</string>
@@ -71,18 +75,20 @@
 
 
     <!-- TID -->
-    <string name="start_tid">Temporal Interval Discrimination (TID)</string>
-    <string name="tid_question_text_audio">L\'intervallo tra la prima coppia di suoni era maggiore o minore dell\'intervallo tra la seconda coppia</string>
-    <string name="tid_question_text_tactile">L\'intervallo tra la prima coppia di vibrazione era maggiore o minore dell\'intervallo tra la seconda coppia</string>
 
-    <string name="tid_rb1_text">Più corto il primo</string>
-    <string name="tid_rb3_text">Piu corto il secondo</string>
+    <string name="tid_label">Temporal Interval Discrimination (TID)</string>
+    <string name="tid_label_short">TID</string>
+
+    <string name="tid_question_text">Quale intervallo in ciascuna coppia era maggiore?\nnella prima o nella seconda coppia?</string>
+
+    <string name="tid_rb1_text">primo</string>
+    <string name="tid_rb3_text">secondo</string>
 
     <string name="tid_rb_male_text">M</string>
     <string name="tid_rb_female_text">F</string>
 
-    <string name="tid_rb_short_text">corti</string>
-    <string name="tid_rb_long_text">lunghi</string>
+    <string name="tid_rb_short_text">CORTO</string>
+    <string name="tid_rb_long_text">LUNGO</string>
 
     <string name="tid_rb_audio_text">audio</string>
     <string name="tid_rb_vibro_text">vibro</string>
@@ -90,11 +96,16 @@
     <string name="tid_select_training_first_modality">Seleziona un\'opzione per la modalità iniziale di training</string>
 
     <string-array name="tid_sessions_array">
+        <item>seleziona...</item>
         <item>test iniziale</item>
-        <item>1</item>
-        <item>2</item>
-        <item>seleziona sessione</item>
+        <item>sessione 1</item>
+        <item>sessione 2</item>
+        <item>sessione 3</item>
+        <item>sessione 4</item>
+        <item>sessione 5</item>
+        <item>test finale</item>
     </string-array>
+
 
 
 

@@ -6,6 +6,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Parcelable
 import com.jakewharton.rxrelay2.PublishRelay
+import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.deleteFile
@@ -108,9 +109,11 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
 
     var nTrials:Int                             = 0
     var currTrial:Int                           = 0
-    private var mResultFile: String                 = ""
+    var mTestLabel: String                      = ""
 
-    var validAnswers: MutableList<String> = mutableListOf()
+    private var mResultFile: String             = ""
+
+    var validAnswers: MutableList<String>       = mutableListOf()
 
     // they are just proxy for properties (implemented / edited) in each subclass
     protected lateinit var mTrial: TrialBasic
@@ -119,9 +122,14 @@ abstract class TestBasic(protected val ctx: Context, protected open val data: Su
 
     protected abstract fun initTest()
     abstract fun onTrialEnd()
+
     abstract fun show(trialid:Int, isRepeat:Boolean=false)
 
     // ===============================================================================================================
+    protected fun getTestTitle(_type:Int):String{
+        return "${ctx.resources.getString(R.string.app_name)} - ${ctx.resources.getString(R.string.lab_test_res)}: $mTestLabel"
+    }
+
     protected fun createResultFile(subj:SubjectBasicParcel, header:String){
         mResultFile = subj.composeResultFileName()
         saveText(ctx, mResultFile, header)
@@ -179,8 +187,9 @@ data class TaskCode(val label: String, val id: Int) : Parcelable{
 }
 
 @Parcelize
-data class TestResult(var code:Int=-1, var res_files:ArrayList<String> = arrayListOf()) : Parcelable
+data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files:ArrayList<String> = arrayListOf(), val testClass:String) : Parcelable
 
-data class Stimulus(val type: Int, val delay: Long)
-data class Stimulus2(val a:Long, val t:Long, val v:Long)
+data class StimulusTypeDelay(val type: Int, val delay: Long)
+data class StimulusType2Delay(val type: Int, val delay1: Long, val delay2: Long)
+data class Stimulus3delay(val a:Long, val t:Long, val v:Long)
 

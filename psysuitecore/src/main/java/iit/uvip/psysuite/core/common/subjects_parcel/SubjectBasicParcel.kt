@@ -89,11 +89,11 @@ open class SubjectBasicParcel(
         return existFileStartingWith(label, allowedext = listOf(".json"))
     }
 
-    fun composeResultFileName():String{
+    open fun composeResultFileName():String{
         return "${label}_${type}_${getFullDateString()}${TestBasic.RES_EXTENSION}"
     }
 
-    private fun composeSubjectFileName():String{
+    open fun composeSubjectFileName():String{
         if(label.isBlank() || type == -1)   return ""
 
         return "${label}_${type}_${getDateString()}${TestBasic.FILE_EXTENSION}"

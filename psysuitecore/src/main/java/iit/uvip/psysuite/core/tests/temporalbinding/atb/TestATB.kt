@@ -3,10 +3,11 @@ package iit.uvip.psysuite.core.tests.temporalbinding.atb
 import android.content.Context
 import android.media.MediaPlayer
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.Stimulus
+import iit.uvip.psysuite.core.common.StimulusTypeDelay
 import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.showToast
 
 
 class TestATB(ctx: Context,
@@ -40,25 +41,25 @@ class TestATB(ctx: Context,
     private val STIM_TYPE_TIME_Ax_T = 6
 
     // 13 different trials
-    private val lStimuli: List<Stimulus> = listOf(
-        Stimulus(STIM_TYPE_TIME_AT, 0),
-        Stimulus(STIM_TYPE_TIME_A, 0),
-        Stimulus(STIM_TYPE_TIME_T, 0),
+    private val lStimuli: List<StimulusTypeDelay> = listOf(
+        StimulusTypeDelay(STIM_TYPE_TIME_AT, 0),
+        StimulusTypeDelay(STIM_TYPE_TIME_A, 0),
+        StimulusTypeDelay(STIM_TYPE_TIME_T, 0),
 
-        Stimulus(STIM_TYPE_TIME_A_Tx, 100),
-        Stimulus(STIM_TYPE_TIME_Ax_T, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_Tx, 100),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_T, 100),
 
-        Stimulus(STIM_TYPE_TIME_A_Tx, 200),
-        Stimulus(STIM_TYPE_TIME_Ax_T, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_Tx, 200),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_T, 200),
 
-        Stimulus(STIM_TYPE_TIME_A_Tx, 300),
-        Stimulus(STIM_TYPE_TIME_Ax_T, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_Tx, 300),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_T, 300),
 
-        Stimulus(STIM_TYPE_TIME_A_Tx, 400),
-        Stimulus(STIM_TYPE_TIME_Ax_T, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_A_Tx, 400),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_T, 400),
 
-        Stimulus(STIM_TYPE_TIME_A_Tx, 800),
-        Stimulus(STIM_TYPE_TIME_Ax_T, 800)
+        StimulusTypeDelay(STIM_TYPE_TIME_A_Tx, 800),
+        StimulusTypeDelay(STIM_TYPE_TIME_Ax_T, 800)
     )
 
     private val STIM_DURATION           = 1000L
@@ -76,6 +77,8 @@ class TestATB(ctx: Context,
         @JvmStatic val TEST_BASIC_LABEL         = "ATB"
         @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
 
+        @JvmStatic val recipients:Array<String> = arrayOf("uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
+
         fun getConditionsInfo(ctx: Context): List<TaskCode> {
             return mutableListOf(
                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.time)        , TEST_ATB_TIME),
@@ -87,6 +90,10 @@ class TestATB(ctx: Context,
             return listOf(
                 listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
                 listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
+        }
+
+        fun getEmailRecipients():Array<String>{
+            return recipients
         }
     }
     // =============================================================================================================================
@@ -159,6 +166,11 @@ class TestATB(ctx: Context,
         nTrials     = mTrials.size
         currTrial   = 0
 
+        mTestLabel = ""
+        getConditionsInfo(ctx).map {
+            if (it.id == data.type) mTestLabel = it.label
+        }
+        if(mTestLabel.isEmpty())    showToast("Should not happen. given test code was not recognized", ctx)
     }
 
     override fun show(trialid:Int, isRepeat:Boolean){
