@@ -1,10 +1,10 @@
-package iit.uvip.psysuite.core.tests.temporalbinding.atb
+package iit.uvip.psysuite.core.tests.temporalbinding
 
 import iit.uvip.psysuite.core.common.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialATB(id:Int=-1, type:Int, val delay:Long=0L, correct_answer:String=""): TrialBasic(id, type, "", correct_answer){
+class TrialBindings (id:Int=-1, type:Int, val delay:Long=0L, correct_answer:String=""): TrialBasic(id, type, "", correct_answer){
 
     companion object {
         @JvmStatic

@@ -7,102 +7,76 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.*
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindings3latencies
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
-import java.util.Collections.max
-import kotlin.math.roundToInt
 
 class TestATVB(
     ctx: Context,
     activity: Activity,
     hostfragment: Fragment,
-    override val data: SubjectATBParcel,
+    override val subjectparcel: SubjectBindingsParcel,
     vibrator: VibrationManager?,
     mImageView: ImageView?,
     isDebug:Boolean
-) : TestBasic(ctx, activity, hostfragment, data, vibrator, mImageView, isDebug = isDebug) {
+) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, mImageView, isDebug = isDebug) {
 
     var LOG_TAG: String = TestATVB::class.java.simpleName
 
     private var noise: MediaPlayer? = null
-    private var tone1sec: MediaPlayer
-    private var tone2sec: MediaPlayer
-    private val mBackgroundColours: List<Int> = listOf(
-        R.drawable.white_circle,
-        R.drawable.red_circle,
-        R.drawable.grey_circle,
-        R.drawable.blue_circle
-    )
+    private var tone2sec:String = "t200hz_2s"
 
     private var curISI: Long = 0L
-    private var curStimDuration: Long = 0L
-
-    private val TYPE_AUDIO = 0
-    private val TYPE_TACTILE = 1
-    private val TYPE_VISUAL = 2
-    private val TYPE_AUDIOVISUAL = 3
-    private val TYPE_AUDIOTACTILE = 4
-    private val TYPE_VISUALTACTILE = 5
-    private val TYPE_AUDIOVISUALTACTILE = 6
-
-    // 7 stimuli types
-    private val STIM_TYPE_TIME_ATV = 0
-    private val STIM_TYPE_TIME_A_TVx = 1
-    private val STIM_TYPE_TIME_Ax_TV = 2
-    private val STIM_TYPE_TIME_V_ATx = 3
-    private val STIM_TYPE_TIME_Vx_AT = 4
-    private val STIM_TYPE_TIME_T_AVx = 5
-    private val STIM_TYPE_TIME_Tx_AV = 6
 
     // 36 different elements
-    private val lStimuli: List<StimulusTypeDelay> = listOf(
+    private val lStimuliUnbalanced: List<Stimulus3delay> = listOf(
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 100),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 100),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 100),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 100),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 100),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 100),
+        Stimulus3delay( 0, 100, 100),
+        Stimulus3delay( 100, 0, 0),
+        Stimulus3delay( 100, 100, 0),
+        Stimulus3delay( 0, 0, 100),
+        Stimulus3delay( 100, 0, 100),
+        Stimulus3delay( 0, 100, 0),
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 200),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 200),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 200),
+        Stimulus3delay( 0, 200, 200),
+        Stimulus3delay( 200, 0, 0),
+        Stimulus3delay( 200, 200, 0),
+        Stimulus3delay( 0, 0, 200),
+        Stimulus3delay( 200, 0, 200),
+        Stimulus3delay( 0, 200, 0),
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 300),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 300),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 300),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 300),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 300),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 300),
+        Stimulus3delay( 0, 300, 300),
+        Stimulus3delay( 300, 0, 0),
+        Stimulus3delay( 300, 300, 0),
+        Stimulus3delay( 0, 0, 300),
+        Stimulus3delay( 300, 0, 300),
+        Stimulus3delay( 0, 300, 0),
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 400),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 400),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 400),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 400),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 400),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 400),
+        Stimulus3delay( 0, 400, 400),
+        Stimulus3delay( 400, 0, 0),
+        Stimulus3delay( 400, 400, 0),
+        Stimulus3delay( 0, 0, 400),
+        Stimulus3delay( 400, 0, 400),
+        Stimulus3delay( 0, 400, 0),
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 800),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 800),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 800),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 800),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 800),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 800),
+        Stimulus3delay( 0, 800, 800),
+        Stimulus3delay( 800, 0, 0),
+        Stimulus3delay( 800, 800, 0),
+        Stimulus3delay( 0, 0, 800),
+        Stimulus3delay( 800, 0, 800),
+        Stimulus3delay( 0, 800, 0),
 
-        StimulusTypeDelay(STIM_TYPE_TIME_A_TVx, 1200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Ax_TV, 1200),
-        StimulusTypeDelay(STIM_TYPE_TIME_V_ATx, 1200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Vx_AT, 1200),
-        StimulusTypeDelay(STIM_TYPE_TIME_T_AVx, 1200),
-        StimulusTypeDelay(STIM_TYPE_TIME_Tx_AV, 1200)
+        Stimulus3delay( 0, 1200, 1200),
+        Stimulus3delay( 1200, 0, 0),
+        Stimulus3delay( 1200, 1200, 0),
+        Stimulus3delay( 0, 0, 1200),
+        Stimulus3delay( 1200, 0, 1200),
+        Stimulus3delay( 0, 1200, 0)
     )
 
     // 72 different elements
-    private val lStimuli3delay: List<Stimulus3delay> = listOf(
+    private val lStimuliBalanced: List<Stimulus3delay> = listOf(
 
         Stimulus3delay( 50, 100, 0),
         Stimulus3delay( 50, 0, 100),
@@ -186,17 +160,16 @@ class TestATVB(
     private val STIM_DURATION   = 1000L
     private val ISI             = 2000L
 
-    private val EVENT_SECOND_TRAIN = 1201
-
-    private val amplitude = 100
-
     private var allQuestions:MutableList<String> = mutableListOf()
+    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
 
     companion object {
 
         @JvmStatic val TEST_BASIC_LABEL     = "ATVB"
         @JvmStatic val NUM_REPETITIONS      = 8
         @JvmStatic val NUM_REPETITIONS2     = 4
+
+        @JvmStatic val recipients:Array<String> = arrayOf("uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
 
         fun getConditionsInfo(ctx: Context): List<TaskCode> {
             return mutableListOf(TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single),  TEST_ATVB_TIME_SINGLESTIM),
@@ -211,101 +184,94 @@ class TestATVB(
                             listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
         }
-        @JvmStatic val recipients:Array<String> = arrayOf("uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
 
-        fun getEmailRecipients():Array<String>{
-            return recipients
-        }
+        fun getEmailRecipients():Array<String> = recipients
     }
 
     // =============================================================================================================================
     // INIT
     // =============================================================================================================================
     init {
-        if(mImageView == null)      throw Exception("IMAGE_VIEW_NOT_DEFINED")
-        else if(vibrator == null)   throw Exception("VIBRATOR_NOT_DEFINED")
-        else
-        {
-            nextTrailModality   = data.nextTrailModality
-            abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
-            showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
-
-            if (data.whitenoise)
-                noise = MediaPlayer.create(ctx, ctx.resources.getIdentifier("wnoise_20s", "raw", ctx.packageName))
-
-            tone1sec        = MediaPlayer.create(ctx, ctx.resources.getIdentifier("tone200hz_1sec", "raw", ctx.packageName))
-            tone2sec        = MediaPlayer.create(ctx, ctx.resources.getIdentifier("tone200hz_2sec", "raw", ctx.packageName))
-
-            allQuestions    = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
-            validAnswers    = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
-
+        if(mImageView == null)      throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+        else if(vibrator == null)   throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+        else{
             initTest()
+
+            mMediaPlayerManager = MediaPlayerManager(ctx, tone2sec, duration = currStimulusDuration, handler = mStimuliHandler)
+            mTactileManager      = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
+            mVisualManager       = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = currStimulusDuration, handler = mStimuliHandler)
         }
     }
 
     override fun initTest() {
 
-        when (data.type) {
+        nextTrailModality   = subjectparcel.nextTrailModality
+        abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
+        showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
+
+        allQuestions    = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
+        validAnswers    = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
+        createResultFile(subjectparcel, TrialBindings3latencies.LOG_HEADER)
+
+        when (subjectparcel.type) {
             TEST_ATVB_TIME_SINGLESTIM,
             TEST_ATVB_TIME_DOUBLESTIM   -> {
-                curISI          = ISI           // 2000L
-                curStimDuration = STIM_DURATION // 1000L
-                createTrialsTime()
-                createResultFile(data, TrialATVB.LOG_HEADER)
+                curISI                  = ISI           // 2000L
+                currStimulusDuration    = STIM_DURATION // 1000L
+                createTrialsTimeUnbalanced()
             }
             TEST_ATVB_TIME_SINGLESTIM2,
             TEST_ATVB_TIME_DOUBLESTIM2   -> {
-                curISI          = ISI           // 2000L
-                curStimDuration = STIM_DURATION // 1000L
-                createTrialsTime2()
-                createResultFile(data, TrialATVB2.LOG_HEADER)
+                curISI                  = ISI           // 2000L
+                currStimulusDuration    = STIM_DURATION // 1000L
+                createTrialsTimeBalanced()
             }
         }
-        when (data.type) {
+        when (subjectparcel.type) {
             TEST_ATVB_TIME_SINGLESTIM,
             TEST_ATVB_TIME_SINGLESTIM2   -> {
                 mQuestion       = allQuestions[0]
             }
             TEST_ATVB_TIME_DOUBLESTIM,
             TEST_ATVB_TIME_DOUBLESTIM2   -> {
-                createResultFile(data, TrialATVB2.LOG_HEADER)
                 mQuestion       = allQuestions[1]
             }
         }
+
+        if (subjectparcel.whitenoise)    noise = MediaPlayerManager.getAudioResource(ctx, "wnoise_20s", 0.4f)
+
         // mTrials list
-        currTone = tone2sec
+        nTrials         = mTrials.size
+        currTrial       = 0
 
-        nTrials = mTrials.size
-        currTrial = 0
+//        mListBlocks     = mutableListOf((nTrials / 2F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+        mListBlocks     = mutableListOf(0,2)    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
-        mListBlocks = mutableListOf((nTrials / 2F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-
-        mTestLabel = ""
+        mTestLabel      = ""
         getConditionsInfo(ctx).map {
-            if (it.id == data.type) mTestLabel = it.label
+            if (it.id == subjectparcel.type) mTestLabel = it.label
         }
-        if(mTestLabel.isEmpty()) showToast(
-            "Should not happen. given test code was not recognized",
-            ctx
-        )
+        if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
     }
 
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrialsTime() {
+    // (36 + 3) * 8
+    private fun createTrialsTimeUnbalanced() {
         var cnt = -1
         mTrials = mutableListOf()
         for (i in 0 until NUM_REPETITIONS) {
 
-            val trials: MutableList<TrialATVB> = mutableListOf()
+            val trials: MutableList<TrialBindings3latencies> = mutableListOf()
 
-            trials.add(TrialATVB(++cnt, STIM_TYPE_TIME_ATV,  0L,  validAnswers[0]))
-            trials.add(TrialATVB(++cnt, STIM_TYPE_TIME_ATV,  0L,  validAnswers[0]))
-            trials.add(TrialATVB(++cnt, STIM_TYPE_TIME_ATV,  0L,  validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
 
-            lStimuli.map {
-                trials.add(TrialATVB(++cnt, it.type, it.delay,  validAnswers[1]))
+            // 36
+            lStimuliUnbalanced.map {
+                trials.add(TrialBindings3latencies(++cnt, it.a, it.t, it.v, validAnswers[1]))
             }
             trials.shuffle()
             mTrials.addAll(trials)
@@ -313,23 +279,24 @@ class TestATVB(
         setTrialsID()   // set id according to their order
     }
 
-    // (72 + 6) * 5
-    private fun createTrialsTime2() {
+    // (72 + 6) * 4
+    private fun createTrialsTimeBalanced() {
         var cnt = -1
         mTrials = mutableListOf()
         for (i in 0 until NUM_REPETITIONS2) {
 
-            val trials: MutableList<TrialATVB2> = mutableListOf()
+            val trials: MutableList<TrialBindings3latencies> = mutableListOf()
 
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
-            trials.add(TrialATVB2(++cnt, 0L, 0L, 0L,  validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
+            trials.add(TrialBindings3latencies(++cnt, 0L, 0L, 0L, validAnswers[0]))
 
-            lStimuli3delay.map {
-                trials.add(TrialATVB2(++cnt, it.a, it.t, it.v,  validAnswers[1]))
+            // 72
+            lStimuliBalanced.map {
+                trials.add(TrialBindings3latencies(++cnt, it.a, it.t, it.v, validAnswers[1]))
             }
             trials.shuffle()
             mTrials.addAll(trials)
@@ -372,189 +339,42 @@ class TestATVB(
         noise?.setVolume(0.5f, 0.5f)
         noise?.start()
 
-        when(data.type) {
+        when(subjectparcel.type) {
 
             TEST_ATVB_TIME_SINGLESTIM -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showStimuliSingle(trial.type, (mTrial as TrialATVB).delay, sendTrialEnd=true)
+                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
                 }, 1000L)
             }
             TEST_ATVB_TIME_SINGLESTIM2 -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showThreeStimuliSingle((trial as TrialATVB2).a, trial.t, trial.v, sendTrialEnd=true)
+                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
                 }, 1000L)
             }
             TEST_ATVB_TIME_DOUBLESTIM -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showStimuliSingle(STIM_TYPE_TIME_ATV, 0L, sendTrialEnd=false)
+                    deliverAlignedStimulus(STIM_TYPE_A2T1V2, managerV = mVisualManager)
                 }, 1000L)
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showStimuliSingle(trial.type, (trial as TrialATVB).delay, sendTrialEnd=true)
-                }, (1000L + 2*curStimDuration))
+                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+                }, (1000L + 2*currStimulusDuration))
             }
             TEST_ATVB_TIME_DOUBLESTIM2 -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showStimuliSingle(STIM_TYPE_TIME_ATV, 0L, sendTrialEnd=false)
+                    deliverAlignedStimulus(STIM_TYPE_A2T1V2)
                 }, 1000L)
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    showThreeStimuliSingle((trial as TrialATVB2).a, trial.t, trial.v, sendTrialEnd=true)
-                }, (1000L + 2*curStimDuration))
+                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+                }, (1000L + 2*currStimulusDuration))
             }
         }
     }
-
-    private fun deliverStimulus(type: Int) {
-
-        when (type) {
-            TYPE_AUDIO -> {
-                currTone.start()
-                mStimuliHandler.postDelayed({
-                    currTone.stop()
-                    currTone.prepare()
-                }, curStimDuration)
-            }
-            TYPE_TACTILE -> vibrator?.vibrateSingle(curStimDuration)
-            TYPE_VISUAL -> {
-                mImageView?.setImageResource(mBackgroundColours[1])
-                mStimuliHandler.postDelayed({
-                    mImageView?.setImageResource(mBackgroundColours[0])
-                }, curStimDuration)
-            }
-            TYPE_AUDIOVISUALTACTILE -> {
-                currTone.start()
-                vibrator?.vibrateSingle(curStimDuration)
-                mImageView?.setImageResource(mBackgroundColours[1])
-
-                mStimuliHandler.postDelayed({
-                    currTone.stop()
-                    mImageView?.setImageResource(mBackgroundColours[0])
-                    vibrator?.cancel()
-                    currTone.prepare()
-                }, curStimDuration)
-            }
-            TYPE_VISUALTACTILE -> {
-                vibrator?.vibrateSingle(curStimDuration)
-                mImageView?.setImageResource(mBackgroundColours[1])
-                mStimuliHandler.postDelayed({
-                    mImageView?.setImageResource(mBackgroundColours[0])
-                    vibrator?.cancel()
-                }, curStimDuration)
-            }
-            TYPE_AUDIOTACTILE -> {
-                currTone.start()
-                vibrator?.vibrateSingle(curStimDuration)
-                mStimuliHandler.postDelayed({
-                    currTone.stop()
-                    vibrator?.cancel()
-                    currTone.prepare()
-                }, curStimDuration)
-            }
-            TYPE_AUDIOVISUAL -> {
-                currTone.start()
-                mImageView?.setImageResource(mBackgroundColours[1])
-                mStimuliHandler.postDelayed({
-                    currTone.stop()
-                    mImageView?.setImageResource(mBackgroundColours[0])
-                    currTone.prepare()
-                }, curStimDuration)
-            }
-        }
-    }
-
-    private fun showThreeStimuliSingle(a:Long, t:Long, v:Long, sendTrialEnd:Boolean=true) {
-
-        val end:Long = max(listOf(a, t, v))
-
-        mStimuliHandler.postDelayed({
-            deliverStimulus(TYPE_AUDIO)
-        }, a)
-        mStimuliHandler.postDelayed({
-            deliverStimulus(TYPE_TACTILE)
-        }, t)
-        mStimuliHandler.postDelayed({
-            deliverStimulus(TYPE_VISUAL)
-        }, v)
-        mStimuliHandler.postDelayed({
-            if(sendTrialEnd) onTrialEnd()
-        }, (curStimDuration + end))
-    }
-
-    private fun showStimuliSingle(type: Int, delay: Long, sendTrialEnd:Boolean=true) {
-
-        when (type) {
-            STIM_TYPE_TIME_ATV -> {
-                deliverStimulus(TYPE_AUDIOVISUALTACTILE)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration))
-            }
-            STIM_TYPE_TIME_A_TVx -> {
-                deliverStimulus(TYPE_AUDIO)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_VISUALTACTILE)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-            STIM_TYPE_TIME_Ax_TV -> {
-                deliverStimulus(TYPE_VISUALTACTILE)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_AUDIO)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-            STIM_TYPE_TIME_T_AVx -> {
-                deliverStimulus(TYPE_AUDIO)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_VISUALTACTILE)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-            STIM_TYPE_TIME_Tx_AV -> {
-                deliverStimulus(TYPE_VISUALTACTILE)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_AUDIO)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-            STIM_TYPE_TIME_V_ATx -> {
-                deliverStimulus(TYPE_AUDIO)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_VISUALTACTILE)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-            STIM_TYPE_TIME_Vx_AT -> {
-                deliverStimulus(TYPE_VISUALTACTILE)
-                mStimuliHandler.postDelayed({
-                    deliverStimulus(TYPE_AUDIO)
-                }, delay)
-                mStimuliHandler.postDelayed({
-                    if(sendTrialEnd) onTrialEnd()
-                }, (curStimDuration + delay))
-            }
-        }
-    }
-
     // =============================================================================================================================
     // DEBUG
-    // =============================================================================================================================
-
     // =============================================================================================================================
 }
 

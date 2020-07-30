@@ -20,11 +20,12 @@ open class SubjectBasicListParcel(
     override var canRecordAudio:Boolean = false,
     override var testClass:String = "",
     override var device: Device? = null,
+    override var block:Int = -1,
 
     open var spinner_sel: Int = -1,
     open var spinner_label: String = "",
     open var spinner_data_resource: Int = -1
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device)
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device, block)
 
 
 

@@ -5,13 +5,19 @@
     <string name="lab_test_res">Risultati Test</string>
 
     <!--    parte comune-->
-    <string name="next">CONTINUA</string>
+    <string name="start">inizia</string>
+    <string name="next">prossimo</string>
     <string name="session_text">sessione</string>
     <string name="trial_id">trial #%1$s</string>
     <string name="abort">interrompi test</string>
     <string name="pause">PAUSA</string>
     <string name="resume">RIPRENDI</string>
+    <string name="delete">cancella</string>
+    <string name="keep">mantieni</string>
+    <string name="continue_txt">prosegui</string>
+    <string name="restart">ricomincia</string>
     <string name="stop">STOP</string>
+    <string name="cancel">cancella</string>
     <string name="continue_label">CONTINUA</string>
     <string name="block_ended">Questa parte del test è terminata\nVuoi continuare o interrompere per poi proseguire un\'altra volta?</string>
     <string name="test_ended">Il Test è terminato</string>
@@ -21,6 +27,30 @@
     <string name="age">ETA\'</string>
     <string name="group">GRUPPO</string>
 
+    <string name="source">SORGENTE</string>
+    <string name="type">TIPO</string>
+    <string name="pattern">pattern</string>
+    <string name="audio">audio</string>
+    <string name="tactile">tattile</string>
+    <string name="visual">visivo</string>
+    <string name="audio_short">a</string>
+    <string name="tactile_short">t</string>
+    <string name="visual_short">v</string>
+    <string name="duration">durata</string>
+    <string name="single">singolo</string>
+    <string name="pair">coppia</string>
+    <string name="shifted">sfasato</string>
+    <string name="distance">distanza</string>
+    <string name="aligned">allineato</string>
+    <string name="repetitions_number">numero ripetizioni</string>
+    <string name="number">numero</string>
+    <string name="amplitude_short">Amp</string>
+    <string name="amplitude">Intensità</string>
+    <string name="end_trial_behaviour">Automatico</string>
+    <string name="volume">volume</string>
+    <string name="volume_short">vol</string>
+    <string name="resource_name">nome</string>
+
     <string name="time">tempo</string>
     <string name="frequency">frequenza</string>
     <string name="condition">condizione sperimentale</string>
@@ -28,6 +58,7 @@
     <string name="warning">Attenzione</string>
 
     <string name="subject_present">Il nome scelto è già esistente. Vuoi continuare ad usare questo nome?</string>
+    <string name="subject_block_present">Esiste una precedente sessione di test\nVuoi proseguirla o vuoi cancellare tutto e ricominciare da zero?</string>
     <string name="select_subject_info">Indicare nome ed età</string>
     <string name="select_gender">Indicare il sesso</string>
     <string name="select_condition">Seleziona una condizione sperimentale</string>
@@ -155,6 +186,34 @@
     <string name="mmeters_rb2_text">Uguale</string>
     <string name="mmeters_rb3_text">no</string>
 
+    <!-- SAMPLE TEST -->
+    <string name="sample_label">TRIALS GENERATION</string>
 
+    <string name="select_source">Seleziona almeno una modalità di stimolazione</string>
+
+    <string-array name="sample_audio_types">
+        <item>tone</item>
+        <item>resource</item>
+    </string-array>
+
+    <string-array name="sample_visual_types">
+        <item>visibility</item>
+        <item>drawables</item>
+    </string-array>
+
+    <string-array name="sample_tactile_types">
+        <item>single</item>
+        <item>sequence</item>
+    </string-array>
+
+    <string-array name="sample_audioresources_array">
+        <item>t1000hz_10ms</item>
+        <item>t1000hz_20ms</item>
+        <item>t1000hz_30ms</item>
+        <item>t1000hz_50ms</item>
+        <item>t200hz_1s</item>
+        <item>t200hz_2s</item>
+        <item>wnoise_20s</item>
+    </string-array>
 
 </resources>

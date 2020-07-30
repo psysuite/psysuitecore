@@ -26,13 +26,12 @@ open class SubjectBasicParcel(
     open var nextTrailModality: Int = -1,
     open var canRecordAudio:Boolean = false,
     open var testClass:String = "",
-    open var device:Device? = null
-
-
+    open var device:Device? = null,
+    open var block:Int = -1
 ) : Parcelable {
 
     @IgnoredOnParcel
-    private var subjectFileName:String = ""
+    var subjectFileName:String = ""
 
     companion object  {
         @JvmStatic val CURR_SUBJ_FILE:String = "curr_subject"
@@ -85,20 +84,45 @@ open class SubjectBasicParcel(
         return label.hashCode()
     }
 
-    open fun existSubjectFile():Boolean{
-        return existFileStartingWith("${label}_${type}", allowedext = listOf(".json"))
+    // return   : -1 no file exist
+    //          :  0 only one result file exist
+    //          :  1-based last block file  (if it finds lab_type_2.txt => return 3)
+    open fun existSubjectFile():Int{
+        val prefix = getFilesPrefix()
+        return  if(existFileStartingWith(prefix, allowedext = listOf(".json")))
+                        getLastValidBlock(prefix, listOf(".json"))
+                else
+                        -1
     }
 
-    // label_type_datetime.txt
-    open fun composeResultFileName():String{
-        return "${label}_${type}_${getFullDateString()}${TestBasic.RES_EXTENSION}"
+    private fun getLastValidBlock(prefix:String, allowedext:List<String> = listOf()):Int{
+        val list = getFileList(allowedext = allowedext, contains = prefix)
+        var blk = -1
+        list.map{
+            val words = it.name.split(".")[0].split("_blk")
+            if(words.size  > 1) blk = blk.coerceAtLeast(words[1].toInt())
+        }
+        return (blk+1)
     }
 
-    // label_type_date.json
-    open fun composeSubjectFileName():String{
+
+    open fun getFilesPrefix():String = "${label}_${type}"
+
+    // label_type(_blk)_datetime.txt
+    open fun composeResultFileName(blk:Int = -1):String{
+
+        val blkstr =    if(blk > -1)    "_blk$blk"
+                        else           ""
+        return "${getFilesPrefix()}_${getFullDateString()}${blkstr}${TestBasic.RES_EXTENSION}"
+    }
+
+    // label_type(_blk)_date.json
+    open fun composeSubjectFileName(blk:Int = -1):String{
         if(label.isBlank() || type == -1)   return ""
 
-        return "${label}_${type}_${getDateString()}${TestBasic.FILE_EXTENSION}"
+        val blkstr =    if(blk > -1)    "_blk$blk"
+                        else           ""
+        return "${getFilesPrefix()}_${getDateString()}${blkstr}${TestBasic.FILE_EXTENSION}"
     }
 
     // return filename or "" if file does not exist
@@ -115,16 +139,13 @@ open class SubjectBasicParcel(
         val jsonAdapter = moshi.adapter(this.javaClass)
 
         return try {
-                    subjectFileName = composeSubjectFileName()
+                    subjectFileName = composeSubjectFileName(block)
                     if(subjectFileName.isEmpty()){
                         ERROR_SUBJECT_INCOMPLETE
                     }
                     else {
-                        if (existSubjectFile()) SUBJECTFILE_EXIST
-                        else {
-                            saveText(context, subjectFileName, jsonAdapter.toJson(this))        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
-                            0
-                        }
+                        saveText(context, subjectFileName, jsonAdapter.toJson(this))        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+                        0
                     }
         }
         catch (e: Exception){

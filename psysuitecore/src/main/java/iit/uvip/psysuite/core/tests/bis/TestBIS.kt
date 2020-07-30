@@ -6,9 +6,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCode
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.TrialBasic
+import iit.uvip.psysuite.core.common.*
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 
 import org.albaspazio.core.accessory.VibrationManager
@@ -68,48 +66,54 @@ class TestBIS(
     }
 
     // contains : stimulus type & delay
-    private var trialsDefaultSchema:List<Triple<Int,Int,String>> = listOf(
-        Triple(4, 200, CONFLICT_TYPE_NONE),
-        Triple(6, 300, CONFLICT_TYPE_NONE),
-        Triple(6, 400, CONFLICT_TYPE_NONE),
-        Triple(6, 600, CONFLICT_TYPE_NONE),
-        Triple(6, 700, CONFLICT_TYPE_NONE),
-        Triple(4, 800, CONFLICT_TYPE_NONE)
+    private var trialsDefaultSchema:List<StimulusBIS> = listOf(
+        StimulusBIS(4, 200, CONFLICT_TYPE_NONE),
+        StimulusBIS(6, 300, CONFLICT_TYPE_NONE),
+        StimulusBIS(6, 400, CONFLICT_TYPE_NONE),
+        StimulusBIS(6, 600, CONFLICT_TYPE_NONE),
+        StimulusBIS(6, 700, CONFLICT_TYPE_NONE),
+        StimulusBIS(4, 800, CONFLICT_TYPE_NONE)
     )
 
     // first stim is delivered at the given latency. the second  AV_STIMULUS_DELTA after
                                                                         // ntrials  latency conflict-type
-    private var trialsAudioVideoSchema:List<Triple<Int,Int,String>> = listOf(
-        Triple(4, 200, CONFLICT_TYPE_VA),
-        Triple(4, 300, CONFLICT_TYPE_VA),
-        Triple(4, 400, CONFLICT_TYPE_VA),
-        Triple(4, 500, CONFLICT_TYPE_VA),
-        Triple(4, 600, CONFLICT_TYPE_VA),
-        Triple(4, 200, CONFLICT_TYPE_AV),
-        Triple(4, 300, CONFLICT_TYPE_AV),
-        Triple(4, 400, CONFLICT_TYPE_AV),
-        Triple(4, 500, CONFLICT_TYPE_AV),
-        Triple(4, 600, CONFLICT_TYPE_AV)
+    private var trialsAudioVideoSchema:List<StimulusBIS> = listOf(
+        StimulusBIS(4, 200, CONFLICT_TYPE_VA),
+        StimulusBIS(4, 300, CONFLICT_TYPE_VA),
+        StimulusBIS(4, 400, CONFLICT_TYPE_VA),
+        StimulusBIS(4, 500, CONFLICT_TYPE_VA),
+        StimulusBIS(4, 600, CONFLICT_TYPE_VA),
+        StimulusBIS(4, 200, CONFLICT_TYPE_AV),
+        StimulusBIS(4, 300, CONFLICT_TYPE_AV),
+        StimulusBIS(4, 400, CONFLICT_TYPE_AV),
+        StimulusBIS(4, 500, CONFLICT_TYPE_AV),
+        StimulusBIS(4, 600, CONFLICT_TYPE_AV)
     )
 
-    private val mBackgroundColours:List<Int> = listOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
+    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
 
     // =============================================================================================================================
     // INIT
     // =============================================================================================================================
     init{
-        if(mImageView == null)      throw Exception("IMAGE_VIEW_NOT_DEFINED")
-        else if(vibrator == null)   throw Exception("VIBRATOR_NOT_DEFINED")
-        else
-        {
-            validAnswers = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
-            initTest()
+        when {
+            mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+            vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            else -> {
+                validAnswers    = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
+                initTest()
+
+                mToneManager     = ToneManager(duration = STIMULUS_DURATION_AUDIO, handler = mStimuliHandler)
+                mTactileManager  = TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler)
+                mVisualManager   = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler)
+            }
         }
     }
 
     override fun initTest(){
-        // set question & create mTrials list
-        when(data.type)
+        // set stimuli default & create mTrials list
+
+        when(subjectparcel.type)
         {
             TEST_BISECTION_AUDIO            -> initBisectionAudio()
             TEST_BISECTION_TACTILE          -> initBisectionTactile()
@@ -121,14 +125,13 @@ class TestBIS(
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == data.type) mTestLabel = it.label
+            if (it.id == subjectparcel.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast(
             "Should not happen. given test code was not recognized",
             ctx
         )
-
-        createResultFile(data, TrialBIS.LOG_HEADER)
+        createResultFile(subjectparcel, TrialBIS.LOG_HEADER)
     }
 
     // =============================================================================================================================
@@ -137,36 +140,31 @@ class TestBIS(
     private fun createDefaultTrials(stim_type_label:String, duration:Int, duration2:Int=0){
 
         for(section in trialsDefaultSchema)
-            for(i in 0 until section.first){
-                val corr_answ = if(section.second < LAST_STIMULUS_DELAY/2)  validAnswers[0]
-                                else                                        validAnswers[1]
-                //                      id   type       label,          corr_answ,  position       conflict_type   duration       duration2
-                mTrials.add(TrialBIS(-1, data.type, stim_type_label, corr_answ, section.second, section.third, duration, duration2))
+            for(i in 0 until section.ntrials){
+                val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)    validAnswers[0]
+                                else                                            validAnswers[1]
+                //                      id   type       label,          corr_answ, position          conflict_type     duration  duration2
+                mTrials.add(TrialBIS(-1, subjectparcel.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
             }
         mTrials.shuffle()
-
-        // set trial id according to its order in the list
-        for(i in 0 until mTrials.size)
-            mTrials[i].id = (i + 1)
+        setTrialsID()   // set trial id according to its order in the list
     }
 
     private fun createAudioVideoTrials(durationAudio:Int, durationVideo:Int){
         for(section in trialsAudioVideoSchema)
-            for(i in 0 until section.first){
-                val corr_answ = if(section.second < LAST_STIMULUS_DELAY/2)  validAnswers[0]
-                else                                                        validAnswers[1]
-                when(section.third == CONFLICT_TYPE_AV){
-                    //                                 id   type        label,                   corr_answ, position       conflict_type   duration       duration2
-                    true    -> mTrials.add(TrialBIS(-1, data.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.second, section.third, durationAudio, durationVideo))
-                    false   -> mTrials.add(TrialBIS(-1, data.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.second, section.third, durationVideo, durationAudio))
+            for(i in 0 until section.ntrials){
+                val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)    validAnswers[0]
+                else                                                            validAnswers[1]
+                when(section.conflict == CONFLICT_TYPE_AV){
+                    //                                 id   type        label,                   corr_answ, position          conflict_type   duration       duration2
+                    true    -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationAudio, durationVideo))
+                    false   -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationVideo, durationAudio))
                 }
             }
         mTrials.shuffle()
-
-        // set trial id according to its order in the list
-        for(i in 0 until mTrials.size)
-            mTrials[i].id = (i + 1)
+        setTrialsID()   // set trial id according to its order in the list
     }
+
     // ----------------------------------
     private fun initBisectionAudio(){
         mQuestion = ctx.resources.getString(R.string.bisection_question_text_audio)
@@ -229,43 +227,43 @@ class TestBIS(
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
 
         when(trial.type) {
-            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus(STIMULUS_DURATION_AUDIO)
-            TEST_BISECTION_TACTILE          ->  deliverTStimulus(STIMULUS_DURATION_TACTILE)
-            TEST_BISECTION_AUDIO_TACTILE    ->  deliverA1TStimulus(STIMULUS_DURATION_AUDIO)
+            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus(mToneManager)
+            TEST_BISECTION_TACTILE          ->  deliverT1Stimulus(mTactileManager)
+            TEST_BISECTION_AUDIO_TACTILE    ->  deliverA1T1Stimulus(mToneManager, mTactileManager)
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)
         }
     }
 
     private fun deliverAVStimuli(trial:TrialBIS, stage:Int=0){
 
+        mVisualManager!!.drawResOn = mDrawablesResource[stage]
         when(stage == TRIAL_STAGE_2){
             true -> {
                 // mid (second) stimulus: audio and video are dissociated
-
                 when(trial.conflict_type == CONFLICT_TYPE_VA){
                     true    -> {
                         // first visual
-                        deliverV2Stimulus(STIMULUS_DURATION_VISUAL, Pair(mBackgroundColours[stage], mBackgroundColours[0]))
+                        deliverV2Stimulus(mVisualManager)
 
                         // delayed stimulus
                         mStimuliHandler.postDelayed({
-                            deliverA1Stimulus(STIMULUS_DURATION_AUDIO)
+                            deliverA1Stimulus()
                         }, AV_STIMULUS_DELTA.toLong())
                     }
                     false   -> {
                         // first audio
-                        deliverA1Stimulus(STIMULUS_DURATION_AUDIO)
+                        deliverA1Stimulus()
 
                         // delayed stimulus
                         mStimuliHandler.postDelayed({
-                            deliverV2Stimulus(STIMULUS_DURATION_VISUAL, Pair(mBackgroundColours[stage], mBackgroundColours[0]))
+                            deliverV2Stimulus(mVisualManager)
                         }, AV_STIMULUS_DELTA.toLong())
                     }
                 }
             }
             false -> {
                 // normal stimulus (1st or 3rd): audio and video simultaneously
-                deliverA1V2Stimulus(STIMULUS_DURATION_AUDIO, Pair(mBackgroundColours[stage], mBackgroundColours[0]))
+                deliverA1V2Stimulus(managerV = mVisualManager)
             }
         }
     }
@@ -275,15 +273,15 @@ class TestBIS(
     // =====================================================================================
     // Trial(val type:Int, val label:String, val conflict_type:String, val position:Int, val duration:Int)
     // just one trial for each latency
-    private var trialsDefaultSchema_debug: List<Triple<Int, Int, String>> = listOf(Triple(2, 200, CONFLICT_TYPE_NONE))
+    private var trialsDefaultSchema_debug: List<StimulusBIS> = listOf(StimulusBIS(2, 200, CONFLICT_TYPE_NONE))
 
     private fun createDefaultTrials_debug(stim_type_label:String, duration:Int, duration2:Int=0){
         nTrials = trialsDefaultSchema_debug.size
         for(section in trialsDefaultSchema)
             for(i in 0 until 1){
-                val corr_answ = if(section.second < LAST_STIMULUS_DELAY/2)  validAnswers[0]
+                val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)  validAnswers[0]
                 else                                        validAnswers[1]
-                mTrials.add(TrialBIS(-1, data.type, stim_type_label, corr_answ, section.second, section.third, duration, duration2))
+                mTrials.add(TrialBIS(-1, subjectparcel.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
             }
         mTrials.shuffle()
 

@@ -14,8 +14,9 @@ import iit.uvip.psysuite.core.common.TestResult
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.bis.TestBIS
 import iit.uvip.psysuite.core.tests.mmd.TestMMD
+import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.sample.TestSample
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.SubjectATBParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
 import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
@@ -26,6 +27,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
 import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.getAbsoluteFilePath
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
@@ -125,21 +127,22 @@ class TestFragment : BaseFragment(
                 TestBasic.TEST_TID_LONG_AUDIO,
                 TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, isDebug)
 
-                TestBasic.TEST_ATB_TIME,
-                TestBasic.TEST_ATB_FREQUENCY,           // to be coded
-                TestBasic.TEST_ATB_FREQUENCY_INF,       // to be coded
-                TestBasic.TEST_ATB_TIME_INF_15s,
-                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectATBParcel, vibrator, isDebug)
+                TestBasic.TEST_ATB_TIME_SINGLESTIM,
+                TestBasic.TEST_ATB_TIME_DOUBLESTIM,
+                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, isDebug)
 
                 TestBasic.TEST_ATVB_TIME_SINGLESTIM,
                 TestBasic.TEST_ATVB_TIME_SINGLESTIM2,
                 TestBasic.TEST_ATVB_TIME_DOUBLESTIM,
-                TestBasic.TEST_ATVB_TIME_DOUBLESTIM2    -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectATBParcel, vibrator, circleView, isDebug)
+                TestBasic.TEST_ATVB_TIME_DOUBLESTIM2    -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, circleView, isDebug)
 
-                TestBasic.TEST_SAMPLE                   -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, isDebug)
+                TestBasic.TEST_SAMPLE_ALIGNED,
+                TestBasic.TEST_SAMPLE_SHIFTED,
+                TestBasic.TEST_SAMPLE_PAIR              -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView, isDebug)
 
                 else    -> {
                     showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
+                    Navigation.findNavController(requireView()).popBackStack()
                     return
                 }
             }
@@ -147,16 +150,15 @@ class TestFragment : BaseFragment(
         catch (e:Exception){
             showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
             showAlert(requireActivity(),resources.getString(R.string.critical_error), e.toString())
+            Navigation.findNavController(requireView()).popBackStack()
             return
         }
-
 
         bt_next.visibility      = View.INVISIBLE
         bt_abort.visibility     = View.INVISIBLE
         bt_pause.visibility     = View.INVISIBLE
         txtDebugInfo.visibility = View.INVISIBLE
 
-        if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
         if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS){
             bt_abort.visibility = View.VISIBLE
             bt_pause.visibility = View.VISIBLE
@@ -164,6 +166,9 @@ class TestFragment : BaseFragment(
 
         mHandler.postDelayed({
             mTest.start()
+
+            if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
+
         }, 1000L)
     }
 
@@ -203,6 +208,18 @@ class TestFragment : BaseFragment(
     // here I manage all trial-by-trial behaviours invoked by Tests
     // normal flow is
     private fun setEventsFlow(){
+
+        // button is shown when an answer dialog is not displayed
+        bt_next.setOnClickListener{
+
+            bt_next.visibility      = View.INVISIBLE
+            bt_pause.visibility     = View.INVISIBLE
+
+            onNewTrial()
+        }
+
+        if(!this::mTest.isInitialized) return
+
         mTest.testEvent
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
@@ -248,15 +265,6 @@ class TestFragment : BaseFragment(
             }
         }
         .addTo(disposable)
-
-        // button is shown when an answer dialog is not displayed
-        bt_next.setOnClickListener{
-
-            bt_next.visibility      = View.INVISIBLE
-            bt_pause.visibility     = View.INVISIBLE
-
-            onNewTrial()
-        }
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
     // called by: 1) onActivityResult after answer, 2) speechrecognition result
@@ -302,34 +310,35 @@ class TestFragment : BaseFragment(
     }
 
     // user wanted to interrupt test during a block (ask whether sending data)
-    private fun onAbortTest(deletelog:Boolean=false){
-        mTest.abortTest(deletelog)
+    private fun onAbortTest(){
+        mTest.abortTest()
         mHandler.removeCallbacksAndMessages(null)
         navigateBack(TestBasic.TEST_ABORT, mTest.getAbsoluteResultFilePath())
     }
 
+    // user ended a planned block. can continue or stop (result file is renamed "*_blkX")
     private fun onBlockEnded(){
-        show2MethodsDialog(requireActivity(),
-            resources.getString(R.string.warning),
-            resources.getString(R.string.block_ended),
-            resources.getString(R.string.continue_label),
-            resources.getString(R.string.stop),
-            { /* cancelClb*/    onStoppedAfterBlock() },
-            { /* okClb */       mTest.doNextTrial() })
+        show2MethodsDialog(requireActivity(),resources.getString(R.string.warning),resources.getString(R.string.block_ended), resources.getString(R.string.continue_label), resources.getString(R.string.stop),
+            { /* okClb */       mTest.startNewBlock() },
+            { /* cancelClb*/    onStoppedAfterBlock() })
     }
 
-    // user wanted to interrupt test after an end block (send data)
+    // user wanted to interrupt test after an end block (send data). rename current res file
     private fun onStoppedAfterBlock(){
-        mTest.abortTest(false)
+        val newresfilename = mTest.stopTestAfterBlock()
         mHandler.removeCallbacksAndMessages(null)
-        navigateBack(TestBasic.BLOCK_COMPLETED, mTest.getAbsoluteResultFilePath())
+        navigateBack(TestBasic.BLOCK_COMPLETED, getAbsoluteFilePath(newresfilename).second)
     }
 
     // if result_file != "".... means it really exists
     private fun navigateBack(result_code:Int, result_file:String){
 
+        val filelist = when(result_file.isEmpty()){
+                        true    -> arrayListOf()
+                        false   -> arrayListOf(result_file)
+        }
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(), arrayListOf(result_file), mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(), filelist, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
     }
 

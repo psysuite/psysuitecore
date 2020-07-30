@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.common.MediaPlayerManager
 import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
@@ -40,6 +41,7 @@ class TestMMD(ctx: Context,
     // =============================================================================================================================
     init{
         initTest()
+        mMediaPlayerManager    = MediaPlayerManager(ctx, "", handler = mStimuliHandler)    // duration varies according to audio
     }
 
     override fun initTest(){
@@ -48,16 +50,17 @@ class TestMMD(ctx: Context,
         mQuestion = ctx.resources.getString(R.string.mmeters_question_text)
         createTrials()
 
+
         nTrials     = mTrials.size
         currTrial   = 0
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == data.type) mTestLabel = it.label
+            if (it.id == subjectparcel.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(data, TrialMMD.LOG_HEADER)
+        createResultFile(subjectparcel, TrialMMD.LOG_HEADER)
     }
 
     // =============================================================================================================================
@@ -94,7 +97,7 @@ class TestMMD(ctx: Context,
             false -> "mmc" + (trial as TrialMMD).audio_id
         }
         try {
-            playbackAllAudioResource(resname){  onTrialEnd()    }
+            MediaPlayerManager.playbackAllAudioResource(ctx, resname){  onTrialEnd()    }
         }
         catch(e:Exception){
             e.printStackTrace()

@@ -1,14 +1,14 @@
-package iit.uvip.psysuite.core.tests.temporalbinding.atvb
+package iit.uvip.psysuite.core.tests.temporalbinding
 
 import iit.uvip.psysuite.core.common.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialATVB2(id: Int = -1, val a:Long, val t:Long, val v:Long, correct_answer:String) : TrialBasic(id, 0, "", correct_answer) {
+class TrialBindings3latencies(id:Int=-1, val a:Long=0L, val t:Long=0L, val v:Long=0L, correct_answer:String=""):TrialBasic(id, 0, "", correct_answer) {
 
     companion object {
         @JvmStatic
-        val LOG_HEADER = "id\ttype\taudio\ttactile\tvideo\tanswer\tsuccess\telapsed\n"
+        val LOG_HEADER = "id\taudio\ttactile\tvideo\tanswer\tsuccess\telapsed\n"
     }
 
     // all class exported as string

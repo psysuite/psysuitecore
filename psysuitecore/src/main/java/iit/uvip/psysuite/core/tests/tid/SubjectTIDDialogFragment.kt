@@ -72,12 +72,13 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
         // spGroup and spCondition data coincides.
-        // when selecting training sessions => selCondition = selGroup
+        // when selecting training sessions => selCondition = selGroup (and condition spinner gets disabled)
 
         // session changed
         when(spinner.selectedItemPosition){
             in 2..6   -> {
                         setConditions(listOf(mTaskCodes[spGroup.selectedItemPosition])) // make condition spinner GONE
+                        spCondition.isEnabled = false
             }
             else      -> {
 
@@ -87,8 +88,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
                         mTaskCodes.mapIndexed { index, taskCode ->
                             if(taskCode.id == selcond)    spCondition.setSelection(index)   // set what was selected before this change
                         }
-//                        labCondition.visibility = View.VISIBLE
-//                        spCondition.visibility = View.VISIBLE
+                        spCondition.isEnabled = true
             }
         }
         labCondition.visibility = View.VISIBLE

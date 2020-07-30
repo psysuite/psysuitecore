@@ -14,18 +14,19 @@ import iit.uvip.psysuite.core.common.TaskCode
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
+import org.albaspazio.core.accessory.deleteFilesStartingWith
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.ui.show2MethodsDialog
 import org.albaspazio.core.ui.showAlert
 
-open class SubjectBasicDialogFragment: DialogFragment()
-{
+open class SubjectBasicDialogFragment: DialogFragment(){
+
     open val LOG_TAG: String = SubjectBasicDialogFragment::class.java.simpleName
     protected var nConditions: Int = 0
     protected var selCondition: Int = -1
 
     protected lateinit var mTaskCodes: List<TaskCode>
-    private lateinit var mNextTrialModes:List<List<Int>>
+    protected lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
 
     companion object {
@@ -58,7 +59,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
 
         initData(subject)
 
-        txtName.requestFocus()
+        if(txtName != null) txtName.requestFocus()      // subclasses may not have this UI elements (e.g. SampleDialog)
     }
 
     override fun onResume() {
@@ -164,11 +165,7 @@ open class SubjectBasicDialogFragment: DialogFragment()
         val errors = checkData()
         if(errors.isNotEmpty()){
             val str_errors = errors.joinToString("\n")
-            showAlert(
-                requireActivity(),
-                resources.getString(R.string.warning),
-                resources.getString(R.string.subject_info_notcorrected, str_errors)
-            )
+            showAlert(requireActivity(),resources.getString(R.string.warning), resources.getString(R.string.subject_info_notcorrected, str_errors))
         }
         else {
             // data are valid => create subject object
@@ -251,25 +248,38 @@ open class SubjectBasicDialogFragment: DialogFragment()
     }
 
     // check whether subject's "label_type_Date" file exists, ask user whether continue or change name
+    // -1 no file exist, 0 just one file without block, > 0  id of the next block (if it found _blk1 => returns 2)
     private fun manageSubjectFileExistence(subj: SubjectBasicParcel):Boolean{
-        return if(subj.existSubjectFile()){
-            show2MethodsDialog(
-                requireActivity(),
-                resources.getString(R.string.warning),
-                resources.getString(R.string.subject_present),
-                resources.getString(R.string.yes),
-                resources.getString(R.string.no),
-                {
-                    // cancel press. stop. let user change data
+        val nextblock = subj.existSubjectFile()
+        return when(nextblock){
+
+            -1 -> true  // does not exist a same subject file
+            0  -> {     // exist only one same subjects file
+                show2MethodsDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_present), resources.getString(R.string.yes), resources.getString(R.string.no),
+                    { // ok press, update subject, then continue
+                        subject = subj
+                        sendResult(subject)
+                    },
+                    { // cancel press. stop. let user change data
                     txtName.requestFocus()
-                },
-                { // ok press, update subject, then continue
+                })
+                false
+            }
+            else  -> {  // exist at least n-block files
+                show2MethodsDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_block_present), resources.getString(R.string.continue_txt), resources.getString(R.string.restart),
+                    { // ok press, continue next block
+                        subject = subj
+                        subject.block = nextblock
+                        sendResult(subject)
+                    },
+                    { // cancel press. all previous files
+                    deleteFilesStartingWith(subject.getFilesPrefix())
                     subject = subj
                     sendResult(subject)
                 })
-            false
+                false
+            }
         }
-        else true
     }
 
     private fun showInteractive(show: Boolean) {
