@@ -82,7 +82,7 @@ class TestFragment : BaseFragment(
 
     private lateinit var onsetDate: Date
 
-    private val isDebug:Boolean                     = true
+    private val isDebug:Boolean                     = false
     private var currDebugInfo:String                = ""
 
     // ==========================================================================================================================
@@ -134,7 +134,7 @@ class TestFragment : BaseFragment(
                 TestBasic.TEST_ATVB_TIME_S_UNBAL,
                 TestBasic.TEST_ATVB_TIME_S_BAL,
                 TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                TestBasic.TEST_ATVB_TIME_D_BAL    -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, circleView, isDebug)
+                TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, circleView, isDebug)
 
                 TestBasic.TEST_SAMPLE_ALIGNED,
                 TestBasic.TEST_SAMPLE_SHIFTED,
@@ -306,7 +306,7 @@ class TestFragment : BaseFragment(
 
     private fun onTestEnded(){
         showToast(getText(R.string.test_ended).toString(), requireContext())
-        navigateBack(TestBasic.TEST_COMPLETED, mTest.getAbsoluteResultFilePath())
+        navigateBack(TestBasic.TEST_COMPLETED, listOf(mTest.getAbsoluteResultFilePath(), mTest.closeSummary()))
     }
 
     // user wanted to interrupt test during a block (ask whether deleting results file and it)
@@ -320,12 +320,12 @@ class TestFragment : BaseFragment(
             { /* okClb */
                 mTest.abortTest(false)
                 mHandler.removeCallbacksAndMessages(null)
-                navigateBack(TestBasic.TEST_ABORT, mTest.getAbsoluteResultFilePath())
+                navigateBack(TestBasic.TEST_ABORT, listOf(mTest.getAbsoluteResultFilePath(), mTest.closeSummary()))
             },
             { /* cancelClb*/
                 mTest.abortTest(true)
                 mHandler.removeCallbacksAndMessages(null)
-                navigateBack(TestBasic.TEST_ABORT, "")
+                navigateBack(TestBasic.TEST_ABORT, listOf())
             })
     }
 
@@ -340,18 +340,26 @@ class TestFragment : BaseFragment(
     private fun onStoppedAfterBlock(){
         val newresfilename = mTest.stopTestAfterBlock()
         mHandler.removeCallbacksAndMessages(null)
-        navigateBack(TestBasic.BLOCK_COMPLETED, getAbsoluteFilePath(newresfilename).second)
+        navigateBack(TestBasic.BLOCK_COMPLETED, listOf(getAbsoluteFilePath(newresfilename).second, mTest.closeSummary()))
     }
 
-    // if result_file != "".... means it really exists
-    private fun navigateBack(result_code:Int, result_file:String){
+    // results_file can be empty. it can have only the first (result) file not empty or having both results and summary
+    private fun navigateBack(result_code:Int, results_file:List<String>){
 
-        val filelist = when(result_file.isEmpty()){
+        val files_list:ArrayList<String> = when(results_file.isEmpty()){
+            true -> arrayListOf()
+            false -> when(results_file[0].isEmpty()){
                         true    -> arrayListOf()
-                        false   -> arrayListOf(result_file)
+                        false   -> {
+                                    val l = arrayListOf(results_file[0])
+                                    if(results_file[1].isNotEmpty())    l.add(results_file[1])
+                                    l
+                                }
+                    }
         }
+
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(), filelist, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
     }
 

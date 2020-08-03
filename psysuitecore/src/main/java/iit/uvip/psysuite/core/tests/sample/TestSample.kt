@@ -44,11 +44,11 @@ class TestSample(
         @JvmStatic val STIM_SHIFTED         = 1
         @JvmStatic val STIM_PAIR            = 2
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
             return mutableListOf(
-                TaskCode("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}", TEST_SAMPLE_ALIGNED),
-                TaskCode("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}", TEST_SAMPLE_SHIFTED),
-                TaskCode("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}", TEST_SAMPLE_PAIR)
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}", TEST_SAMPLE_ALIGNED, "$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}"),
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}", TEST_SAMPLE_SHIFTED, "$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}"),
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}", TEST_SAMPLE_PAIR, "$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}")
             )
         }
         
@@ -169,6 +169,8 @@ class TestSample(
             }
         }
     }
+
+    override fun initSummary(){}
 
     // =============================================================================================================================
     // DELIVER STIMULI

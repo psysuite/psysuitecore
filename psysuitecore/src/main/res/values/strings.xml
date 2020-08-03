@@ -51,6 +51,7 @@
     <string name="volume">volume</string>
     <string name="volume_short">vol</string>
     <string name="resource_name">nome</string>
+    <string name="interactivity">interattivo</string>
 
     <string name="time">tempo</string>
     <string name="frequency">frequenza</string>
@@ -83,7 +84,6 @@
 
     <!-- ATB -->
     <string name="start_atb">Audio-Tactile Binding (AT-B)</string>
-    <string name="atb_interactivity">interattivo</string>
 
     <string-array name="unused_atb_tests_array">
         <item>normale</item>
@@ -92,9 +92,14 @@
     </string-array>
     <string name="whitenoise">aggiungi rumore bianco</string>
 
-    <string name="atv_subtask_time_infants">tempo infanti</string>
-    <string name="atv_subtask_time_infants_15s">tempo infanti 1.5s</string>
-    <string name="atv_subtask_frequency_infants">frequenza infanti</string>
+    <string name="atb_subtask_time_single">Singolo Stimolo</string>
+    <string name="atb_subtask_time_single_tag">SSU</string>
+    <string name="atb_subtask_time_double">Doppio Stimolo</string>
+    <string name="atb_subtask_time_double_tag">DSU</string>
+
+    <string name="atb_subtask_time_infants">tempo infanti</string>
+    <string name="atb_subtask_time_infants_tag">INF</string>
+
 
     <string name="atb_rb1_text">uguali</string>
     <string name="atb_rb3_text">diversi</string>
@@ -104,9 +109,13 @@
     <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
+    <string name="atvb_subtask_time_single_tag">SSU</string>
     <string name="atvb_subtask_time_single2">Singolo Stimolo bilanciato</string>
+    <string name="atvb_subtask_time_single2_tag">SSB</string>
     <string name="atvb_subtask_time_double">Doppio Stimolo</string>
+    <string name="atvb_subtask_time_double_tag">DSU</string>
     <string name="atvb_subtask_time_double2">Doppio Stimolo bilanciato</string>
+    <string name="atvb_subtask_time_double2_tag">DSB</string>
 
     <string name="atvb_rb1_text">si</string>
     <string name="atvb_rb3_text">no</string>

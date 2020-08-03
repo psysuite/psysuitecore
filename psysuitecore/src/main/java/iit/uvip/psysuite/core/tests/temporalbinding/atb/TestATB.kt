@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.*
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
-import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindings
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
@@ -28,13 +27,6 @@ class TestATB(ctx: Context,
 
     private var curISI: Long = 0L
 
-
-    private val TYPE_AT     = 0
-    private val TYPE_A      = 1
-    private val TYPE_T      = 2
-    private val TYPE_A_T    = 3
-    private val TYPE_T_A    = 4
-    
     // stimuli combinations
     private val STIM_TYPE_TIME_A800_T   = 100
     private val STIM_TYPE_TIME_A_T800   = 101
@@ -72,27 +64,6 @@ class TestATB(ctx: Context,
         StimulusBindingsUnbalanced( TYPE_A_T, 800),
         StimulusBindingsUnbalanced( TYPE_T_A, 800)
     )    
-//    private val lStimuli3delay: List<Stimulus3delay> = listOf(
-//
-//        Stimulus3delay( 0, 0, 0, -1),
-//        Stimulus3delay( 0, 0, -1, -1),
-//        Stimulus3delay( 0, -1, 0, -1),
-//        
-//        Stimulus3delay( 0, 0, 100, -1),
-//        Stimulus3delay( 0, 100, 0, -1),
-//        
-//        Stimulus3delay( 0, 0, 200, -1),
-//        Stimulus3delay( 0, 200, 0, -1),
-//        
-//        Stimulus3delay( 0, 0, 300, -1),
-//        Stimulus3delay( 0, 300, 0, -1),
-//        
-//        Stimulus3delay( 0, 0, 400, -1),
-//        Stimulus3delay( 0, 400, 0, -1),
-//        
-//        Stimulus3delay( 0, 0, 800, -1),
-//        Stimulus3delay( 0, 800, 0, -1)
-//    )    
 
     private val STIM_DURATION           = 1000L
     private val ISI                     = 2000L
@@ -109,14 +80,19 @@ class TestATB(ctx: Context,
         @JvmStatic val TEST_BASIC_LABEL         = "ATB"
         @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
 
+        @JvmStatic val TYPE_AT     = 0
+        @JvmStatic val TYPE_A      = 1
+        @JvmStatic val TYPE_T      = 2
+        @JvmStatic val TYPE_A_T    = 3
+        @JvmStatic val TYPE_T_A    = 4
+
         @JvmStatic val recipients:Array<String> = arrayOf("uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
             return mutableListOf(
-                TaskCode("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atvb_subtask_time_single)}" , TEST_ATB_TIME_SINGLESTIM),
-                TaskCode("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atvb_subtask_time_double)}" , TEST_ATB_TIME_DOUBLESTIM),
-                TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atv_subtask_time_infants), TEST_ATB_TIME_INF)
-            )
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_ATB_TIME_SINGLESTIM  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}"),
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_ATB_TIME_DOUBLESTIM  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}"),
+                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF         , "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}"))
         }
 
         fun getNextTrialModes():List<List<Int>> {
@@ -177,13 +153,15 @@ class TestATB(ctx: Context,
             TEST_ATB_TIME_SINGLESTIM,
             TEST_ATB_TIME_DOUBLESTIM       -> {
                 createTrialsTime()
-                createResultFile(subjectparcel, TrialBindings.LOG_HEADER)
+                createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
             }
             TEST_ATB_TIME_INF   -> {
                 createTrialsTimeInfants()
                 createResultFile(subjectparcel, TrialATBInfants.LOG_HEADER)
             }
         }
+        initSummary()
+
         nTrials     = mTrials.size
         currTrial   = 0
 
@@ -367,6 +345,15 @@ class TestATB(ctx: Context,
         }
     }
 
+    override fun initSummary(){
+
+        mSummary = when (subjectparcel.type) {
+            TEST_ATB_TIME_DOUBLESTIM,
+            TEST_ATB_TIME_SINGLESTIM ->  ATBUnBalancedSummary(ctx)
+
+            else                     ->  ATBUnBalancedSummary(ctx)
+        }
+    }
     // =============================================================================================================================
     // DELIVER STIMULI
     // =============================================================================================================================

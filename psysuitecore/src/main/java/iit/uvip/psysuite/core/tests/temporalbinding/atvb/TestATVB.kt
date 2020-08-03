@@ -31,16 +31,6 @@ class TestATVB(
 
     private var curISI: Long = 0L
 
-
-    private val TYPE_ATV  = 0
-    private val TYPE_A_TV = 1
-    private val TYPE_T_AV = 2
-    private val TYPE_V_AT = 3
-
-    private val TYPE_TV_A = 4
-    private val TYPE_AV_T = 5
-    private val TYPE_AT_V = 6
-
     // 36 different elements
     private val lStimuliUnbalanced: List<StimulusBindingsUnbalanced> = listOf(
 
@@ -181,20 +171,28 @@ class TestATVB(
         @JvmStatic val NUM_REPETITIONS      = 8
         @JvmStatic val NUM_REPETITIONS2     = 4
 
+        @JvmStatic val TYPE_ATV  = 0
+        @JvmStatic val TYPE_A_TV = 1
+        @JvmStatic val TYPE_TV_A = 2
+        @JvmStatic val TYPE_V_AT = 3
+        @JvmStatic val TYPE_AT_V = 4
+        @JvmStatic val TYPE_T_AV = 5
+        @JvmStatic val TYPE_AV_T = 6
+
         @JvmStatic val recipients:Array<String> = arrayOf("uvip.apptester@gmail.com", "monica.gori.parmiggiani@gmail.com") // "psysuite.uvip@gmail.com",
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
-            return mutableListOf(TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single),  TEST_ATVB_TIME_S_UNBAL),
-//                                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single2), TEST_ATVB_TIME_S_BAL),
-                                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_double), TEST_ATVB_TIME_D_UNBAL))
-//                                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_double2), TEST_ATVB_TIME_D_BAL))
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
+            return mutableListOf(TaskCodeLabels(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single),  TEST_ATVB_TIME_S_UNBAL, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atvb_subtask_time_single_tag)}"),
+                                 TaskCodeLabels(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_double), TEST_ATVB_TIME_D_UNBAL, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atvb_subtask_time_double_tag)}"))
+//                                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_single2), TEST_ATVB_TIME_S_BAL, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atvb_subtask_time_single2_tag)}"),
+//                                 TaskCode(TEST_BASIC_LABEL + "_" + ctx.resources.getString(R.string.atvb_subtask_time_double2), TEST_ATVB_TIME_D_BAL, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atvb_subtask_time_double2_tag)}"))
         }
 
         // unbalanced stimuli temporarily disabled
         fun getNextTrialModes():List<List<Int>>{
             return listOf(  listOf(TEST_NEXTTRIAL_ANSWER),
-//                            listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER))
+//                            listOf(TEST_NEXTTRIAL_ANSWER),
 //                            listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
         }
 
@@ -222,9 +220,11 @@ class TestATVB(
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
-        allQuestions    = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
-        validAnswers    = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
+        allQuestions        = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
+        validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
+
         createResultFile(subjectparcel, TrialBindings3latencies.LOG_HEADER)
+        initSummary()
 
         when (subjectparcel.type) {
             TEST_ATVB_TIME_S_UNBAL,
@@ -341,6 +341,16 @@ class TestATVB(
         testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
         return super.nextTrial(prev_result, elapsed)
     }
+
+    override fun initSummary(){
+
+        mSummary = when (subjectparcel.type) {
+            TEST_ATVB_TIME_S_UNBAL,
+            TEST_ATVB_TIME_D_UNBAL  ->  ATVBUnBalancedSummary(ctx)
+            else                    ->  null
+        }
+    }
+
     // =============================================================================================================================
     // DELIVER STIMULI
     // =============================================================================================================================
@@ -387,23 +397,21 @@ class TestATVB(
         }
     }
 
-
     private fun deliverUnBalancedStimuli(trial:TrialBindingsUnBalanced){
         when(trial.type){
-            TYPE_ATV    ->  deliverShiftedStimulus(0, 0, 0, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_A_TV   ->  deliverShiftedStimulus(0, trial.delay, trial.delay, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_TV_A   ->  deliverShiftedStimulus(trial.delay, 0, 0, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_T_AV   ->  deliverShiftedStimulus(trial.delay, 0, trial.delay, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_AV_T   ->  deliverShiftedStimulus(0, trial.delay, 0, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_V_AT   ->  deliverShiftedStimulus(trial.delay, trial.delay, 0, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-            TYPE_AT_V   ->  deliverShiftedStimulus(0, 0, trial.delay, audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_ATV    ->  deliverShiftedStimulus(0, 0, 0,                 audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_A_TV   ->  deliverShiftedStimulus(0, trial.delay, trial.delay,     audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_TV_A   ->  deliverShiftedStimulus(trial.delay, 0, 0,           audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_T_AV   ->  deliverShiftedStimulus(trial.delay, 0, trial.delay,     audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_AV_T   ->  deliverShiftedStimulus(0, trial.delay, 0,           audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_V_AT   ->  deliverShiftedStimulus(trial.delay, trial.delay, 0,     audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+            TYPE_AT_V   ->  deliverShiftedStimulus(0, 0, trial.delay,           audiotype = STIM_TYPE_A2, visualtype = STIM_TYPE_V2){ onTrialEnd()}
         }
     }
     // =============================================================================================================================
     // DEBUG
     // =============================================================================================================================
 }
-
 
 /*
 This App perform an Audio-Tactile-Visual Binding (ATV-B) test:

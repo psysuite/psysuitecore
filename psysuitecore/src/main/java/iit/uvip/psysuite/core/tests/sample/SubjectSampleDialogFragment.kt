@@ -56,7 +56,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         //------------------------------------------------------
         // SUB TASKS
         //------------------------------------------------------
-        setConditions(mTaskCodes)
+        setConditions(mTaskCodeLabels)
 
         etDurationAudio.isEnabled   = false
         spAudio.isEnabled           = false
@@ -303,7 +303,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
     // subject has been already validated
      override fun updateSubject(): SubjectBasicParcel{
 
-        subject.type                = mTaskCodes[spCondition.selectedItemPosition].id
+        subject.type                = mTaskCodeLabels[spCondition.selectedItemPosition].id
 
         subject.nextTrailModality = when (swInteractive?.isChecked) {
             true -> TestBasic.TEST_NEXTTRIAL_BUTTON
@@ -339,7 +339,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
 
     // check whether subject's "label_type_Date" file exists, ask user whether continue or change name
     private fun manageSubjectFileExistence(subj: SubjectBasicParcel):Boolean{
-        return if(subj.existSubjectFile() > -1){
+        return if(subj.existSubjectFile(requireContext()) > -1){
             show2ChoisesDialog(requireActivity(), resources.getString(R.string.warning),
                 resources.getString(R.string.subject_present), resources.getString(R.string.yes), resources.getString(R.string.no),
                 { // ok press, update subject, then continue

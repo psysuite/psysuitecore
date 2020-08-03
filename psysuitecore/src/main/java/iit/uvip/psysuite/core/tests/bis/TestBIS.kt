@@ -26,7 +26,7 @@ class TestBIS(
 
     companion object {
 
-        @JvmStatic val TEST_BASIC_LABEL             = "BIS"
+        @JvmStatic val TEST_BASIC_LABEL                 = "BIS"
 
         @JvmStatic var NUM_TRIALS                       = 32
         @JvmStatic val STIMULUS_DURATION_VISUAL:Long    = 150
@@ -47,16 +47,20 @@ class TestBIS(
         @JvmStatic val STIMULUS_TYPE_AUDIO_TACTILE  = "AUDIO_TACTILE"
         @JvmStatic val STIMULUS_TYPE_AUDIO_VIDEO    = "AUDIO_VIDEO"
 
-        @JvmStatic val CONFLICT_TYPE_NONE           = "none"
-        @JvmStatic val CONFLICT_TYPE_AV             = "av"
-        @JvmStatic val CONFLICT_TYPE_VA             = "va"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_LOG          = "A"
+        @JvmStatic val STIMULUS_TYPE_TACTILE_LOG        = "T"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_TACTILE_LOG  = "AT"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_VIDEO_LOG    = "AV"
+        @JvmStatic val STIMULUS_TYPE_VIDEO_AUDIO_LOG    = "VA"
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+        @JvmStatic val CONFLICT_TYPE_NONE           = "none"
+
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
             return mutableListOf(
-                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO),
-                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE         , TEST_BISECTION_TACTILE),
-                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE   , TEST_BISECTION_AUDIO_TACTILE),
-                TaskCode(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VIDEO     , TEST_BISECTION_AUDIO_VIDEO)
+                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO          , STIMULUS_TYPE_AUDIO_LOG),
+                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE         , TEST_BISECTION_TACTILE        , STIMULUS_TYPE_TACTILE_LOG),
+                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE   , TEST_BISECTION_AUDIO_TACTILE  , STIMULUS_TYPE_AUDIO_TACTILE_LOG),
+                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VIDEO     , TEST_BISECTION_AUDIO_VIDEO    , STIMULUS_TYPE_AUDIO_VIDEO_LOG)
             )
         }
         
@@ -78,16 +82,16 @@ class TestBIS(
     // first stim is delivered at the given latency. the second  AV_STIMULUS_DELTA after
                                                                         // ntrials  latency conflict-type
     private var trialsAudioVideoSchema:List<StimulusBIS> = listOf(
-        StimulusBIS(4, 200, CONFLICT_TYPE_VA),
-        StimulusBIS(4, 300, CONFLICT_TYPE_VA),
-        StimulusBIS(4, 400, CONFLICT_TYPE_VA),
-        StimulusBIS(4, 500, CONFLICT_TYPE_VA),
-        StimulusBIS(4, 600, CONFLICT_TYPE_VA),
-        StimulusBIS(4, 200, CONFLICT_TYPE_AV),
-        StimulusBIS(4, 300, CONFLICT_TYPE_AV),
-        StimulusBIS(4, 400, CONFLICT_TYPE_AV),
-        StimulusBIS(4, 500, CONFLICT_TYPE_AV),
-        StimulusBIS(4, 600, CONFLICT_TYPE_AV)
+        StimulusBIS(4, 200, STIMULUS_TYPE_VIDEO_AUDIO_LOG),
+        StimulusBIS(4, 300, STIMULUS_TYPE_VIDEO_AUDIO_LOG),
+        StimulusBIS(4, 400, STIMULUS_TYPE_VIDEO_AUDIO_LOG),
+        StimulusBIS(4, 500, STIMULUS_TYPE_VIDEO_AUDIO_LOG),
+        StimulusBIS(4, 600, STIMULUS_TYPE_VIDEO_AUDIO_LOG),
+        StimulusBIS(4, 200, STIMULUS_TYPE_AUDIO_VIDEO_LOG),
+        StimulusBIS(4, 300, STIMULUS_TYPE_AUDIO_VIDEO_LOG),
+        StimulusBIS(4, 400, STIMULUS_TYPE_AUDIO_VIDEO_LOG),
+        StimulusBIS(4, 500, STIMULUS_TYPE_AUDIO_VIDEO_LOG),
+        StimulusBIS(4, 600, STIMULUS_TYPE_AUDIO_VIDEO_LOG)
     )
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
@@ -155,7 +159,7 @@ class TestBIS(
             for(i in 0 until section.ntrials){
                 val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)    validAnswers[0]
                 else                                                            validAnswers[1]
-                when(section.conflict == CONFLICT_TYPE_AV){
+                when(section.conflict == STIMULUS_TYPE_AUDIO_VIDEO_LOG){
                     //                                 id   type        label,                   corr_answ, position          conflict_type   duration       duration2
                     true    -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationAudio, durationVideo))
                     false   -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationVideo, durationAudio))
@@ -192,6 +196,8 @@ class TestBIS(
     override fun onTrialEnd(){
         testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
     }
+
+    override fun initSummary(){}
 
     // =============================================================================================================================
     // DELIVER STIMULI
@@ -240,7 +246,7 @@ class TestBIS(
         when(stage == TRIAL_STAGE_2){
             true -> {
                 // mid (second) stimulus: audio and video are dissociated
-                when(trial.conflict_type == CONFLICT_TYPE_VA){
+                when(trial.conflict_type == STIMULUS_TYPE_VIDEO_AUDIO_LOG){
                     true    -> {
                         // first visual
                         deliverV2Stimulus(mVisualManager)

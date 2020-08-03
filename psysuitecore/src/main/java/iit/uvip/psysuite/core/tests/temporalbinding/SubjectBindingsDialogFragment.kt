@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCode
+import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
@@ -40,7 +40,7 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-        when((spCondition.selectedItem as TaskCode).id){
+        when((spCondition.selectedItem as TaskCodeLabels).id){
              TestBasic.TEST_ATB_TIME_DOUBLESTIM,
              TestBasic.TEST_ATB_TIME_SINGLESTIM,
              TestBasic.TEST_ATVB_TIME_D_UNBAL,

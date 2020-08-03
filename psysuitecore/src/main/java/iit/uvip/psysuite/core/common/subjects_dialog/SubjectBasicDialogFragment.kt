@@ -10,7 +10,7 @@ import android.view.WindowManager
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCode
+import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
@@ -25,7 +25,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     protected var nConditions: Int = 0
     protected var selCondition: Int = -1
 
-    protected lateinit var mTaskCodes: List<TaskCode>
+    protected lateinit var mTaskCodeLabels: List<TaskCodeLabels>
     protected lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
 
@@ -55,7 +55,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         mNextTrialModes = ntm.first?.call(ntm.second) as List<List<Int>>
 
         val ci          = getCompanionObjectMethod(subject.testClass, "getConditionsInfo")
-        mTaskCodes      = ci.first?.call(ci.second, requireContext()) as List<TaskCode>
+        mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<TaskCodeLabels>
 
         initData(subject)
 
@@ -88,7 +88,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         //------------------------------------------------------
         // SUB TASKS
         //------------------------------------------------------
-        setConditions(mTaskCodes)
+        setConditions(mTaskCodeLabels)
 
         //------------------------------------------------------
         // NEXT TRIAL MODALITY
@@ -126,9 +126,9 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         //------------------------------------------------------
     }
 
-    protected fun setConditions(tc:List<TaskCode>){
+    protected fun setConditions(tc:List<TaskCodeLabels>){
 
-        val adapter: ArrayAdapter<TaskCode> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
+        val adapter: ArrayAdapter<TaskCodeLabels> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spCondition.adapter = adapter
         nConditions         = adapter.count
@@ -137,13 +137,13 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             // do not show condition spinner & set subject.type
             labCondition.visibility = View.GONE
             spCondition.visibility  = View.GONE
-            subject.type            = mTaskCodes[0].id
+            subject.type            = mTaskCodeLabels[0].id
             selCondition            = 0
         }
         else if (nConditions > 1) {
             if(subject.type != -1) {
                 // set condition spinner to subject.type
-                mTaskCodes.mapIndexed { index, taskCode ->
+                mTaskCodeLabels.mapIndexed { index, taskCode ->
                     if (taskCode.id == subject.type){
                         spCondition.setSelection(index)
                         selCondition            = index
@@ -154,7 +154,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 // set condition spinner to first sub-task
                 selCondition = 0
                 spCondition.setSelection(selCondition)
-                subject.type            = mTaskCodes[0].id
+                subject.type            = mTaskCodeLabels[0].id
             }
         }
     }
@@ -216,7 +216,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         val gender:Int              = radioGroupGender.indexOfChild(radioGroupGender.findViewById(radioGroupGender.checkedRadioButtonId))
 
-        subject.type                = mTaskCodes[spCondition.selectedItemPosition].id
+        subject.type                = mTaskCodeLabels[spCondition.selectedItemPosition].id
 
         subject.label               = txtName.text.toString()
         subject.age                 = txtAge.text.toString().toInt()
@@ -250,7 +250,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     // check whether subject's "label_type_Date" file exists, ask user whether continue or change name
     // -1 no file exist, 0 just one file without block, > 0  id of the next block (if it found _blk1 => returns 2)
     private fun manageSubjectFileExistence(subj: SubjectBasicParcel):Boolean{
-        val nextblock = subj.existSubjectFile()
+        val nextblock = subj.existSubjectFile(requireContext())
         return when(nextblock){
 
             -1 -> true  // does not exist a same subject file
@@ -273,7 +273,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                         sendResult(subject)
                     },
                     { // cancel press. all previous files
-                    deleteFilesStartingWith(subject.getFilesPrefix())
+                    deleteFilesStartingWith(subject.getFilesPrefix(requireContext()))
                     subject = subj
                     sendResult(subject)
                 })

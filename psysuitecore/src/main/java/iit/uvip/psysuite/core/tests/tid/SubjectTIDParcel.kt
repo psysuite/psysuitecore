@@ -1,9 +1,13 @@
 package iit.uvip.psysuite.core.tests.tid
 
+import android.content.Context
+import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.getLabelLog
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectLongitParcel
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.Device
+import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.accessory.getDateString
 
 // session
@@ -24,15 +28,21 @@ class SubjectTIDParcel(
     var group: Int = -1
 ) : SubjectLongitParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device, block, spinner_sel, spinner_data_resource){
 
-    override fun getFilesPrefix():String = "${label}_${group}_s${session}_${type}"
+    override fun getFilesPrefix(ctx:Context):String{
 
-    override fun composeSubjectFileName(blk:Int):String{
+        val ci          = getCompanionObjectMethod(testClass, "getConditionsInfo")
+        val type_label  = (ci.first?.call(ci.second, ctx) as List<TaskCodeLabels>).getLabelLog(type)
+
+        return "${label}_${group}_s${session}_$type_label"
+    }
+
+    override fun composeSubjectFileName(ctx: Context, blk:Int):String{
         if(label.isBlank() || group == -1 || type == -1 || session == -1)   return ""
 
         val blkstr =    if(blk > -1)    "_blk$blk"
                         else           ""
 
-        return "${getFilesPrefix()}_${getDateString()}${blkstr}${TestBasic.FILE_EXTENSION}"
+        return "${getFilesPrefix(ctx)}_${getDateString()}${blkstr}${TestBasic.FILE_EXTENSION}"
     }
 }
 

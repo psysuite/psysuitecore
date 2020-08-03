@@ -4,17 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.os.Environment
 import android.os.Handler
-import android.os.Parcelable
 import android.util.Log
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.*
 import org.albaspazio.core.ui.showAlert
-import java.util.*
 import java.util.Collections.max
 import java.util.Collections.min
 
@@ -95,10 +92,10 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_ATB_TIME_DOUBLESTIM     = 131
         @JvmStatic val TEST_ATB_TIME_INF            = 132
 
-        @JvmStatic val TEST_ATVB_TIME_S_UNBAL    = 140
-        @JvmStatic val TEST_ATVB_TIME_D_UNBAL    = 141
-        @JvmStatic val TEST_ATVB_TIME_D_BAL   = 142
-        @JvmStatic val TEST_ATVB_TIME_S_BAL   = 143
+        @JvmStatic val TEST_ATVB_TIME_S_UNBAL       = 140
+        @JvmStatic val TEST_ATVB_TIME_D_UNBAL       = 141
+        @JvmStatic val TEST_ATVB_TIME_D_BAL         = 142
+        @JvmStatic val TEST_ATVB_TIME_S_BAL         = 143
 
         @JvmStatic val TEST_SAMPLE_ALIGNED          = 150
         @JvmStatic val TEST_SAMPLE_SHIFTED          = 151
@@ -172,7 +169,6 @@ abstract class TestBasic(protected val ctx: Context,
         nBlocks = value.size + 1
     }
 
-
     // this instances are defined and validated during sub-class init{}
     // in case of error an exception is thrown and test is aborted.
     // the only susceptible to error is MediaPlayer in case of the test involves different resources to be loaded
@@ -184,6 +180,7 @@ abstract class TestBasic(protected val ctx: Context,
     protected open var mDrawablesResource:MutableList<Int>  = mutableListOf()   // list of drawables' resources id to be edited in subclasses
     protected var mStimuliHandler: Handler                  = Handler()
 
+    protected var mSummary:Summary?                         = null
     private var mResultFile: String                         = ""
     private var mCurrBlock: Int                             = 0
 
@@ -198,6 +195,10 @@ abstract class TestBasic(protected val ctx: Context,
     abstract fun onTrialEnd()
     abstract fun show(trial:TrialBasic, isRepeat:Boolean=false)
 
+    abstract fun initSummary()              // init summary content (mSummary),
+    fun closeSummary():String {
+        return mSummary?.close(subjectparcel.composeSummaryFileName(ctx)) ?: ""
+    }
     // ===============================================================================================================
 
     fun start(){
@@ -220,7 +221,10 @@ abstract class TestBasic(protected val ctx: Context,
     // ===============================================================================================================
     open fun nextTrial(prev_result: String = "", elapsed: Int = -1): Int {
 
-        if (prev_result != "")  mTrial.setResponse(prev_result, elapsed)
+        if (prev_result != ""){
+            mTrial.setResponse(prev_result, elapsed)
+            mSummary?.add(mTrial)
+        }
 
         return when {
             currTrial == (nTrials - 1) -> {
@@ -273,10 +277,10 @@ abstract class TestBasic(protected val ctx: Context,
 
         mStimuliHandler.removeCallbacksAndMessages(null)
 
-        val newresname = subjectparcel.composeResultFileName(mCurrBlock)
+        val newresname = subjectparcel.composeResultFileName(ctx, mCurrBlock)
         renameFile(mResultFile, newresname)
 
-        val newsubjname = subjectparcel.composeSubjectFileName(mCurrBlock)
+        val newsubjname = subjectparcel.composeSubjectFileName(ctx, mCurrBlock)
         renameFile(subjectparcel.subjectFileName, newsubjname)
 
         notifyFile(newresname, ctx, dir)
@@ -315,7 +319,7 @@ abstract class TestBasic(protected val ctx: Context,
     }
 
     protected fun createResultFile(subj:SubjectBasicParcel, header:String){
-        mResultFile = subj.composeResultFileName(subj.block)
+        mResultFile = subj.composeResultFileName(ctx, subj.block)
         saveText(ctx, mResultFile, header)
     }
 
@@ -974,23 +978,4 @@ abstract class TestBasic(protected val ctx: Context,
         }
     }
     // =============================================================================================================================
-}
-
-@Parcelize
-data class TaskCode(val label: String, val id: Int) : Parcelable{
-    override fun toString(): String {
-        return label
-    }
-}
-
-@Parcelize
-data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files:ArrayList<String> = arrayListOf(), val testClass:String) : Parcelable
-
-data class StimulusATBInfants(val type: Int, val tactile_pattern:Int)
-data class Stimulus3delay(val type: Int, val a:Long, val t:Long, val v:Long)
-data class StimulusBindingsUnbalanced(val type: Int, val delay:Long)
-data class StimulusBIS(val ntrials:Int, val position:Int, val conflict:String)
-
-fun VibrationManager.vibrateSingle(paramsT:TactileManager) {
-    this.vibrateSingle(paramsT.duration, paramsT.amplitude)
 }

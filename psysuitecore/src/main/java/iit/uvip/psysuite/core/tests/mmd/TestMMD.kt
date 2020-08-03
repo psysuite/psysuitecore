@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.MediaPlayerManager
-import iit.uvip.psysuite.core.common.TaskCode
+import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
@@ -26,8 +26,8 @@ class TestMMD(ctx: Context,
         @JvmStatic val NUM_TRIALS = 18
         @JvmStatic val TEST_BASIC_LABEL = "MMD"
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
-            return mutableListOf(TaskCode(TEST_BASIC_LABEL, TEST_MUSICAL_METERS))
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
+            return mutableListOf(TaskCodeLabels(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL))
         }
 
         fun getNextTrialModes():List<List<Int>>{
@@ -85,6 +85,7 @@ class TestMMD(ctx: Context,
         testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
     }
 
+    override fun initSummary(){}
     // =============================================================================================================================
     // DELIVER STIMULI
     // =============================================================================================================================

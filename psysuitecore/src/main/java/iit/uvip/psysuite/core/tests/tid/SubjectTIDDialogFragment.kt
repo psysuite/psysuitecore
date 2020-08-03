@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCode
+import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectLongitudinalDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
@@ -35,7 +35,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         //------------------------------------------------------
         // GROUPS <=> mTaskCodes
         //------------------------------------------------------
-        val adapter:ArrayAdapter<TaskCode> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodes)
+        val adapter:ArrayAdapter<TaskCodeLabels> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodeLabels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spGroup.adapter = adapter
 
@@ -44,13 +44,13 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
             // do not show condition spinner & set subject.type
             labGroup.visibility = View.GONE
             spGroup.visibility  = View.GONE
-            (subject as SubjectTIDParcel).group = mTaskCodes[0].id
+            (subject as SubjectTIDParcel).group = mTaskCodeLabels[0].id
             selGroup                            = 0
         }
         else if (nConditions > 1) {
             if((subject as SubjectTIDParcel).group != -1) {
                 // set group spinner to subject.group
-                mTaskCodes.mapIndexed { index, taskCode ->
+                mTaskCodeLabels.mapIndexed { index, taskCode ->
                     if (taskCode.id == (subject as SubjectTIDParcel).group){
                         spGroup.setSelection(index)
                         selGroup            = index
@@ -61,7 +61,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
                 // set group spinner to first sub-task
                 selGroup = 0
                 spGroup.setSelection(selGroup)
-                (subject as SubjectTIDParcel).group = mTaskCodes[0].id
+                (subject as SubjectTIDParcel).group = mTaskCodeLabels[0].id
             }
         }
     }
@@ -77,15 +77,15 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         // session changed
         when(spinner.selectedItemPosition){
             in 2..6   -> {
-                        setConditions(listOf(mTaskCodes[spGroup.selectedItemPosition])) // make condition spinner GONE
+                        setConditions(listOf(mTaskCodeLabels[spGroup.selectedItemPosition])) // make condition spinner GONE
                         spCondition.isEnabled = false
             }
             else      -> {
 
-                        val selcond = mTaskCodes[spGroup.selectedItemPosition].id   // get current selected task
-                        setConditions(mTaskCodes)                                       // enable all
+                        val selcond = mTaskCodeLabels[spGroup.selectedItemPosition].id   // get current selected task
+                        setConditions(mTaskCodeLabels)                                       // enable all
 
-                        mTaskCodes.mapIndexed { index, taskCode ->
+                        mTaskCodeLabels.mapIndexed { index, taskCode ->
                             if(taskCode.id == selcond)    spCondition.setSelection(index)   // set what was selected before this change
                         }
                         spCondition.isEnabled = true
@@ -111,11 +111,11 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
 
         subject  = super.updateSubject() as SubjectTIDParcel
 
-        (subject as SubjectTIDParcel).group     = mTaskCodes[spGroup.selectedItemPosition].id
+        (subject as SubjectTIDParcel).group     = mTaskCodeLabels[spGroup.selectedItemPosition].id
         (subject as SubjectTIDParcel).session   = spinner.selectedItemPosition - 1
 
-        subject.type = if(spinner.selectedItemPosition in 2..6) mTaskCodes[spGroup.selectedItemPosition].id
-                       else                                     mTaskCodes[spCondition.selectedItemPosition].id
+        subject.type = if(spinner.selectedItemPosition in 2..6) mTaskCodeLabels[spGroup.selectedItemPosition].id
+                       else                                     mTaskCodeLabels[spCondition.selectedItemPosition].id
 
         return subject as SubjectTIDParcel
     }

@@ -69,17 +69,17 @@ class TestTID(ctx: Context,
         @JvmStatic val STIMULUS_TYPE_AUDIO          = "A"
         @JvmStatic val STIMULUS_TYPE_TACTILE        = "T"
 
-        fun getConditionsInfo(ctx: Context): List<TaskCode> {
+        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
 
             val label   = ctx.resources.getString(R.string.tid_label_short)
             val sts     = ctx.resources.getString(R.string.tid_rb_short_text)
             val stl     = ctx.resources.getString(R.string.tid_rb_long_text)
 
             return mutableListOf(
-                TaskCode(label + "_" + STIMULUS_TYPE_AUDIO + "_" + sts    , TEST_TID_SHORT_AUDIO),
-                TaskCode(label + "_" + STIMULUS_TYPE_TACTILE + "_" + sts  , TEST_TID_SHORT_TACTILE),
-                TaskCode(label + "_" + STIMULUS_TYPE_AUDIO + "_" + stl    , TEST_TID_LONG_AUDIO),
-                TaskCode(label + "_" + STIMULUS_TYPE_TACTILE + "_" + stl  , TEST_TID_LONG_TACTILE)
+                TaskCodeLabels(label + "_" + STIMULUS_TYPE_AUDIO + "_" + sts    , TEST_TID_SHORT_AUDIO),
+                TaskCodeLabels(label + "_" + STIMULUS_TYPE_TACTILE + "_" + sts  , TEST_TID_SHORT_TACTILE),
+                TaskCodeLabels(label + "_" + STIMULUS_TYPE_AUDIO + "_" + stl    , TEST_TID_LONG_AUDIO),
+                TaskCodeLabels(label + "_" + STIMULUS_TYPE_TACTILE + "_" + stl  , TEST_TID_LONG_TACTILE)
             )
         }
 
@@ -261,6 +261,8 @@ class TestTID(ctx: Context,
         (mTrials[trial_id] as TrialTID).correct_answer =    if((mTrials[trial_id] as TrialTID).delta1 > (mTrials[trial_id] as TrialTID).delta2) validAnswers[0]
         else                                                                                validAnswers[1]
     }
+
+    override fun initSummary(){}
 
     // =============================================================================================================================
     // DELIVER STIMULI
