@@ -5,11 +5,13 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.StimulusBIS
+import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.TrialBasic
+import iit.uvip.psysuite.core.common.stimuli.*
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
 
@@ -104,15 +106,19 @@ class TestBIS(
     // =============================================================================================================================
     init{
         when {
-            mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mImageView == null -> throw ImageViewDefinedException(
+                "IMAGE_VIEW_NOT_DEFINED"
+            )
+            vibrator == null -> throw VibratorNotDefinedException(
+                "VIBRATOR_NOT_DEFINED"
+            )
             else -> {
                 validAnswers    = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
                 initTest()
 
-                mToneManager     = ToneManager(duration = STIMULUS_DURATION_AUDIO, handler = mStimuliHandler)
-                mTactileManager  = TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler)
-                mVisualManager   = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler)
+                mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
+                mTactileManager = TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler)
+                mVisualManager  = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler)
             }
         }
     }
@@ -140,7 +146,7 @@ class TestBIS(
         )
         createResultFile(subjectparcel, TrialBIS.LOG_HEADER)
 
-        noise = MediaPlayerManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
+        noise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
     }
 
     // =============================================================================================================================
@@ -243,9 +249,9 @@ class TestBIS(
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
 
         when(trial.type) {
-            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus(mToneManager)
+            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus(mAudioManager)
             TEST_BISECTION_TACTILE          ->  deliverT1Stimulus(mTactileManager)
-            TEST_BISECTION_AUDIO_TACTILE    ->  deliverAlignedStimulus(STIM_TYPE_A1T1, stimuliDelay = subjectparcel.stimuliDelay, managerA = mToneManager)
+            TEST_BISECTION_AUDIO_TACTILE    ->  deliverAlignedStimulus(STIM_TYPE_A1T1, stimuliDelay = subjectparcel.stimuliDelay, managerA = mAudioManager)
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)
         }
     }

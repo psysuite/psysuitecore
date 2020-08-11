@@ -5,7 +5,12 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.TrialBasic
+import iit.uvip.psysuite.core.common.stimuli.AudioManager
+import iit.uvip.psysuite.core.common.stimuli.TactileManager
+import iit.uvip.psysuite.core.common.stimuli.VibratorNotDefinedException
 import iit.uvip.psysuite.core.utility.QuestObject
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
@@ -76,7 +81,6 @@ class TestTID(ctx: Context,
 
         fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
 
-            val label   = ctx.resources.getString(R.string.tid_label_short)
             val sts     = ctx.resources.getString(R.string.tid_rb_short_text)
             val stl     = ctx.resources.getString(R.string.tid_rb_long_text)
 
@@ -108,11 +112,14 @@ class TestTID(ctx: Context,
     // INIT
     // =============================================================================================================================
     init{
-        if(vibrator == null)    throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+        if(vibrator == null)    throw VibratorNotDefinedException(
+            "VIBRATOR_NOT_DEFINED"
+        )
         else{
             initTest()
-            mToneManager     = ToneManager(duration = currStimulusDuration, handler = mStimuliHandler)
-            mTactileManager  = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
+
+            mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
+            mTactileManager = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
         }
     }
 
@@ -165,7 +172,7 @@ class TestTID(ctx: Context,
 
         createResultFile(subjectparcel, TrialTID.LOG_HEADER)
 
-        noise = MediaPlayerManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
+        noise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
     }
 
     // =============================================================================================================================

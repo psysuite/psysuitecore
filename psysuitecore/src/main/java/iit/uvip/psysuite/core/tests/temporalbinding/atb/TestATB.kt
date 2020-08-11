@@ -6,6 +6,9 @@ import android.media.MediaPlayer
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.stimuli.AudioManager
+import iit.uvip.psysuite.core.common.stimuli.TactileManager
+import iit.uvip.psysuite.core.common.stimuli.VibratorNotDefinedException
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import org.albaspazio.core.accessory.VibrationManager
@@ -123,12 +126,13 @@ class TestATB(ctx: Context,
     // INIT
     // =============================================================================================================================
     init{
-        if(vibrator == null)    throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+        if(vibrator == null)    throw VibratorNotDefinedException(
+            "VIBRATOR_NOT_DEFINED"
+        )
         else{
             initTest()
-//            mMediaPlayerManager = MediaPlayerManager(ctx, tone2sec  , duration = currStimulusDuration, handler = mStimuliHandler)
-            mToneManager        = ToneManager(duration = currStimulusDuration, handler = mStimuliHandler)
-            mTactileManager     = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
+            mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
+            mTactileManager = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
         }
     }
 
@@ -201,7 +205,7 @@ class TestATB(ctx: Context,
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
         if (subjectparcel.whitenoise)
-            noise = MediaPlayerManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
+            noise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
     }
     //              _   _   _   _   _

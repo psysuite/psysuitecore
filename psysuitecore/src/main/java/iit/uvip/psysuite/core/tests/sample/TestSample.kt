@@ -6,7 +6,10 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.TestBasic
+import iit.uvip.psysuite.core.common.TrialBasic
+import iit.uvip.psysuite.core.common.stimuli.*
 import iit.uvip.psysuite.core.tests.sample.TrialSample.Companion.LOG_HEADER
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
@@ -64,8 +67,12 @@ class TestSample(
     // =============================================================================================================================
     init{
         when {
-            mImageView == null  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mImageView == null  -> throw ImageViewDefinedException(
+                "IMAGE_VIEW_NOT_DEFINED"
+            )
+            vibrator == null    -> throw VibratorNotDefinedException(
+                "VIBRATOR_NOT_DEFINED"
+            )
             else -> {
                 validAnswers    = mutableListOf()
                 initTest()
@@ -96,30 +103,37 @@ class TestSample(
     // =============================================================================================================================
     private fun createTrials(){
 
-        mToneManager = null
-        if((subjectparcel as SubjectSampleParcel).stim_sources and STIM_TYPE_A1 > 0){
-            mToneManager = ToneManager(amplitude = subjectparcel.audioVolume.toInt(), duration = subjectparcel.audioDuration, handler = mStimuliHandler)
+        mAudioManager = when {
+            (subjectparcel as SubjectSampleParcel).stim_sources and STIM_TYPE_A1 > 0 ->
+                AudioManager(STIM_TYPE_A1, -1,
+                            amplitude  = subjectparcel.audioVolume.toInt(),
+                            duration   = subjectparcel.audioDuration,
+                            handler    = mStimuliHandler,
+                            ctx        = ctx)
+            subjectparcel.stim_sources and STIM_TYPE_A2 > 0 ->
+                try{
+                        if(subjectparcel.audioResource.isEmpty())    subjectparcel.audioResource = currAudioResourceName
+                        AudioManager(STIM_TYPE_A1,
+                            subjectparcel.audioResource,
+                            subjectparcel.audioVolume.toInt(),
+                            duration = subjectparcel.audioDuration,
+                            handler = mStimuliHandler,
+                            ctx = ctx)
+
+                    } catch(e:Exception){
+                        throw Exception("GENERIC ERROR: $e")
+                    } catch(e: AudioResourceException){
+                        throw AudioResourceException("AUDIO_RESOURCE_ERROR: resource name = $e")
+                    }
+            else -> null
         }
 
-        mMediaPlayerManager = null
-        try{
-            if(subjectparcel.stim_sources and STIM_TYPE_A2 > 0){
-                if(subjectparcel.audioResource.isEmpty())    subjectparcel.audioResource = currAudioResourceName
-                mMediaPlayerManager = MediaPlayerManager(ctx, subjectparcel.audioResource, subjectparcel.audioVolume.toInt(), duration = subjectparcel.audioDuration, handler = mStimuliHandler)
-            }
-        }
-        catch(e:Exception){
-            throw Exception("GENERIC ERROR: $e")
-        }
-        catch(e:AudioResourceException){
-            throw AudioResourceException("AUDIO_RESOURCE_ERROR: resource name = $e")
-        }
-
-        mTactileManager =   if(subjectparcel.stim_sources and STIM_TYPE_T1 > 0){
+        mTactileManager =   if(subjectparcel.stim_sources and STIM_TYPE_T1 > 0)
                                 TactileManager(vibrator!!, subjectparcel.tactileAmplitude, duration = subjectparcel.tactileSequence.toLong(), handler = mStimuliHandler)
-                            }else if(subjectparcel.stim_sources and STIM_TYPE_T2 > 0){
+
+                            else if(subjectparcel.stim_sources and STIM_TYPE_T2 > 0){
                                 val timings = TactileManager.validatePattern(subjectparcel.tactileSequence)
-                                if(timings != null)     TactileManager(vibrator!!, subjectparcel.tactileAmplitude, timings!!, handler = mStimuliHandler)
+                                if(timings != null) TactileManager(vibrator!!, subjectparcel.tactileAmplitude, timings!!, handler = mStimuliHandler)
                                 else {
                                     // TODO: ALERT
                                     null
@@ -127,18 +141,20 @@ class TestSample(
                             }
                             else null
 
-        mVisualManager =    if(subjectparcel.stim_sources and STIM_TYPE_V1 > 0){
+        mVisualManager = when {
+                            subjectparcel.stim_sources and STIM_TYPE_V1 > 0 -> {
                                 val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)    mDrawablesResource.size
-                                            else                                                             subjectparcel.visualDrawableOn
-
+                                else                                                             subjectparcel.visualDrawableOn
                                 VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[on], duration = subjectparcel.visualDuration, handler = mStimuliHandler)
-                            }else if(subjectparcel.stim_sources and STIM_TYPE_V2 > 0){
+                            }
+                            subjectparcel.stim_sources and STIM_TYPE_V2 > 0 -> {
                                 if(mImageView == null)  return
                                 val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size-1
-                                            else                                                            subjectparcel.visualDrawableOn
+                                else                                                            subjectparcel.visualDrawableOn
                                 VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[on], mDrawablesResource[subjectparcel.visualDrawableOff], subjectparcel.visualDuration, handler = mStimuliHandler)
                             }
-                            else null
+                            else -> null
+        }
 
         val extraTrial:Any? = when(subjectparcel.type){
             TEST_SAMPLE_SHIFTED     -> subjectparcel.shiftedParams
@@ -182,7 +198,7 @@ class TestSample(
             TEST_SAMPLE_SHIFTED ->  {
                 val corr_delays = arrangeDelays(((trial as TrialSample).extraTrial as List<Long>)[0],
                                                                  (trial.extraTrial as List<Long>)[1],
-                                                                 (trial.extraTrial as List<Long>)[2], subjectparcel.stimuliDelay)
+                                                                  trial.extraTrial[2], subjectparcel.stimuliDelay)
 
                 deliverShiftedStimulus(trial.source, corr_delays.a, corr_delays.t, corr_delays.v){onTrialEnd()}
             }

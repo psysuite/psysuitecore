@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.stimuli.*
 import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindings3latencies
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
@@ -207,15 +208,18 @@ class TestATVB(
     // INIT
     // =============================================================================================================================
     init {
-        if(mImageView == null)      throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-        else if(vibrator == null)   throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+        if(mImageView == null)      throw ImageViewDefinedException(
+            "IMAGE_VIEW_NOT_DEFINED"
+        )
+        else if(vibrator == null)   throw VibratorNotDefinedException(
+            "VIBRATOR_NOT_DEFINED"
+        )
         else{
             initTest()
 
-//            mMediaPlayerManager = MediaPlayerManager(ctx, tone2sec, duration = currStimulusDuration, handler = mStimuliHandler)
-            mToneManager        = ToneManager(duration = currStimulusDuration, handler = mStimuliHandler)
-            mTactileManager     = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
-            mVisualManager      = VisualManager(STIM_TYPE_V1, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler)
+            mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
+            mTactileManager = TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler)
+            mVisualManager  = VisualManager(STIM_TYPE_V1, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler)
         }
     }
 
@@ -252,7 +256,7 @@ class TestATVB(
             }
         }
 
-        if (subjectparcel.whitenoise)    noise = MediaPlayerManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subjectparcel.whitenoise)    noise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         // mTrials list
         nTrials         = mTrials.size

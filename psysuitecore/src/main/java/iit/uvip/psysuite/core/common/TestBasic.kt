@@ -9,6 +9,10 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.common.stimuli.AudioManager
+import iit.uvip.psysuite.core.common.stimuli.StimulusManager
+import iit.uvip.psysuite.core.common.stimuli.TactileManager
+import iit.uvip.psysuite.core.common.stimuli.VisualManager
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import org.albaspazio.core.accessory.*
 import org.albaspazio.core.ui.showAlert
@@ -140,11 +144,6 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_ABORT                       = 230
         @JvmStatic val TEST_COMPLETED                   = 231
         @JvmStatic val BLOCK_COMPLETED                  = 232
-
-        @JvmStatic val TEST_PRE                         = 233
-        @JvmStatic val TEST_POST                        = 234
-        @JvmStatic val TEST_TRAINING                    = 235
-
     }
 
     val testEvent:PublishRelay<Pair<Int,Any?>> = PublishRelay.create()
@@ -174,10 +173,9 @@ abstract class TestBasic(protected val ctx: Context,
     // this instances are defined and validated during sub-class init{}
     // in case of error an exception is thrown and test is aborted.
     // the only susceptible to error is MediaPlayer in case of the test involves different resources to be loaded
-    protected var mMediaPlayerManager:MediaPlayerManager? = null
-    protected var mToneManager:ToneManager?         = null
-    protected var mTactileManager:TactileManager?   = null
-    protected var mVisualManager:VisualManager?     = null
+    protected var mAudioManager: AudioManager?       = null
+    protected var mTactileManager: TactileManager?   = null
+    protected var mVisualManager: VisualManager?     = null
 
     protected open var mDrawablesResource:MutableList<Int>  = mutableListOf()   // list of drawables' resources id to be edited in subclasses
     protected var mStimuliHandler: Handler                  = Handler()
@@ -319,7 +317,7 @@ abstract class TestBasic(protected val ctx: Context,
         mTrial      = mTrials[currTrial]
     }
 
-    protected fun getTestTitle(_type:Int):String{
+    protected fun getTestTitle():String{
         return "${ctx.resources.getString(R.string.app_name)} - ${ctx.resources.getString(R.string.lab_test_res)}: $mTestLabel"
     }
 
@@ -328,7 +326,7 @@ abstract class TestBasic(protected val ctx: Context,
         saveText(ctx, mResultFile, header)
     }
 
-    fun getResultFile(blk:Int=0): String{
+    fun getResultFile(): String{
         return  if(existFile(mResultFile).first)    mResultFile
         else                                ""
     }
@@ -350,7 +348,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     // manage durations when they are defined in the single call or retrieve the global value
     // returns MAX, MIN, MEAN
-    private fun getDuration(managerA:StimulusManager? = null, managerT:StimulusManager? = null, managerV:StimulusManager? = null):Triple<Long,Long,Long>{
+    private fun getDuration(managerA: StimulusManager? = null, managerT: StimulusManager? = null, managerV: StimulusManager? = null):Triple<Long,Long,Long>{
 
         val durs:MutableList<Long> = mutableListOf()
         if(managerA != null)     if(managerA.duration > 0)    durs.add(managerA.duration)
@@ -428,7 +426,7 @@ abstract class TestBasic(protected val ctx: Context,
     // ---------------------------------------------------------------------------------------------
     // deliver a pair of identical aligned stimuli, separated by "isi" ms.
     protected fun deliverAlignedStimuliPair(isi:Long, type:Int,
-                                            managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                            managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                             stimuliDelay: StimuliDelay,
                                             onEnd:() -> Unit = {}){
 
@@ -438,7 +436,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     // OVERLOAD with stimuliDelay: StimuliDelay:  simultaneous multimodal stimuli...that must be corrected
     protected fun deliverAlignedStimuliPair(isi:Long,
-                                            managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                            managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                             stimuliDelay: StimuliDelay,
                                             audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                             onEnd:()-> Unit = {}){
@@ -449,7 +447,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     protected fun deliverShiftedStimuliPair(isi:Long,
                                             a:Long, t:Long, v:Long, shift:Long,
-                                            managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                            managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                             audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                             onEnd:() -> Unit = {}){
 
@@ -467,28 +465,20 @@ abstract class TestBasic(protected val ctx: Context,
 
     // MAIN: with unimodal types
     protected fun deliverShiftedStimulus(a:Long, t:Long, v:Long,
-                                         managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                         managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                          audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                          onEnd:()-> Unit = {}) {
 
         val offset = 0L
         val durlist = mutableListOf<Long>()
 
-        val am:StimulusManager?
+        val am: AudioManager?
         if(a > -1) {
-            am = when (audiotype == STIM_TYPE_A1) {
-                true -> managerA ?: if (mToneManager == null) {
-                                        Log.e("TestBasic", "error in deliverShiftedStimulus: a valid audio manager was not found")
-                                        return
-                                    }
-                                    else mToneManager
-
-                false -> managerA ?:    if (mMediaPlayerManager == null) {
-                                            Log.e("TestBasic", "error in deliverShiftedStimulus: a valid audio manager was not found")
-                                            return
-                                        }
-                                        else mMediaPlayerManager
-            }
+            am = managerA ?:    if (mAudioManager == null) {
+                                    Log.e("TestBasic", "error in deliverShiftedStimulus: a valid audio manager was not found")
+                                    return
+                                }
+                                else mAudioManager
             durlist.add(am!!.duration + a)
             mStimuliHandler.postDelayed({
                 Log.d("TestBasic", "audio: type=$audiotype")
@@ -496,7 +486,7 @@ abstract class TestBasic(protected val ctx: Context,
             }, a + offset)
         }
 
-        val tm:TactileManager?
+        val tm: TactileManager?
         if(t > -1) {
             tm = managerT   ?:  if(mTactileManager == null) {
                                     Log.e("TestBasic", "error in deliverShiftedStimulus: a valid tactile manager was not found")
@@ -510,7 +500,7 @@ abstract class TestBasic(protected val ctx: Context,
             }, t + offset)
         }
 
-        val vm:VisualManager?
+        val vm: VisualManager?
         if(v > -1) {
             vm = managerV   ?:  if(mVisualManager == null)  {
                                     Log.e("TestBasic", "error in deliverShiftedStimulus: a valid visual manager was not found")
@@ -531,7 +521,7 @@ abstract class TestBasic(protected val ctx: Context,
     // with global type, call above function
     protected fun deliverShiftedStimulus(type:Int,
                                          a:Long, t:Long, v:Long,
-                                         managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                         managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                          onEnd:() -> Unit = {}) {
 
         val unimodal_types = unimodaltypesFromMainType(type)
@@ -543,7 +533,7 @@ abstract class TestBasic(protected val ctx: Context,
     // ---------------------------------------------------------------------------------------------
 
     // MAIN: with unimodal types and StimuliDelay
-    protected fun deliverAlignedStimulus(managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+    protected fun deliverAlignedStimulus(managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                          stimuliDelay: StimuliDelay,
                                          audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                          onEnd:()-> Unit = {}){
@@ -554,7 +544,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     // with global type and StimuliDelay, call above fun
     protected fun deliverAlignedStimulus(type:Int,
-                                         managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+                                         managerA: AudioManager? = null, managerT: TactileManager? = null, managerV: VisualManager? = null,
                                          stimuliDelay: StimuliDelay,
                                          onEnd:()-> Unit = {}){
 
@@ -565,20 +555,18 @@ abstract class TestBasic(protected val ctx: Context,
     // ---------------------------------------------------------------------------------------------
     // UNIMODAL STIMULUS (unimodal stimulus)
     // ---------------------------------------------------------------------------------------------
-    protected fun deliverUnimodalStimulus(type:Int, manager:StimulusManager? = null, onEnd:() -> Unit = {}){
+    protected fun deliverUnimodalStimulus(type:Int, manager: StimulusManager? = null, onEnd:() -> Unit = {}){
         when(type){
-            STIM_TYPE_A1        -> deliverA1Stimulus(manager as ToneManager?        , onEnd)    // ToneParams()        tone generator
-            STIM_TYPE_A2        -> deliverA2Stimulus(manager as MediaPlayerManager? , onEnd)    // AudioParams()       mediaplayer from resource
-            STIM_TYPE_T1        -> deliverT1Stimulus(manager as TactileManager      , onEnd)    // TactileParams()
-            STIM_TYPE_T2        -> deliverT2Stimulus(manager as TactileManager      , onEnd)    // TactileParams()
-            STIM_TYPE_V1        -> deliverV1Stimulus(manager as VisualManager       , onEnd)    // VisualParams()      made visible/invisible
-            STIM_TYPE_V2        -> deliverV2Stimulus(manager as VisualManager       , onEnd)    // VisualParams()      imageview with different color frame (one as background)
+            STIM_TYPE_A1                -> deliverA1Stimulus(manager as AudioManager   , onEnd)
+            STIM_TYPE_A2                -> deliverA2Stimulus(manager as AudioManager   , onEnd)
+            STIM_TYPE_T1,STIM_TYPE_T2   -> deliverT1Stimulus(manager as TactileManager , onEnd)
+            STIM_TYPE_V1,STIM_TYPE_V2   -> deliverVStimulus(manager as VisualManager  , onEnd)
         }
     }
 
-    protected fun deliverA1Stimulus(managerA:ToneManager? = null, onEnd:() -> Unit = {}){
+    protected fun deliverA1Stimulus(managerA: AudioManager? = null, onEnd:() -> Unit = {}){
 
-        val am          = managerA ?: mToneManager!!
+        val am          = managerA ?: mAudioManager!!
         if(!am.isValid()){
             // TODO : ALERT
             Log.e("TestBasic", "error in deliverA1Stimulus: $am")
@@ -590,21 +578,21 @@ abstract class TestBasic(protected val ctx: Context,
         // ---------------------------------------------------------------------------------------
         mStimuliHandler.postDelayed({   onEnd() }, duration)
     }
-    protected fun deliverA2Stimulus(managerA:MediaPlayerManager? = null, onEnd:() -> Unit = {}){
+    protected fun deliverA2Stimulus(managerA: AudioManager? = null, onEnd:() -> Unit = {}){
 
         try {
-            var duration:Long = mMediaPlayerManager!!.duration
+            var duration:Long = mAudioManager!!.duration
             val audio = if(managerA != null) {
                 duration = managerA.duration
                 when {
-                    managerA.isLoaded(managerA.resource) -> managerA
-                    managerA.resource.isNotEmpty()       -> {
-                        managerA.loadResource(managerA.resource)
+                    managerA.isLoaded(managerA.resource as String) -> managerA
+                    (managerA.resource as String).isNotEmpty()       -> {
+                        managerA.loadResource(managerA.resource as String)
                         managerA
                     }
                     else                                 -> throw Exception("deliverA2Stimulus: mediaplayer audio resource is empty")
                 }
-            } else mMediaPlayerManager!!
+            } else mAudioManager!!
 
             audio.deliver()
             // ---------------------------------------------------------------------------------------
@@ -617,21 +605,7 @@ abstract class TestBasic(protected val ctx: Context,
         }
     }
 
-    protected fun deliverT1Stimulus(managerT:TactileManager? = null, onEnd:() -> Unit = {}){
-
-        val tm = managerT ?: mTactileManager!!
-        if(!tm.isValid()){
-            // TODO : ALERT
-            Log.e("TestBasic", "error in deliverT1Stimulus: $tm")
-            return
-        }
-        val duration = tm.duration
-        tm.deliver()
-
-        // ---------------------------------------------------------------------------------------
-        mStimuliHandler.postDelayed({   onEnd() }, duration)
-    }
-    protected fun deliverT2Stimulus(managerT:TactileManager? = null, onEnd:() -> Unit = {}){
+    protected fun deliverT1Stimulus(managerT: TactileManager? = null, onEnd:() -> Unit = {}){
 
         val tm = managerT ?: mTactileManager!!
         if(!tm.isValid()){
@@ -646,29 +620,12 @@ abstract class TestBasic(protected val ctx: Context,
         mStimuliHandler.postDelayed({   onEnd() }, duration)
     }
 
-    protected fun deliverV1Stimulus(managerV:VisualManager? = null, onEnd:() -> Unit = {}){
+    protected fun deliverVStimulus(managerV: VisualManager? = null, onEnd:() -> Unit = {}){
 
         val vm = managerV ?: mVisualManager!!
         if(!vm.isValid()){
             // TODO : ALERT
             Log.e("TestBasic", "error in deliverV1Stimulus: $vm")
-            return
-        }
-        val duration = vm.duration
-        vm.deliver()
-
-        // ---------------------------------------------------------------------------------------
-        mStimuliHandler.postDelayed({
-            onEnd()
-        }, duration)
-    }
-
-    protected fun deliverV2Stimulus(managerV:VisualManager? = null, onEnd:() -> Unit = {}){
-
-        val vm = managerV ?: mVisualManager!!
-        if(!vm.isValid()){
-            // TODO : ALERT
-            Log.e("TestBasic", "error in deliverV2Stimulus: $vm")
             return
         }
         val duration = vm.duration
@@ -686,7 +643,7 @@ abstract class TestBasic(protected val ctx: Context,
 
 // simultaneous multimodal stimuli...redirect call to specific calls
 //    protected fun deliverAlignedStimulus(type:Int,
-//                                         managerA:StimulusManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
+//                                         managerA:AudioManager? = null, managerT:TactileManager? = null, managerV:VisualManager? = null,
 //                                         onEnd:() -> Unit = {}){
 //        when(type){
 //            STIM_TYPE_A1        -> deliverA1Stimulus(managerA as ToneManager?, onEnd)             // ToneParams()        tone generator

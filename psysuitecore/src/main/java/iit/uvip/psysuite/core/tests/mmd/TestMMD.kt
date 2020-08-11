@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.MediaPlayerManager
 import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
+import iit.uvip.psysuite.core.common.stimuli.AudioManager
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import org.albaspazio.core.ui.showToast
 
@@ -41,7 +41,6 @@ class TestMMD(ctx: Context,
     // =============================================================================================================================
     init{
         initTest()
-        mMediaPlayerManager    = MediaPlayerManager(ctx, "", handler = mStimuliHandler)    // duration varies according to audio
     }
 
     override fun initTest(){
@@ -98,7 +97,7 @@ class TestMMD(ctx: Context,
             false -> "mmc" + (trial as TrialMMD).audio_id
         }
         try {
-            MediaPlayerManager.playbackAllAudioResource(ctx, resname){  onTrialEnd()    }
+            AudioManager.playbackAllAudioResource(ctx, resname){  onTrialEnd()    }
         }
         catch(e:Exception){
             e.printStackTrace()

@@ -3,6 +3,7 @@ package iit.uvip.psysuite.core.common
 import android.content.Context
 import android.os.Environment
 import android.os.Parcelable
+import iit.uvip.psysuite.core.common.stimuli.TactileManager
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.VibrationManager
@@ -53,7 +54,7 @@ data class Stimulus3delay(val type: Int, val a:Long, val t:Long, val v:Long)
 data class StimulusBindingsUnbalanced(val type: Int, val delay:Long)
 data class StimulusBIS(val ntrials:Int, val position:Int, val conflict:String)
 
-fun VibrationManager.vibrateSingle(paramsT:TactileManager) {
+fun VibrationManager.vibrateSingle(paramsT: TactileManager) {
     this.vibrateSingle(paramsT.duration, paramsT.amplitude)
 }
 
