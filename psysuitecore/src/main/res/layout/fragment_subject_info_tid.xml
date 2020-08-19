@@ -17,26 +17,24 @@
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <ImageButton
-            android:id="@+id/bt_clear"
-            android:layout_width="109dp"
-            android:layout_height="65dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginBottom="20dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
+        android:id="@+id/bt_clear"
+        android:layout_width="109dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="40dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <ImageButton
-            android:id="@+id/bt_confirm"
-            android:layout_width="112dp"
-            android:layout_height="62dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/green_tick" />
+        android:id="@+id/bt_confirm"
+        android:layout_width="112dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="24dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:srcCompat="@drawable/green_tick" />
 
     <TextView
             android:id="@+id/labAge"
@@ -104,14 +102,15 @@
     </RadioGroup>
 
     <Button
-            android:id="@+id/bt_cancel"
-            android:layout_width="357dp"
-            android:layout_height="57dp"
-            android:layout_marginBottom="16dp"
-            android:text="@android:string/cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/bt_cancel"
+        android:layout_width="357dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="92dp"
+        android:text="@android:string/cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6" />
 
     <TextView
             android:id="@+id/labCondition"
@@ -171,6 +170,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="469dp" />
 
 
     <!--    <TextView-->

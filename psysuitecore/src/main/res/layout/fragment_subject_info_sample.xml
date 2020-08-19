@@ -84,11 +84,10 @@
         android:id="@+id/bt_confirm"
         android:layout_width="110dp"
         android:layout_height="50dp"
-        android:layout_marginTop="12dp"
         android:layout_marginEnd="24dp"
         android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/swInteractive"
+        app:layout_constraintTop_toTopOf="@+id/guideline10"
         app:srcCompat="@drawable/green_tick" />
 
     <EditText
@@ -106,10 +105,9 @@
         android:layout_width="110dp"
         android:layout_height="51dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/swInteractive"
+        app:layout_constraintTop_toTopOf="@+id/guideline10"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <EditText
@@ -293,15 +291,13 @@
     <Button
         android:id="@+id/bt_cancel"
         android:layout_width="358dp"
-        android:layout_height="35dp"
-        android:layout_marginBottom="16dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="56dp"
         android:text="@android:string/cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.528"
+        app:layout_constraintHorizontal_bias="0.547"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_clear"
-        app:layout_constraintVertical_bias="0.041" />
+        app:layout_constraintTop_toTopOf="@+id/guideline10" />
 
     <Spinner
         android:id="@+id/spTactile"
@@ -405,14 +401,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="316dp" />
+        app:layout_constraintGuide_begin="302dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="452dp" />
+        app:layout_constraintGuide_begin="432dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -451,5 +447,12 @@
         android:layout_marginTop="60dp"
         app:layout_constraintStart_toEndOf="@+id/labAudioResource"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="523dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -346,14 +346,27 @@ abstract class TestBasic(protected val ctx: Context,
         return mTrial.debugInfo()
     }
 
+    protected fun getValidAudioManager(manager: AudioManager?):AudioManager?{
+        return manager ?: mAudioManager
+    }
+
+    protected fun getValidTactileManager(manager: TactileManager?):TactileManager?{
+        return manager ?: mTactileManager
+    }
+
+    protected fun getValidVisualManager(manager: VisualManager?):VisualManager?{
+        return manager ?: mVisualManager
+    }
+
+
     // manage durations when they are defined in the single call or retrieve the global value
     // returns MAX, MIN, MEAN
     private fun getDuration(managerA: StimulusManager? = null, managerT: StimulusManager? = null, managerV: StimulusManager? = null):Triple<Long,Long,Long>{
 
         val durs:MutableList<Long> = mutableListOf()
-        if(managerA != null)     if(managerA.duration > 0)    durs.add(managerA.duration)
-        if(managerT != null)     if(managerT.duration > 0)    durs.add(managerT.duration)
-        if(managerV != null)     if(managerV.duration > 0)    durs.add(managerV.duration)
+        if(managerA != null)    if(managerA.duration > 0)    durs.add(managerA.duration)
+        if(managerT != null)    if(managerT.duration > 0)    durs.add(managerT.duration)
+        if(managerV != null)    if(managerV.duration > 0)    durs.add(managerV.duration)
 
         if(durs.isEmpty())  return Triple(currStimulusDuration, currStimulusDuration, currStimulusDuration)
 
@@ -391,28 +404,42 @@ abstract class TestBasic(protected val ctx: Context,
 
     // subtract system delay corrections (all positive) to given trial delays (all positive).
     // calculate min latency after correction, if negative => shift all latencies forward and report it
-    protected fun arrangeDelays(a:Long, t:Long, v:Long, stim_delay:StimuliDelay):CorrectedStimuliDelay{
+    // v 0.9.5.1 added type check in case delays were not set to -1. e.g. when calling deliverAlignedStimuliPair
+    protected fun arrangeDelays(a:Long, t:Long, v:Long, stim_delay:StimuliDelay, atype:Int=0, ttype:Int=0, vtype:Int=0 ):CorrectedStimuliDelay{
 
         val deltas = mutableListOf(-1L, -1L, -1L)
+        var minimum = 1000000L
 
-        if(a != -1L) deltas[0] = a - stim_delay.a
-        if(t != -1L) deltas[1] = t - stim_delay.t
-        if(v != -1L) deltas[2] = v - stim_delay.v
-
-        val minimum = min(deltas)
+        if(a != -1L && atype != -1){
+            deltas[0] = a - stim_delay.a
+            minimum = deltas[0]
+        }
+        if(t != -1L && ttype != -1){
+            deltas[1] = t - stim_delay.t
+            minimum = min(listOf(minimum, deltas[1]))
+        }
+        if(v != -1L && vtype != -1){
+            deltas[2] = v - stim_delay.v
+            minimum = min(listOf(minimum, deltas[2]))
+        }
 
         val corr_delays = CorrectedStimuliDelay()
 
+        if(minimum ==  1000000L){
+            Log.e("TestBasic", "Error in arrangeDelays: none of delays/types were valid")
+            return corr_delays
+        }
+
         if(minimum < 0){
-            corr_delays.a = if (a != -1L) deltas[0] - minimum else -1
-            corr_delays.t = if (t != -1L) deltas[1] - minimum else -1
-            corr_delays.v = if (v != -1L) deltas[2] - minimum else -1
+            corr_delays.a = if (a != -1L && atype != -1) deltas[0] - minimum else -1
+            corr_delays.t = if (t != -1L && ttype != -1) deltas[1] - minimum else -1
+            corr_delays.v = if (v != -1L && vtype != -1) deltas[2] - minimum else -1
             corr_delays.shift = -minimum
         }
         else {
-            corr_delays.a = if (a != -1L) deltas[0] else -1
-            corr_delays.t = if (t != -1L) deltas[1] else -1
-            corr_delays.v = if (v != -1L) deltas[2] else -1
+            corr_delays.a = if (a != -1L && atype != -1) deltas[0] else -1
+            corr_delays.t = if (t != -1L && ttype != -1) deltas[1] else -1
+            corr_delays.v = if (v != -1L && vtype != -1) deltas[2] else -1
             corr_delays.shift = 0
         }
         return corr_delays
@@ -430,7 +457,7 @@ abstract class TestBasic(protected val ctx: Context,
                                             stimuliDelay: StimuliDelay,
                                             onEnd:() -> Unit = {}){
 
-        val unimodal_types = unimodaltypesFromMainType(type)
+        val unimodal_types = unimodaltypesFromMainType(type)    // returns A, T, V
         deliverAlignedStimuliPair(isi, managerA, managerT, managerV, stimuliDelay, unimodal_types[0], unimodal_types[1], unimodal_types[2], onEnd)
     }
 
@@ -441,7 +468,7 @@ abstract class TestBasic(protected val ctx: Context,
                                             audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                             onEnd:()-> Unit = {}){
 
-        val corr_delays = arrangeDelays(0,0,0, stimuliDelay)
+        val corr_delays = arrangeDelays(0,0,0, stimuliDelay, audiotype, tactiletype, visualtype)
         deliverShiftedStimuliPair(isi, corr_delays.a, corr_delays.t, corr_delays.v, corr_delays.shift, managerA, managerT, managerV, audiotype, tactiletype, visualtype, onEnd)
     }
 
@@ -451,11 +478,14 @@ abstract class TestBasic(protected val ctx: Context,
                                             audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                             onEnd:() -> Unit = {}){
 
-        val meanduration = getDuration(managerA, managerT, managerV).third
+        val am = getValidAudioManager(managerA)
+        val tm = getValidTactileManager(managerT)
+        val vm = getValidVisualManager(managerV)
+        val meanduration = getDuration(am, tm, vm).third
 
-        deliverShiftedStimulus(a, t, v, managerA, managerT, managerV, audiotype, visualtype, tactiletype)
+        deliverShiftedStimulus(a, t, v, am, tm, vm, audiotype, tactiletype, visualtype)
         mStimuliHandler.postDelayed({
-            deliverShiftedStimulus(a, t, v, managerA, managerT, managerV, audiotype, visualtype, tactiletype){   onEnd() }
+            deliverShiftedStimulus(a, t, v, am, tm, vm, audiotype, tactiletype, visualtype){   onEnd() }
         }, (meanduration + isi + shift))
     }
 
@@ -474,12 +504,12 @@ abstract class TestBasic(protected val ctx: Context,
 
         val am: AudioManager?
         if(a > -1) {
-            am = managerA ?:    if (mAudioManager == null) {
-                                    Log.e("TestBasic", "error in deliverShiftedStimulus: a valid audio manager was not found")
-                                    return
-                                }
-                                else mAudioManager
-            durlist.add(am!!.duration + a)
+            am = getValidAudioManager(managerA)
+            if(am == null) {
+                Log.e("TestBasic", "error in deliverShiftedStimulus: a valid audio manager was not found")
+                return
+            }
+            durlist.add(am.duration + a)
             mStimuliHandler.postDelayed({
                 Log.d("TestBasic", "audio: type=$audiotype")
                 deliverUnimodalStimulus(audiotype, am)
@@ -538,7 +568,7 @@ abstract class TestBasic(protected val ctx: Context,
                                          audiotype:Int = STIM_TYPE_A1, tactiletype:Int = STIM_TYPE_T1, visualtype:Int = STIM_TYPE_V1,
                                          onEnd:()-> Unit = {}){
 
-        val corr_delays = arrangeDelays(0,0,0, stimuliDelay)
+        val corr_delays = arrangeDelays(0,0,0, stimuliDelay, audiotype, tactiletype, visualtype)
         deliverShiftedStimulus(corr_delays.a, corr_delays.t, corr_delays.v, managerA, managerT, managerV, audiotype, tactiletype, visualtype, onEnd)
     }
 
