@@ -79,7 +79,7 @@ class ATBUnBalancedSummary(ctx:Context) : Summary(ctx){
         }
 
         override fun toString():String{
-            var res = "type\tlatency\tntrial\t%yes\t%succ\n"
+            var res = "type\tlat\tntr\t%yes\t%succ\trt\n"
             latencies.map{
                 res += it.toString()
             }
@@ -113,7 +113,7 @@ class ATBUnBalancedSummary(ctx:Context) : Summary(ctx){
         }
 
         override fun toString():String{
-            return "$label\t$latency\t$ntrial\t$perc_discrimination\t$perc_succ\n"
+            return "$label\t$latency\t$ntrial\t$perc_discrimination\t$perc_succ\t$rt\n"
         }
     }
 }

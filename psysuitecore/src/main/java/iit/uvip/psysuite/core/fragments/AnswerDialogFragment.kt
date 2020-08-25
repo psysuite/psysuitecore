@@ -13,6 +13,7 @@ import iit.uvip.psysuite.core.common.TestBasic
 import kotlinx.android.synthetic.main.fragment_answer.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.ui.showToast
+import java.lang.Math.random
 import java.util.*
 
 
@@ -24,6 +25,7 @@ class AnswerDialogFragment: DialogFragment()
 
     private lateinit var mAnswers:ArrayList<String>
     lateinit var onsetDate:Date
+    private val mHandler:Handler = Handler()
 
     companion object {
         fun newInstance(title: String): AnswerDialogFragment {
@@ -70,9 +72,10 @@ class AnswerDialogFragment: DialogFragment()
 
 
         if(isDebug){
-            Handler().postDelayed({
-                sendResult(mAnswers[0], 100, TestBasic.EVENT_ANSWER_GIVEN)
-            }, 500L)
+            mHandler.postDelayed({
+                if(random() < 0.5)  sendResult(mAnswers[0], 100, TestBasic.EVENT_ANSWER_GIVEN)
+                else                sendResult(mAnswers[1], 100, TestBasic.EVENT_ANSWER_GIVEN)
+            }, 1000L)
         }
     }
 
@@ -106,6 +109,7 @@ class AnswerDialogFragment: DialogFragment()
         }
 
         bt_abort_test.setOnClickListener{
+            mHandler.removeCallbacksAndMessages(null)
             sendResult("", 0, TestBasic.EVENT_TRIAL_ABORT)
             dismiss()
         }
