@@ -1,6 +1,6 @@
 package iit.uvip.psysuite.core.common
 
-abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:String="", protected var correct_answer:String) {
+abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:String="", var correct_answer:String) {
 
     var user_answer:String  = ""
     var repetitions:Int     =  1
@@ -10,6 +10,10 @@ abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:Strin
 
     // data exported to log file
     abstract fun Log():String
+
+    open fun debugInfo():String{
+        return "lab=$label, type=$type, corr_answ=$correct_answer"
+    }
 
     open fun setResponse(result: String, elapsedms: Int) {
         user_answer = result

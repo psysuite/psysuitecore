@@ -2,6 +2,7 @@ package iit.uvip.psysuite.core.fragments
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,8 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TestBasic
 import kotlinx.android.synthetic.main.fragment_answer.*
 import org.albaspazio.core.accessory.getTimeDifference
-import org.albaspazio.core.accessory.showToast
+import org.albaspazio.core.ui.showToast
+import java.lang.Math.random
 import java.util.*
 
 
@@ -19,8 +21,11 @@ class AnswerDialogFragment: DialogFragment()
 {
     val LOG_TAG = AnswerDialogFragment::class.java.simpleName
 
+    private var isDebug:Boolean = false
+
     private lateinit var mAnswers:ArrayList<String>
     lateinit var onsetDate:Date
+    private val mHandler:Handler = Handler()
 
     companion object {
         fun newInstance(title: String): AnswerDialogFragment {
@@ -46,11 +51,13 @@ class AnswerDialogFragment: DialogFragment()
         val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
         val question    = requireArguments().getString("question", "Enter Name")
         val answers     = requireArguments().getStringArrayList("answers")
+        val debug_info  = requireArguments().getString("debug")
 
         dialog?.setTitle(title)
 
         txt_trials.text     = str_trial
         txt_question.text   = question
+        txt_debug.text      = debug_info
 
         if (answers != null)
             if (answers.isNotEmpty()) {
@@ -62,6 +69,14 @@ class AnswerDialogFragment: DialogFragment()
             }
 
         onsetDate           = Date()
+
+
+        if(isDebug){
+            mHandler.postDelayed({
+                if(random() < 0.5)  sendResult(mAnswers[0], 100, TestBasic.EVENT_ANSWER_GIVEN)
+                else                sendResult(mAnswers[1], 100, TestBasic.EVENT_ANSWER_GIVEN)
+            }, 1000L)
+        }
     }
 
     override fun onResume() {
@@ -82,7 +97,10 @@ class AnswerDialogFragment: DialogFragment()
                     val radioId = radioGroupIntervals.indexOfChild(radioGroupIntervals.findViewById(radioGroupIntervals.checkedRadioButtonId))
                     sendResult(mAnswers[radioId], elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
                 }
-                false -> showToast("Seleziona un'opzione", requireContext())
+                false -> showToast(
+                    "Seleziona un'opzione",
+                    requireContext()
+                )
             }
         }
 
@@ -91,6 +109,7 @@ class AnswerDialogFragment: DialogFragment()
         }
 
         bt_abort_test.setOnClickListener{
+            mHandler.removeCallbacksAndMessages(null)
             sendResult("", 0, TestBasic.EVENT_TRIAL_ABORT)
             dismiss()
         }

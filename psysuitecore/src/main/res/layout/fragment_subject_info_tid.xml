@@ -6,71 +6,35 @@
         android:layout_height="match_parent"
         tools:context=".fragments.AnswerDialogFragment">
 
-
     <Spinner
-            android:id="@+id/spCondition"
-            android:layout_width="229dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="28dp"
-            android:textAlignment="textEnd"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner" />
-
-    <TextView
-            android:id="@+id/labGroupFirstModality"
-            android:layout_width="120dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="44dp"
-            android:text="@string/tid_group_first_modality_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labCondition" />
-
-    <RadioGroup
-            android:id="@+id/radioGroupFirstModality"
-            android:layout_width="173dp"
-            android:layout_height="54dp"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="12dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spCondition">
-
-        <RadioButton
-                android:id="@+id/rb_first_audio"
-                android:layout_width="82dp"
-                android:layout_height="49dp"
-                android:text="@string/tid_rb_audio_text" />
-
-        <RadioButton
-                android:id="@+id/rb_first_vibro"
-                android:layout_width="85dp"
-                android:layout_height="49dp"
-                android:text="@string/tid_rb_vibro_text" />
-
-    </RadioGroup>
+        android:id="@+id/spCondition"
+        android:layout_width="166dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="12dp"
+        android:textAlignment="textEnd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <ImageButton
-            android:id="@+id/bt_clear"
-            android:layout_width="109dp"
-            android:layout_height="65dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginBottom="20dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
+        android:id="@+id/bt_clear"
+        android:layout_width="109dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="40dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <ImageButton
-            android:id="@+id/bt_confirm"
-            android:layout_width="112dp"
-            android:layout_height="62dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/green_tick" />
+        android:id="@+id/bt_confirm"
+        android:layout_width="112dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="24dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        app:srcCompat="@drawable/green_tick" />
 
     <TextView
             android:id="@+id/labAge"
@@ -138,14 +102,15 @@
     </RadioGroup>
 
     <Button
-            android:id="@+id/bt_cancel"
-            android:layout_width="357dp"
-            android:layout_height="57dp"
-            android:layout_marginBottom="16dp"
-            android:text="@android:string/cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/bt_cancel"
+        android:layout_width="357dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="92dp"
+        android:text="@android:string/cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6" />
 
     <TextView
             android:id="@+id/labCondition"
@@ -168,22 +133,84 @@
             app:layout_constraintTop_toBottomOf="@+id/labAge" />
 
     <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="188dp"
-            android:layout_height="41dp"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
+        android:id="@+id/spinner"
+        android:layout_width="165dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spGroup" />
 
     <TextView
-            android:id="@+id/labSpinner"
-            android:layout_width="120dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="44dp"
-            android:text="TEXT"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labGender" />
+        android:id="@+id/labSpinner"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="50dp"
+        android:text="TEXT"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labGroup" />
+
+    <TextView
+        android:id="@+id/labGroup"
+        android:layout_width="122dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="44dp"
+        android:text="@string/group"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labGender" />
+
+    <Spinner
+        android:id="@+id/spGroup"
+        android:layout_width="165dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="469dp" />
+
+
+    <!--    <TextView-->
+    <!--            android:id="@+id/labGroupFirstModality"-->
+    <!--            android:layout_width="120dp"-->
+    <!--            android:layout_height="24dp"-->
+    <!--            android:layout_marginStart="28dp"-->
+    <!--            android:layout_marginTop="44dp"-->
+    <!--            android:text="@string/tid_group_first_modality_text"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@+id/labCondition" />-->
+
+    <!--    <RadioGroup-->
+    <!--        android:id="@+id/radioGroupFirstModality"-->
+    <!--        android:layout_width="173dp"-->
+    <!--        android:layout_height="54dp"-->
+    <!--        android:layout_marginTop="28dp"-->
+    <!--        android:layout_marginEnd="4dp"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/spCondition">-->
+
+    <!--        <RadioButton-->
+    <!--            android:id="@+id/rb_first_audio"-->
+    <!--            android:layout_width="82dp"-->
+    <!--            android:layout_height="49dp"-->
+    <!--            android:text="@string/tid_rb_audio_text" />-->
+
+    <!--        <RadioButton-->
+    <!--            android:id="@+id/rb_first_vibro"-->
+    <!--            android:layout_width="85dp"-->
+    <!--            android:layout_height="49dp"-->
+    <!--            android:text="@string/tid_rb_vibro_text" />-->
+    <!--    </RadioGroup>-->
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

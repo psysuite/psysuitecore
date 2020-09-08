@@ -3,18 +3,10 @@ package iit.uvip.psysuite.core.tests.bis
 import iit.uvip.psysuite.core.common.TrialBasic
 
 
-class TrialBIS(id:Int=-1, type:Int, label:String, val position:Int, val conflict_type:String, val duration:Int, private val duration2:Int=0): TrialBasic(id,type,label, ""){
+class TrialBIS(id:Int=-1, type:Int, label:String, corr_answer:String, val position:Int, val conflict_type:String, val duration:Int, private val duration2:Int=0): TrialBasic(id,type,label, corr_answer){
 
     companion object {
-        @JvmStatic val LOG_HEADER           = "id\tlabel\tlat\tconflict\tres\tcor_ans\tuser_ans\telapsed\trep\n"
-        @JvmStatic val LAST_STIMULUS_DELAY  = 1000
-    }
-
-    init {
-        correct_answer = when (position >= LAST_STIMULUS_DELAY / 2) {
-            true    -> "1"
-            false   -> "0"
-        }
+        @JvmStatic val LOG_HEADER           = "id\tlabel\tlat\tconfl\tres\tcor_ans\tuser_ans\telapsed\trep\n"
     }
 
     // all class exported as string
@@ -25,5 +17,9 @@ class TrialBIS(id:Int=-1, type:Int, label:String, val position:Int, val conflict
     // data exported to log file
     override fun Log():String{
         return id.toString() +  "\t" + label + "\t" + position.toString() + "\t" + conflict_type + "\t" + success.toString() + "\t" + correct_answer + "\t" + user_answer + "\t" + elapsed.toString() + "\t" + repetitions.toString() + "\n"
+    }
+
+    override fun debugInfo():String{
+        return "${super.debugInfo()}, pos=$position, conf_type=$conflict_type"
     }
 }

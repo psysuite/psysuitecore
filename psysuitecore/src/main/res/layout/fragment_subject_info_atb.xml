@@ -13,7 +13,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="28dp"
             android:layout_marginTop="36dp"
-            android:text="@string/atb_interactivity"
+            android:text="@string/interactivity"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/labWhiteNoise" />
 
@@ -28,26 +28,26 @@
             app:layout_constraintTop_toBottomOf="@+id/labGender" />
 
     <ImageButton
-            android:id="@+id/bt_clear"
-            android:layout_width="121dp"
-            android:layout_height="63dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginBottom="28dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
+        android:id="@+id/bt_clear"
+        android:layout_width="121dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="48dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <ImageButton
-            android:id="@+id/bt_confirm"
-            android:layout_width="130dp"
-            android:layout_height="62dp"
-            android:layout_marginEnd="28dp"
-            android:layout_marginBottom="28dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/bt_cancel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/green_tick" />
+        android:id="@+id/bt_confirm"
+        android:layout_width="130dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="28dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4"
+        app:srcCompat="@drawable/green_tick" />
 
     <TextView
             android:id="@+id/labAge"
@@ -115,15 +115,15 @@
     </RadioGroup>
 
     <Button
-            android:id="@+id/bt_cancel"
-            android:layout_width="353dp"
-            android:layout_height="51dp"
-            android:layout_marginBottom="48dp"
-            android:text="Cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.492"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/bt_cancel"
+        android:layout_width="353dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="128dp"
+        android:text="Cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.517"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4" />
 
     <Spinner
             android:id="@+id/spCondition"
@@ -173,5 +173,12 @@
             android:text="@string/gender"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/labAge" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="464dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

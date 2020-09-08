@@ -1,5 +1,6 @@
-package iit.uvip.psysuite.core.tests.temporalbinding.atb
+package iit.uvip.psysuite.core.tests.temporalbinding
 
+import iit.uvip.psysuite.core.common.StimuliDelay
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.Device
@@ -12,7 +13,7 @@ in subclasses, user must resolve the condition code according to internal variab
 
 // base class for all tests
 @Parcelize
-open class SubjectATBParcel(
+open class SubjectBindingsParcel(
     override var type: Int = -1,
     override var label: String = "",
     override var age: Int = -1,
@@ -21,10 +22,12 @@ open class SubjectATBParcel(
     override var canRecordAudio:Boolean = false,
     override var testClass:String = "",
     override var device: Device? = null,
+    override var block:Int = -1,
+    override var stimuliDelay: StimuliDelay = StimuliDelay(),
 
     var whitenoise: Boolean = true
 
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device)
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device, block, stimuliDelay)
 
 
 
