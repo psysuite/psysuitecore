@@ -7,6 +7,7 @@ import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.navigation.Navigation
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TestBasic
@@ -16,9 +17,9 @@ import iit.uvip.psysuite.core.tests.bis.TestBIS
 import iit.uvip.psysuite.core.tests.mmd.TestMMD
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.sample.TestSample
-import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
 import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
+import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,6 +29,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.getAbsoluteFilePath
+import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
@@ -37,6 +39,7 @@ import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.ui.showToast
 import java.util.*
+import kotlin.reflect.KFunction
 
 /*
 Three operative modalities:
@@ -69,7 +72,7 @@ class TestFragment : BaseFragment(
 
     private val disposable                          = CompositeDisposable()
 
-    private var answerDialogFragment:AnswerDialogFragment?      = null
+    private var answerDialogFragment:DialogFragment?      = null
     private var isAnswerDialogOn:Boolean            = false
 
     private var isPaused:Boolean                    = false
@@ -85,6 +88,7 @@ class TestFragment : BaseFragment(
     private val isDebug:Boolean                     = false
     private var currDebugInfo:String                = ""
 
+    private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
     // ==========================================================================================================================
     // ==========================================================================================================================
     companion object {
@@ -131,16 +135,18 @@ class TestFragment : BaseFragment(
                 TestBasic.TEST_ATB_TIME_DOUBLESTIM,
                 TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
                 TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
-                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, isDebug)
+                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, isDebug)
 
                 TestBasic.TEST_ATVB_TIME_S_UNBAL,
                 TestBasic.TEST_ATVB_TIME_S_BAL,
                 TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, circleView, isDebug)
+                TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, isDebug)
 
                 TestBasic.TEST_SAMPLE_ALIGNED,
                 TestBasic.TEST_SAMPLE_SHIFTED,
                 TestBasic.TEST_SAMPLE_PAIR              -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView, isDebug)
+
+                TestBasic.TEST_TFI                      -> mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, true)
 
                 else    -> {
                     showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
@@ -155,6 +161,11 @@ class TestFragment : BaseFragment(
             Navigation.findNavController(requireView()).popBackStack()
             return
         }
+
+        val answerDialogClass = if(mSubjectParcel!!.classes.size > 1 && mSubjectParcel!!.classes[1].isNotEmpty())
+                                        mSubjectParcel!!.classes[1]
+                                else    "iit.uvip.psysuite.core.fragments.AnswerDialogFragment"
+        answerDialogRef = getCompanionObjectMethod(answerDialogClass, "newInstance")
 
         bt_next.visibility      = View.INVISIBLE
         bt_abort.visibility     = View.INVISIBLE
@@ -422,17 +433,23 @@ class TestFragment : BaseFragment(
         b.putStringArrayList("answers", mTest.validAnswers as ArrayList<String>)
         b.putString("debug", currDebugInfo)
 
-        answerDialogFragment = AnswerDialogFragment.newInstance("Some Title")
-        (answerDialogFragment as AnswerDialogFragment).setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
-        (answerDialogFragment as AnswerDialogFragment).arguments    = b
-        (answerDialogFragment as AnswerDialogFragment).isCancelable = false
-        (answerDialogFragment as AnswerDialogFragment).show(parentFragmentManager, ANSWER_DIALOG_TAG)
+        answerDialogFragment = answerDialogRef.first?.call(answerDialogRef.second, "") as DialogFragment
+        if(answerDialogFragment == null){
+            showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer) + "\nAnswer dialog was not available")
+            return
+        }
+
+        Log.d("TestFragment", "ok")
+        answerDialogFragment?.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
+        answerDialogFragment?.arguments    = b
+        answerDialogFragment?.isCancelable = false
+        answerDialogFragment?.show(parentFragmentManager, ANSWER_DIALOG_TAG)
         isAnswerDialogOn = true
     }
 
     private fun closeAnswerDialog(){
         if(isAnswerDialogOn) {
-            (answerDialogFragment as AnswerDialogFragment).dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
+            answerDialogFragment?.dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
             isAnswerDialogOn = false
         }
     }

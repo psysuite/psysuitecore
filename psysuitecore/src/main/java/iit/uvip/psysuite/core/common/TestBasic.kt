@@ -59,6 +59,11 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_NEXTTRIAL_VOICE_ANSWER      = 3         //  wait for VOICE ANSWER dialog through speech recognition
         @JvmStatic val TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER = 4       //  wait for either ANSWER dialog or VOICE ANSWER through speech recognition
 
+        @JvmStatic val TEST_WNOISE_DISABLED             = 0         //  disabled, cannot enable it
+        @JvmStatic val TEST_WNOISE_CHOOSE_OFF           = 1         //  can choose, disabled by default
+        @JvmStatic val TEST_WNOISE_CHOOSE_ON            = 2         //  can choose, enabled by default
+        @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
+
         //-----------------------------------------------------------------------------------------
         //
         //-----------------------------------------------------------------------------------------
@@ -106,6 +111,8 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_SAMPLE_ALIGNED          = 150
         @JvmStatic val TEST_SAMPLE_SHIFTED          = 151
         @JvmStatic val TEST_SAMPLE_PAIR             = 152
+
+        @JvmStatic val TEST_TFI                     = 160
 
         //-----------------------------------------------------------------------------------------
         // STIMULUS TYPES UNIQUE CODES
@@ -405,6 +412,7 @@ abstract class TestBasic(protected val ctx: Context,
     // subtract system delay corrections (all positive) to given trial delays (all positive).
     // calculate min latency after correction, if negative => shift all latencies forward and report it
     // v 0.9.5.1 added type check in case delays were not set to -1. e.g. when calling deliverAlignedStimuliPair
+    // a/t/v type contain the unimodal code or -1
     protected fun arrangeDelays(a:Long, t:Long, v:Long, stim_delay:StimuliDelay, atype:Int=0, ttype:Int=0, vtype:Int=0 ):CorrectedStimuliDelay{
 
         val deltas = mutableListOf(-1L, -1L, -1L)
@@ -457,7 +465,7 @@ abstract class TestBasic(protected val ctx: Context,
                                             stimuliDelay: StimuliDelay,
                                             onEnd:() -> Unit = {}){
 
-        val unimodal_types = unimodaltypesFromMainType(type)    // returns A, T, V
+        val unimodal_types = unimodaltypesFromMainType(type)    // returns [STIM_TYPE_Ax/-1,  STIM_TYPE_Tx/-1, STIM_TYPE_Vx/-1]
         deliverAlignedStimuliPair(isi, managerA, managerT, managerV, stimuliDelay, unimodal_types[0], unimodal_types[1], unimodal_types[2], onEnd)
     }
 

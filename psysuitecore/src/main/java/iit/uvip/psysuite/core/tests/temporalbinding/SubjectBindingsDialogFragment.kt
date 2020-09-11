@@ -26,16 +26,6 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
         spCondition.onItemSelectedListener = this
     }
 
-    override fun initData(subj: SubjectBasicParcel) {
-        super.initData(subj)
-        swWhiteNoise.isChecked = (subj as SubjectBindingsParcel).whitenoise
-    }
-
-    override fun clear() {
-        super.clear()
-        swWhiteNoise.isChecked = true
-    }
-
     override fun onNothingSelected(parent: AdapterView<*>) {}
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -61,11 +51,9 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
         }
     }
 
-    override fun updateSubject(): SubjectBindingsParcel {
+    override fun updateSubject(): SubjectBasicParcel {
 
-        subject = super.updateSubject() as SubjectBindingsParcel
-
-        (subject as SubjectBindingsParcel).whitenoise = swWhiteNoise.isChecked
+        subject = super.updateSubject()
 
         subject.nextTrailModality = when(subject.type) {                // could choose whether pausing each trial
             TestBasic.TEST_ATB_TIME_INF         ->  if(swInteractive.isChecked) TestBasic.TEST_NEXTTRIAL_BUTTON
@@ -77,11 +65,11 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
             TestBasic.TEST_ATVB_TIME_D_BAL,
             TestBasic.TEST_ATVB_TIME_S_UNBAL,
             TestBasic.TEST_ATVB_TIME_S_BAL ->  if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
-                                                     else                        TestBasic.TEST_NEXTTRIAL_ANSWER
+                                               else                        TestBasic.TEST_NEXTTRIAL_ANSWER
 
             else                                ->   subject.nextTrailModality
         }
 
-        return subject as SubjectBindingsParcel
+        return subject
     }
 }

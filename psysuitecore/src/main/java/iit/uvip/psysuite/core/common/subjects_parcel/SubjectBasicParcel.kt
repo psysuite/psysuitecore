@@ -28,10 +28,12 @@ open class SubjectBasicParcel(
     open var gender: Int = -1,
     open var nextTrailModality: Int = -1,
     open var canRecordAudio:Boolean = false,
-    open var testClass:String = "",
+    open var classes:List<String> = listOf(),
     open var device:Device? = null,
     open var block:Int = -1,
-    open var stimuliDelay:StimuliDelay = StimuliDelay()
+    open var stimuliDelay:StimuliDelay = StimuliDelay(),
+    open var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
+    open var vercode: Int = -1
 ) : Parcelable {
 
     @IgnoredOnParcel
@@ -98,7 +100,7 @@ open class SubjectBasicParcel(
 
     open fun getFilesPrefix(ctx:Context):String {
 
-        val ci = getCompanionObjectMethod(testClass, "getConditionsInfo")
+        val ci = getCompanionObjectMethod(classes[0], "getConditionsInfo")
         val type_label = (ci.first?.call(ci.second, ctx) as List<TaskCodeLabels>).getLabelLog(type)
 
         return "${label}_$type_label"

@@ -14,7 +14,7 @@
         android:layout_marginStart="36dp"
         android:background="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroupIntervals"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupAudio"
         app:srcCompat="@drawable/repeat_icon" />
 
     <ImageButton
@@ -24,7 +24,7 @@
             android:layout_marginEnd="40dp"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroupIntervals"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroupAudio"
             app:srcCompat="@drawable/green_tick" />
 
     <Button
@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <RadioGroup
-            android:id="@+id/radioGroupIntervals"
+            android:id="@+id/radioGroupAudio"
             android:layout_width="333dp"
             android:layout_height="72dp"
             android:layout_marginStart="16dp"
@@ -53,13 +53,13 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_question">
 
         <RadioButton
-                android:id="@+id/rb1"
+                android:id="@+id/rb_a_0"
                 android:layout_width="167dp"
                 android:layout_height="55dp"
                 android:text="@string/tid_rb1_text" />
 
         <RadioButton
-                android:id="@+id/rb3"
+                android:id="@+id/rb_a_1"
                 android:layout_width="167dp"
                 android:layout_height="55dp"
                 android:text="@string/tid_rb3_text" />

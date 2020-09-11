@@ -83,7 +83,7 @@
 
 
     <!-- ATB -->
-    <string name="start_atb">Audio-Tactile Binding (AT-B)</string>
+    <string name="start_atb">AT Binding (AT-B)</string>
 
     <string-array name="unused_atb_tests_array">
         <item>normale</item>
@@ -111,7 +111,7 @@
     <string name="atb_question">Sono uguali?</string>
 
     <!-- ATVB -->
-    <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
+    <string name="start_atvb">ATV Binding (ATV-B)</string>
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
     <string name="atvb_subtask_time_single_tag">SSU</string>
@@ -204,8 +204,14 @@
     <string name="mmeters_rb2_text">Uguale</string>
     <string name="mmeters_rb3_text">no</string>
 
+    <!-- TFI TEST -->
+    <string name="tfi_label">TRIPLE FLASH ILLUSION (TFI)</string>
+    <string name="tfi_question">Indica il numero di stimoli che hai visto per ciascuna delle 3 modalità</string>
+
+
     <!-- SAMPLE TEST -->
-    <string name="sample_label">TRIALS GENERATION</string>
+
+    <string name="samples_test">TRIALS GENERATION</string>
 
     <string name="select_source">Seleziona almeno una modalità di stimolazione</string>
 

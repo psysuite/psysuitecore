@@ -20,19 +20,21 @@ class SubjectTIDParcel(
     override var gender: Int = -1,
     override var nextTrailModality: Int = -1,
     override var canRecordAudio:Boolean = false,
-    override var testClass:String = "",
+    override var classes:List<String> = listOf(),
     override var device: Device? = null,
     override var block:Int = -1,
     override var stimuliDelay: StimuliDelay = StimuliDelay(),
+    override var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
+    override var vercode: Int = -1,
 
     override var spinner_sel: Int = -1,
     override var spinner_data_resource: Int = -1,
     var group: Int = -1
-) : SubjectLongitParcel(type, label, age, gender, nextTrailModality, canRecordAudio, testClass, device, block, stimuliDelay, spinner_sel, spinner_data_resource){
+) : SubjectLongitParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelay, whitenoise, vercode, spinner_sel, spinner_data_resource){
 
     override fun getFilesPrefix(ctx:Context):String{
 
-        val ci          = getCompanionObjectMethod(testClass, "getConditionsInfo")
+        val ci          = getCompanionObjectMethod(classes[0], "getConditionsInfo")
         val type_label  = (ci.first?.call(ci.second, ctx) as List<TaskCodeLabels>).getLabelLog(type)
 
         return "${label}_${group}_s${session}_$type_label"

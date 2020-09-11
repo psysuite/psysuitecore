@@ -8,16 +8,6 @@
 
 
     <TextView
-            android:id="@+id/labInteractive"
-            android:layout_width="120dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="36dp"
-            android:text="@string/interactivity"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labWhiteNoise" />
-
-    <TextView
             android:id="@+id/labCondition"
             android:layout_width="179dp"
             android:layout_height="24dp"
@@ -135,6 +125,17 @@
             app:layout_constraintHorizontal_bias="0.394"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/labCondition" />
+
+
+    <TextView
+        android:id="@+id/labInteractive"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="36dp"
+        android:text="@string/interactivity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labWhiteNoise" />
 
     <Switch
             android:id="@+id/swInteractive"

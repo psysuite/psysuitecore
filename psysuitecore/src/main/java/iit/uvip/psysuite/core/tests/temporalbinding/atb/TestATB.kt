@@ -9,7 +9,7 @@ import iit.uvip.psysuite.core.common.*
 import iit.uvip.psysuite.core.common.stimuli.AudioManager
 import iit.uvip.psysuite.core.common.stimuli.TactileManager
 import iit.uvip.psysuite.core.common.stimuli.VibratorNotDefinedException
-import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
+import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.ui.showToast
@@ -18,7 +18,7 @@ import org.albaspazio.core.ui.showToast
 class TestATB(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              override val subjectparcel: SubjectBindingsParcel,
+              override val subjectparcel: SubjectBasicParcel,
               vibrator: VibrationManager?,
               isDebug:Boolean
 ) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, isDebug = isDebug)
@@ -204,9 +204,7 @@ class TestATB(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        if (subjectparcel.whitenoise)
-            noise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
-
+        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    noise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
     }
     //              _   _   _   _   _
     // 9 segments  | |_| |_| |_| |_| |
@@ -523,7 +521,7 @@ class TestATB(ctx: Context,
                 }, WN_FIRSTSTIM_INTERVAL)
                 mStimuliHandler.postDelayed({
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
-                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI + corr_delays.shift))     // to preserve the desired ISI between 1st and 2nd stimuli,
+                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI - corr_delays.shift))     // to preserve the desired ISI between 1st and 2nd stimuli,
                                                                                                     // I also add the shift that could be eventually imposed to the fastest modality
             }
         }

@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.*
 import iit.uvip.psysuite.core.common.stimuli.*
-import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
+import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindings3latencies
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import org.albaspazio.core.accessory.VibrationManager
@@ -19,7 +19,7 @@ class TestATVB(
     ctx: Context,
     activity: Activity,
     hostfragment: Fragment,
-    override val subjectparcel: SubjectBindingsParcel,
+    override val subjectparcel: SubjectBasicParcel,
     vibrator: VibrationManager?,
     mImageView: ImageView?,
     isDebug:Boolean
@@ -256,7 +256,7 @@ class TestATVB(
             }
         }
 
-        if (subjectparcel.whitenoise)    noise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    noise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         // mTrials list
         nTrials         = mTrials.size
@@ -374,32 +374,40 @@ class TestATVB(
                     deliverUnBalancedStimuli((trial as TrialBindingsUnBalanced))
                 }, WN_FIRSTSTIM_INTERVAL)
             }
-            TEST_ATVB_TIME_S_BAL -> {
-                mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = UNIMODAL_AUDIO_CODE, visualtype = STIM_TYPE_V2){ onTrialEnd()}
-                }, WN_FIRSTSTIM_INTERVAL)
-            }
+
             TEST_ATVB_TIME_D_UNBAL -> {
+                // to align trimodal stimuli, I have to delay the fastest modality by time_shift ms.
+                // Thus I anticipate all main onsets by the same ms
                 val corr_delays = arrangeDelays(0,0,0, subjectparcel.stimuliDelay)
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
                     deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
-                }, WN_FIRSTSTIM_INTERVAL)
+                }, WN_FIRSTSTIM_INTERVAL - corr_delays.shift)
+
+                // this second stimuli onset could be improved. I should calculate here the final corrected delay (sum of trial specs & system delay)
+                // and adjust  corr_delays.shift accordingly. but here few ms between the two stimuli does not change the task
                 mStimuliHandler.postDelayed({
                     deliverUnBalancedStimuli((trial as TrialBindingsUnBalanced))
-                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI + corr_delays.shift))
+                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI - corr_delays.shift))
             }
-            TEST_ATVB_TIME_D_BAL -> {
-                val corr_delays = arrangeDelays(0,0,0, subjectparcel.stimuliDelay)
-                mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
-                }, WN_FIRSTSTIM_INTERVAL)
-                mStimuliHandler.postDelayed({
-                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, (trial as TrialBindings3latencies).a, trial.t, trial.v){ onTrialEnd()}
-                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI + corr_delays.shift))
-            }
+
+//            TEST_ATVB_TIME_S_BAL -> {
+//                mStimuliHandler.postDelayed({
+//                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+//                    deliverShiftedStimulus((trial as TrialBindings3latencies).a, trial.t, trial.v, audiotype = UNIMODAL_AUDIO_CODE, visualtype = STIM_TYPE_V2){ onTrialEnd()}
+//                }, WN_FIRSTSTIM_INTERVAL)
+//            }
+
+//            TEST_ATVB_TIME_D_BAL -> {
+//                val corr_delays = arrangeDelays(0,0,0, subjectparcel.stimuliDelay)
+//                mStimuliHandler.postDelayed({
+//                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+//                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+//                }, WN_FIRSTSTIM_INTERVAL)
+//                mStimuliHandler.postDelayed({
+//                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, (trial as TrialBindings3latencies).a, trial.t, trial.v){ onTrialEnd()}
+//                }, (WN_FIRSTSTIM_INTERVAL + currStimulusDuration + curISI - corr_delays.shift))
+//            }
         }
     }
 

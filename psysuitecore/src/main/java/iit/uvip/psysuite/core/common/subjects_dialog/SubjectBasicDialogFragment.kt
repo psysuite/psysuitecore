@@ -13,7 +13,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
+import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
 import org.albaspazio.core.accessory.deleteFilesStartingWith
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.ui.show2ChoisesDialog
@@ -51,10 +51,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             return
         } else subject = subj
 
-        val ntm         = getCompanionObjectMethod(subject.testClass, "getNextTrialModes")
+        val ntm         = getCompanionObjectMethod(subject.classes[0], "getNextTrialModes")
         mNextTrialModes = ntm.first?.call(ntm.second) as List<List<Int>>
 
-        val ci          = getCompanionObjectMethod(subject.testClass, "getConditionsInfo")
+        val ci          = getCompanionObjectMethod(subject.classes[0], "getConditionsInfo")
         mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<TaskCodeLabels>
 
         initData(subject)
@@ -124,6 +124,8 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         if (subj.gender != -1)  radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
         else                    radioGroupGender.clearCheck()
         //------------------------------------------------------
+        swWhiteNoise.isChecked = (subj.whitenoise > TestBasic.TEST_WNOISE_CHOOSE_OFF)
+
     }
 
     protected fun setConditions(tc:List<TaskCodeLabels>){
@@ -193,6 +195,8 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             swInteractive?.isChecked    = false
             subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
         }
+
+        swWhiteNoise.isChecked = true
     }
 
     //------------------------------------------------------------------------------------
@@ -234,6 +238,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 null -> subject.nextTrailModality
             }
         }
+
+        subject.whitenoise =    if(swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
+                                else                        TestBasic.TEST_WNOISE_CHOOSE_OFF
+
         return subject
     }
 

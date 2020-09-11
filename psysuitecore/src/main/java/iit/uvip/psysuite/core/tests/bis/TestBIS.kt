@@ -38,7 +38,7 @@ class TestBIS(
         @JvmStatic val STIMULUS_DURATION_TACTILE:Long   = 150
         @JvmStatic val STIMULUS_DURATION_AUDIO:Long     = 50
         @JvmStatic val QUESTION_DELAY                   = 1500      // latency
-        @JvmStatic val FIRST_STIMULUS_DELAY             = 1000      // ms to wait before sending the first trial
+        @JvmStatic val FIRST_STIMULUS_DELAY             = 1000L      // ms to wait before sending the first trial
         @JvmStatic val LAST_STIMULUS_DELAY              = 1000      // ms of the third stimulus wrt first
 
         @JvmStatic val TRIAL_STAGE_1                = 1
@@ -228,22 +228,30 @@ class TestBIS(
         noise?.start()
         if(isRepeat)    mTrial.repetitions++
 
+        // to align bimodal stimuli, I have to delay the fastest modality by time_shift ms.
+        // Thus I anticipate all main onsets by the same ms
+        val time_shift = when(trial.type){
+            TEST_BISECTION_AUDIO_TACTILE    -> arrangeDelays(0,0,-1, subjectparcel.stimuliDelay).shift
+            TEST_BISECTION_AUDIO_VIDEO      -> arrangeDelays(0,-1,0, subjectparcel.stimuliDelay).shift
+            else                            -> 0
+        }
+
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialBIS, TRIAL_STAGE_1)
             testEvent.accept(Pair(EVENT_STIMULI_START, null))
-        }, FIRST_STIMULUS_DELAY.toLong())
+        }, FIRST_STIMULUS_DELAY - time_shift)
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialBIS, TRIAL_STAGE_2)
-        }, (FIRST_STIMULUS_DELAY + (trial as TrialBIS).position).toLong())
+        }, (FIRST_STIMULUS_DELAY - time_shift + (trial as TrialBIS).position))
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial, TRIAL_STAGE_3)
-        }, (FIRST_STIMULUS_DELAY + LAST_STIMULUS_DELAY).toLong())
+        }, (FIRST_STIMULUS_DELAY - time_shift + LAST_STIMULUS_DELAY))
 
         mStimuliHandler.postDelayed({
             onTrialEnd()
-        }, (FIRST_STIMULUS_DELAY + QUESTION_DELAY).toLong())
+        }, (FIRST_STIMULUS_DELAY - time_shift + QUESTION_DELAY))
     }
 
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
@@ -261,8 +269,14 @@ class TestBIS(
         mVisualManager!!.drawResOn = mDrawablesResource[stage]
         if(stage == TRIAL_STAGE_2){
             // mid (second) stimulus: audio and video are dissociated
-            if(trial.conflict_type == STIMULUS_TYPE_VIDEO_AUDIO_LOG)    deliverShiftedStimulus(STIM_TYPE_A1V2, AV_STIMULUS_DELTA.toLong(), -1, 0)
-            else                                                        deliverShiftedStimulus(STIM_TYPE_A1V2, 0, -1, AV_STIMULUS_DELTA.toLong())
+            if(trial.conflict_type == STIMULUS_TYPE_VIDEO_AUDIO_LOG){
+                val corr_delays = arrangeDelays(AV_STIMULUS_DELTA.toLong(),-1,0, subjectparcel.stimuliDelay)
+                deliverShiftedStimulus(STIM_TYPE_A1V2, corr_delays.a, -1, corr_delays.v)
+            }
+            else{
+                val corr_delays = arrangeDelays(0, -1, AV_STIMULUS_DELTA.toLong(), subjectparcel.stimuliDelay)
+                deliverShiftedStimulus(STIM_TYPE_A1V2, corr_delays.a, -1, corr_delays.v)
+            }
         }
         // normal stimulus (1st or 3rd): audio and video simultaneously
         else                                                            deliverAlignedStimulus(STIM_TYPE_A1V2, stimuliDelay = subjectparcel.stimuliDelay)
