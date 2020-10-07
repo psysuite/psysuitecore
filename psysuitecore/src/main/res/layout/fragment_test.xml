@@ -17,14 +17,16 @@
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Button
-            android:id="@+id/bt_next"
-            android:layout_width="148dp"
-            android:layout_height="114dp"
-            android:text="@string/next"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/bt_next"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textColorLink="@color/colorPrimary"
+        android:layout_width="137dp"
+        android:layout_height="75dp"
+        android:text="@string/next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtTrialId"
@@ -36,24 +38,28 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-            android:id="@+id/bt_abort"
-            android:layout_width="335dp"
-            android:layout_height="49dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/abort"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/bt_abort"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="335dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/abort"
+        android:textColorLink="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-            android:id="@+id/bt_pause"
-            android:layout_width="335dp"
-            android:layout_height="49dp"
-            android:layout_marginBottom="20dp"
-            android:text="@string/pause"
-            app:layout_constraintBottom_toTopOf="@+id/bt_abort"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/bt_pause"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textColorLink="@color/colorPrimary"
+        android:layout_width="335dp"
+        android:layout_height="49dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/pause"
+        app:layout_constraintBottom_toTopOf="@+id/bt_abort"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/txtDebugInfo"

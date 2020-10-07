@@ -3,7 +3,7 @@ plugins {
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
 
-    id("name.remal.check-dependency-updates") version "1.0.192"
+    id("name.remal.check-dependency-updates") version "1.0.211"
 }
 
 android {
@@ -46,6 +46,6 @@ dependencies {
     implementation(project(":core"))
 
     testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test:runner:1.2.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

@@ -2,12 +2,11 @@ package iit.uvip.psysuite.core.tests.bis
 
 import android.app.Activity
 import android.content.Context
-import android.media.MediaPlayer
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.StimulusBIS
-import iit.uvip.psysuite.core.common.TaskCodeLabels
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
 import iit.uvip.psysuite.core.common.stimuli.*
@@ -25,9 +24,7 @@ class TestBIS(
     isDebug:Boolean
 ) : TestBasic(ctx, activity, hostfragment, data, vibrator, mImageView, isDebug = isDebug){
 
-    var LOG_TAG:String = TestBIS::class.java.simpleName
-
-    private var noise: MediaPlayer? = null
+    override var LOG_TAG:String = TestBIS::class.java.simpleName
 
     companion object {
 
@@ -60,12 +57,12 @@ class TestBIS(
 
         @JvmStatic val CONFLICT_TYPE_NONE           = "none"
 
-        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
+        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
             return mutableListOf(
-                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO          , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_LOG"),
-                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE         , TEST_BISECTION_TACTILE        , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_TACTILE_LOG"),
-                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE   , TEST_BISECTION_AUDIO_TACTILE  , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_TACTILE_LOG"),
-                TaskCodeLabels(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VIDEO     , TEST_BISECTION_AUDIO_VIDEO    , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_VIDEO_LOG")
+                SpinnerData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO          , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_LOG"),
+                SpinnerData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE         , TEST_BISECTION_TACTILE        , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_TACTILE_LOG"),
+                SpinnerData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE   , TEST_BISECTION_AUDIO_TACTILE  , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_TACTILE_LOG"),
+                SpinnerData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VIDEO     , TEST_BISECTION_AUDIO_VIDEO    , "${TEST_BASIC_LABEL}_$STIMULUS_TYPE_AUDIO_VIDEO_LOG")
             )
         }
         
@@ -116,9 +113,12 @@ class TestBIS(
                 validAnswers    = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
                 initTest()
 
-                mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
-                mTactileManager = TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler)
-                mVisualManager  = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler)
+//                mAudioManager   = AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
+//                mTactileManager = TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler)
+//                mVisualManager  = VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler)
+                mStimuliManager = StimuliManager(AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                                                TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler),
+                                                VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler))
             }
         }
     }
@@ -146,7 +146,7 @@ class TestBIS(
         )
         createResultFile(subjectparcel, TrialBIS.LOG_HEADER)
 
-        noise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
+        mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
     }
 
     // =============================================================================================================================
@@ -206,8 +206,8 @@ class TestBIS(
     // =============================================================================================================================
     override fun onTrialEnd(){
 
-        noise?.stop()
-        noise?.prepare()
+        mNoise?.stop()
+        mNoise?.prepare()
 
         testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
     }
@@ -225,14 +225,15 @@ class TestBIS(
     // + (QUESTION_DELAY + FIRST_STIMULUS_DELAY)        => event : show question
     override fun show(trial:TrialBasic, isRepeat:Boolean){
 
-        noise?.start()
+        mNoise?.start()
         if(isRepeat)    mTrial.repetitions++
 
         // to align bimodal stimuli, I have to delay the fastest modality by time_shift ms.
-        // Thus I anticipate all main onsets by the same ms
+        // Thus I anticipate all main onsets by the same ms.
+        // Since this code act for every kind of stimulus combination, I assume a trimodal stim
         val time_shift = when(trial.type){
-            TEST_BISECTION_AUDIO_TACTILE    -> arrangeDelays(0,0,-1, subjectparcel.stimuliDelay).shift
-            TEST_BISECTION_AUDIO_VIDEO      -> arrangeDelays(0,-1,0, subjectparcel.stimuliDelay).shift
+            TEST_BISECTION_AUDIO_TACTILE    -> delaysAligner.getShift(STIM_TYPE_A1T1, 0,0,-1)
+            TEST_BISECTION_AUDIO_VIDEO      -> delaysAligner.getShift(STIM_TYPE_A1V2, 0,-1,0)
             else                            -> 0
         }
 
@@ -257,29 +258,29 @@ class TestBIS(
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
 
         when(trial.type) {
-            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus(mAudioManager)
-            TEST_BISECTION_TACTILE          ->  deliverT1Stimulus(mTactileManager)
-            TEST_BISECTION_AUDIO_TACTILE    ->  deliverAlignedStimulus(STIM_TYPE_A1T1, stimuliDelay = subjectparcel.stimuliDelay, managerA = mAudioManager)
+            TEST_BISECTION_AUDIO            ->  deliverA1Stimulus()
+            TEST_BISECTION_TACTILE          ->  deliverTStimulus()
+            TEST_BISECTION_AUDIO_TACTILE    ->  deliverAlignedStimulus(STIM_TYPE_A1T1)
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)
         }
     }
 
     private fun deliverAVStimuli(trial:TrialBIS, stage:Int=0){
 
-        mVisualManager!!.drawResOn = mDrawablesResource[stage]
+        mStimuliManager.mVisualManager!!.drawResOn = mDrawablesResource[stage]
         if(stage == TRIAL_STAGE_2){
             // mid (second) stimulus: audio and video are dissociated
             if(trial.conflict_type == STIMULUS_TYPE_VIDEO_AUDIO_LOG){
-                val corr_delays = arrangeDelays(AV_STIMULUS_DELTA.toLong(),-1,0, subjectparcel.stimuliDelay)
+                val corr_delays = delaysAligner.arrangeDelays(STIM_TYPE_A1V2, AV_STIMULUS_DELTA.toLong(),-1,0)
                 deliverShiftedStimulus(STIM_TYPE_A1V2, corr_delays.a, -1, corr_delays.v)
             }
             else{
-                val corr_delays = arrangeDelays(0, -1, AV_STIMULUS_DELTA.toLong(), subjectparcel.stimuliDelay)
+                val corr_delays = delaysAligner.arrangeDelays(STIM_TYPE_A1V2,0, -1, AV_STIMULUS_DELTA.toLong())
                 deliverShiftedStimulus(STIM_TYPE_A1V2, corr_delays.a, -1, corr_delays.v)
             }
         }
         // normal stimulus (1st or 3rd): audio and video simultaneously
-        else                                                            deliverAlignedStimulus(STIM_TYPE_A1V2, stimuliDelay = subjectparcel.stimuliDelay)
+        else    deliverAlignedStimulus(STIM_TYPE_A1V2)
     }
 
     // =====================================================================================

@@ -17,20 +17,20 @@ data class StimuliDelay(val a:Long=0L, val t:Long=0L, val v:Long=0L) : Parcelabl
 data class CorrectedStimuliDelay(var a:Long=-1, var t:Long=-1, var v:Long=-1, var shift:Long=0) : Parcelable
 
 @Parcelize
-data class TaskCodeLabels(val label:String, val id:Int, val label_log:String = label) : Parcelable {
+data class SpinnerData(val label:String, val id:Int, val label_log:String = label) : Parcelable {
     override fun toString(): String {
         return label
     }
 }
 
-fun List<TaskCodeLabels>.getLabelLog(type:Int):String{
+fun List<SpinnerData>.getLabelLog(type:Int):String{
     this.map{
         if(it.id == type)  return it.label_log
     }
     return ""
 }
 
-fun List<TaskCodeLabels>.getLabel(type:Int):String{
+fun List<SpinnerData>.getLabel(type:Int):String{
     this.map{
         if(it.id == type)  return it.label
     }
@@ -38,8 +38,7 @@ fun List<TaskCodeLabels>.getLabel(type:Int):String{
 }
 
 @Parcelize
-data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files: ArrayList<String> = arrayListOf(), val testClass:String) :
-    Parcelable
+data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files: ArrayList<String> = arrayListOf(), val testClass:String) : Parcelable
 
 data class StimulusATBInfants(val type: Int, val tactile_pattern:Int)
 data class Stimulus3delay(val type: Int, val a:Long, val t:Long, val v:Long)

@@ -38,9 +38,9 @@ class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Lo
     }
 
     private fun processModalities(codes:List<String>){
-        // e.g.   1,2,2  =>  stims[V1T1, A1, V1T1]
-        //        0,1,2  =>  stims[V1, T1, V1]
-        //        1,1,2  =>  stims[V1, A1T1, V1]
+        // e.g.   1,2,2  =>  stims[V2T1, A1, V2T1]
+        //        0,1,2  =>  stims[V2, T1, V2]
+        //        1,1,2  =>  stims[V2, A1T1, V2]
 
         //                 a/t/v      never, only second, first & third
         codes.mapIndexed { modality, occurrence ->
@@ -49,7 +49,7 @@ class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Lo
                     when(modality){
                         0 ->    stims[1] = stims[1] or TestBasic.STIM_TYPE_A1
                         1 ->    stims[1] = stims[1] or TestBasic.STIM_TYPE_T1
-                        2 ->    stims[1] = stims[1] or TestBasic.STIM_TYPE_V1
+                        2 ->    stims[1] = stims[1] or TestBasic.STIM_TYPE_V2
                     }
                 }
                 2 -> {
@@ -63,8 +63,8 @@ class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Lo
                             stims[2] = stims[2] or TestBasic.STIM_TYPE_T1
                         }
                         2 ->    {
-                            stims[0] = stims[0] or TestBasic.STIM_TYPE_V1
-                            stims[2] = stims[2] or TestBasic.STIM_TYPE_V1
+                            stims[0] = stims[0] or TestBasic.STIM_TYPE_V2
+                            stims[2] = stims[2] or TestBasic.STIM_TYPE_V2
                         }
                     }
                 }

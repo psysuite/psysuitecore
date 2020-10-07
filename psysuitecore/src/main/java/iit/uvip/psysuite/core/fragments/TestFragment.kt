@@ -19,18 +19,15 @@ import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.sample.TestSample
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
 import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
-import org.albaspazio.core.accessory.VibrationManager
-import org.albaspazio.core.accessory.getAbsoluteFilePath
-import org.albaspazio.core.accessory.getCompanionObjectMethod
-import org.albaspazio.core.accessory.getTimeDifference
+import org.albaspazio.core.accessory.*
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
 import org.albaspazio.core.speech.SpeechManager
@@ -70,8 +67,6 @@ class TestFragment : BaseFragment(
     private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
     private val TARGET_FRAGMENT_REQUEST_CODE:Int    = 1
 
-    private val disposable                          = CompositeDisposable()
-
     private var answerDialogFragment:DialogFragment?      = null
     private var isAnswerDialogOn:Boolean            = false
 
@@ -87,6 +82,9 @@ class TestFragment : BaseFragment(
 
     private val isDebug:Boolean                     = false
     private var currDebugInfo:String                = ""
+
+    var showResult:Boolean                          = false
+    var correctAnswer:String                       = ""
 
     private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
     // ==========================================================================================================================
@@ -106,6 +104,8 @@ class TestFragment : BaseFragment(
         }
     }
 
+    // main access point. it does:
+    // (try) instanciate the correct TestClass
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         super.onActivityCreated(savedInstanceState)
@@ -137,6 +137,12 @@ class TestFragment : BaseFragment(
                 TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
                 TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, isDebug)
 
+                TestBasic.TEST_TVB_TIME_SINGLESTIM,
+                TestBasic.TEST_TVB_TIME_DOUBLESTIM,
+                TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
+                TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
+                TestBasic.TEST_TVB_TIME_INF             -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, isDebug)
+
                 TestBasic.TEST_ATVB_TIME_S_UNBAL,
                 TestBasic.TEST_ATVB_TIME_S_BAL,
                 TestBasic.TEST_ATVB_TIME_D_UNBAL,
@@ -146,7 +152,8 @@ class TestFragment : BaseFragment(
                 TestBasic.TEST_SAMPLE_SHIFTED,
                 TestBasic.TEST_SAMPLE_PAIR              -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView, isDebug)
 
-                TestBasic.TEST_TFI                      -> mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, true)
+                TestBasic.TEST_TFI,
+                TestBasic.TEST_TFI_TODDLERS             -> mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, isDebug)
 
                 else    -> {
                     showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
@@ -156,12 +163,15 @@ class TestFragment : BaseFragment(
             }
         }
         catch (e:Exception){
+
+            e.logLastTwo(LOG_TAG)
             showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
             showAlert(requireActivity(),resources.getString(R.string.critical_error), e.toString())
             Navigation.findNavController(requireView()).popBackStack()
             return
         }
 
+        // get a reference to the AnswerDialogFragment
         val answerDialogClass = if(mSubjectParcel!!.classes.size > 1 && mSubjectParcel!!.classes[1].isNotEmpty())
                                         mSubjectParcel!!.classes[1]
                                 else    "iit.uvip.psysuite.core.fragments.AnswerDialogFragment"
@@ -275,6 +285,7 @@ class TestFragment : BaseFragment(
                                                             showDebugInfo(e.toString())
                                                         }
                 }
+                TestBasic.EVENT_TEST_ERROR          ->   onTestError(it.second as String)
             }
         }
         .addTo(disposable)
@@ -299,6 +310,7 @@ class TestFragment : BaseFragment(
         when(mTest.nextTrial(prev_result, elapsed)){
             TestBasic.EVENT_TEST_END    -> onTestEnded()
             TestBasic.EVENT_BLOCK_END   -> onBlockEnded()       // ask whether interrupting the test
+            TestBasic.EVENT_TEST_ERROR  -> {}                   // do nothing, test class close the test and send EVENT_TEST_ERROR with error message
             else                        -> onBeforeTrialShow()  // next trial has been started
         }
     }
@@ -314,7 +326,6 @@ class TestFragment : BaseFragment(
             TestBasic.TEST_SHOWTRIALS_TRIALEND  -> showTrialId(1000L)
         }
         if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS)  bt_abort.visibility = View.VISIBLE
-
     }
 
     private fun onTestEnded(){
@@ -348,6 +359,11 @@ class TestFragment : BaseFragment(
             { /* cancelClb*/    onStoppedAfterBlock() })
     }
 
+    private fun onTestError(msg:String){
+        mHandler.removeCallbacksAndMessages(null)
+        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
+        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, listOf(mTest.getAbsoluteResultFilePath(), mTest.closeSummary()))
+    }
     // user wanted to interrupt test after an end block (send data). rename current res file
     private fun onStoppedAfterBlock(){
         val newresfilename = mTest.stopTestAfterBlock()
@@ -427,11 +443,14 @@ class TestFragment : BaseFragment(
     private fun showAnswerDialog(){
 
         val b = Bundle()
-        b.putInt("trial_id",    mTest.currTrial)
-        b.putInt("tot_trials",  mTest.nTrials)
-        b.putString("question", mTest.mQuestion)
+        b.putInt("trial_id",            mTest.currTrial)
+        b.putInt("tot_trials",          mTest.nTrials)
+        b.putString("question",         mTest.mQuestion)
         b.putStringArrayList("answers", mTest.validAnswers as ArrayList<String>)
-        b.putString("debug", currDebugInfo)
+        b.putString("debug",            currDebugInfo)
+
+        b.putBoolean("show_result",     mTest.showResult)
+        b.putString("correct_answer",   mTest.getTrialCorrectAnswer())
 
         answerDialogFragment = answerDialogRef.first?.call(answerDialogRef.second, "") as DialogFragment
         if(answerDialogFragment == null){

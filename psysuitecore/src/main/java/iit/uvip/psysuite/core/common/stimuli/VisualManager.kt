@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import iit.uvip.psysuite.core.common.TestBasic
 
-class VisualManager(type:Int, private val imgV: ImageView, var drawResOn:Int=1, val drawResOff:Int=0,
+class VisualManager(type:Int, private val imgV: ImageView, var drawResOn:Int=1, private val drawResOff:Int=0,
                     override val duration:Long=-1L, handler: Handler
 )
     : StimulusManager(type, 0, duration, handler){

@@ -64,7 +64,7 @@ class AnswerDialogFragmentTFI: DialogFragment()
             mHandler.postDelayed({
                 if(random() < 0.5)  sendResult("1,1,1", 100, TestBasic.EVENT_ANSWER_GIVEN)
                 else                sendResult("2,1,0", 100, TestBasic.EVENT_ANSWER_GIVEN)
-            }, 1000L)
+            }, 3000L)
         }
     }
 

@@ -1,6 +1,6 @@
 package iit.uvip.psysuite.core.tests.sample
 
-import iit.uvip.psysuite.core.common.StimuliDelay
+import iit.uvip.psysuite.core.common.DelaysAligner
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.parcel.Parcelize
@@ -24,9 +24,11 @@ open class SubjectSampleParcel(
     override var classes:List<String> = listOf(),
     override var device: Device?        = null,
     override var block:Int = -1,
-    override var stimuliDelay: StimuliDelay = StimuliDelay(),
+    override var stimuliDelays: DelaysAligner = DelaysAligner(),
     override var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
     override var vercode: Int = -1,
+    override var showResult: Boolean = false,
+    override var population: Int = TestBasic.POPULATION_TD,
 
     var stim_sources:Int = 0,       // according to modalities selection
 
@@ -47,7 +49,7 @@ open class SubjectSampleParcel(
     var repetitions:Int = 1,
     var iti:Long = 1000
 
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelay, whitenoise, vercode)
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelays, whitenoise, vercode, showResult, population)
 
 
 

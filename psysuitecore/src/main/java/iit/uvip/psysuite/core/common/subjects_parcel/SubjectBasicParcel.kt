@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import iit.uvip.psysuite.core.common.StimuliDelay
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.DelaysAligner
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.getLabelLog
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -31,9 +31,11 @@ open class SubjectBasicParcel(
     open var classes:List<String> = listOf(),
     open var device:Device? = null,
     open var block:Int = -1,
-    open var stimuliDelay:StimuliDelay = StimuliDelay(),
+    open var stimuliDelays:DelaysAligner = DelaysAligner(),
     open var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
-    open var vercode: Int = -1
+    open var vercode: Int = -1,
+    open var showResult: Boolean = false,
+    open var population: Int = TestBasic.POPULATION_TD
 ) : Parcelable {
 
     @IgnoredOnParcel
@@ -100,13 +102,14 @@ open class SubjectBasicParcel(
 
     open fun getFilesPrefix(ctx:Context):String {
 
-        val ci = getCompanionObjectMethod(classes[0], "getConditionsInfo")
-        val type_label = (ci.first?.call(ci.second, ctx) as List<TaskCodeLabels>).getLabelLog(type)
+        val ci                  = getCompanionObjectMethod(classes[0], "getConditionsInfo")
+        val type_label          = (ci.first?.call(ci.second, ctx) as List<SpinnerData>).getLabelLog(type)
+        val population_label    = TestBasic.populations.getLabelLog(population)
 
-        return "${label}_$type_label"
+        return "${label}_${type_label}_$population_label"
     }
 
-    // label_type(_blk)_datetime.txt
+    // label_type_population(_blk)_datetime.txt
     open fun composeResultFileName(ctx:Context, blk:Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
@@ -114,7 +117,7 @@ open class SubjectBasicParcel(
         return "${getFilesPrefix(ctx)}_${getFullDateString()}${blkstr}${TestBasic.RES_EXTENSION}"
     }
 
-    // label_type(_blk)_datetime.txt
+    // label_type_population(_blk)_datetime.txt
     open fun composeSummaryFileName(ctx:Context, blk:Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
@@ -122,7 +125,7 @@ open class SubjectBasicParcel(
         return "${getFilesPrefix(ctx)}_${getFullDateString()}_summary${blkstr}${TestBasic.RES_EXTENSION}"
     }
 
-    // label_type(_blk)_date.json
+    // label_type_population(_blk)_date.json
     open fun composeSubjectFileName(ctx:Context, blk:Int = -1):String{
         if(label.isBlank() || type == -1)   return ""
 

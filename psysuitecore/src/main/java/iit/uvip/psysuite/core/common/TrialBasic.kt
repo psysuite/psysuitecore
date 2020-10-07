@@ -20,6 +20,10 @@ abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:Strin
         elapsed     = elapsedms
         success     = (result == correct_answer)
     }
+
+    fun getCorrectAnswer():String{
+        return correct_answer
+    }
 }
 
 

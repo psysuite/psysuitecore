@@ -1,12 +1,13 @@
 package iit.uvip.psysuite.core.tests.sample
 
 import android.app.Activity
+//import android.app.Fragment
 import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
 import iit.uvip.psysuite.core.common.stimuli.*
@@ -38,7 +39,7 @@ class TestSample(
 ) : TestBasic(ctx, activity, hostfragment, data, vibrator, mImageView, isDebug = isDebug)
 {
     private var curStimDuration: Long = 0L
-    var LOG_TAG:String = TestSample::class.java.simpleName
+    override var LOG_TAG:String = TestSample::class.java.simpleName
 
     companion object {
 
@@ -47,11 +48,11 @@ class TestSample(
         @JvmStatic val STIM_SHIFTED         = 1
         @JvmStatic val STIM_PAIR            = 2
 
-        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
+        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
             return mutableListOf(
-                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}" , TEST_SAMPLE_ALIGNED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.aligned)}"),
-                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}" , TEST_SAMPLE_SHIFTED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.shifted)}"),
-                TaskCodeLabels("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}"    , TEST_SAMPLE_PAIR   , "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.pair)}")
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}" , TEST_SAMPLE_ALIGNED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.aligned)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}" , TEST_SAMPLE_SHIFTED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.shifted)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}"    , TEST_SAMPLE_PAIR   , "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.pair)}")
             )
         }
         
@@ -67,12 +68,8 @@ class TestSample(
     // =============================================================================================================================
     init{
         when {
-            mImageView == null  -> throw ImageViewDefinedException(
-                "IMAGE_VIEW_NOT_DEFINED"
-            )
-            vibrator == null    -> throw VibratorNotDefinedException(
-                "VIBRATOR_NOT_DEFINED"
-            )
+            mImageView == null  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+            vibrator == null    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
             else -> {
                 validAnswers    = mutableListOf()
                 initTest()
@@ -103,7 +100,7 @@ class TestSample(
     // =============================================================================================================================
     private fun createTrials(){
 
-        mAudioManager = when {
+        val audioManager = when {
             (subjectparcel as SubjectSampleParcel).stim_sources and STIM_TYPE_A1 > 0 ->
                 AudioManager(STIM_TYPE_A1, -1,
                             amplitude  = subjectparcel.audioVolume.toInt(),
@@ -113,7 +110,7 @@ class TestSample(
             subjectparcel.stim_sources and STIM_TYPE_A2 > 0 ->
                 try{
                         if(subjectparcel.audioResource.isEmpty())    subjectparcel.audioResource = currAudioResourceName
-                        AudioManager(STIM_TYPE_A1,
+                        AudioManager(STIM_TYPE_A2,
                             subjectparcel.audioResource,
                             subjectparcel.audioVolume.toInt(),
                             duration = subjectparcel.audioDuration,
@@ -128,7 +125,7 @@ class TestSample(
             else -> null
         }
 
-        mTactileManager =   if(subjectparcel.stim_sources and STIM_TYPE_T1 > 0)
+        val tactileManager =   if(subjectparcel.stim_sources and STIM_TYPE_T1 > 0)
                                 TactileManager(vibrator!!, subjectparcel.tactileAmplitude, duration = subjectparcel.tactileSequence.toLong(), handler = mStimuliHandler)
 
                             else if(subjectparcel.stim_sources and STIM_TYPE_T2 > 0){
@@ -141,20 +138,22 @@ class TestSample(
                             }
                             else null
 
-        mVisualManager = when {
+        val visualManager = when {
                             subjectparcel.stim_sources and STIM_TYPE_V1 > 0 -> {
-                                val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)    mDrawablesResource.size
-                                else                                                             subjectparcel.visualDrawableOn
+                                val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size
+                                else                                                                        subjectparcel.visualDrawableOn
                                 VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[on], duration = subjectparcel.visualDuration, handler = mStimuliHandler)
                             }
                             subjectparcel.stim_sources and STIM_TYPE_V2 > 0 -> {
                                 if(mImageView == null)  return
                                 val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size-1
-                                else                                                            subjectparcel.visualDrawableOn
+                                else                                                                        subjectparcel.visualDrawableOn
                                 VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[on], mDrawablesResource[subjectparcel.visualDrawableOff], subjectparcel.visualDuration, handler = mStimuliHandler)
                             }
                             else -> null
         }
+
+        mStimuliManager = StimuliManager(audioManager, tactileManager, visualManager)
 
         val extraTrial:Any? = when(subjectparcel.type){
             TEST_SAMPLE_SHIFTED     -> subjectparcel.shiftedParams
@@ -193,16 +192,17 @@ class TestSample(
 
         when(trial.type){
 
-            TEST_SAMPLE_ALIGNED ->  deliverAlignedStimulus((trial as TrialSample).source, stimuliDelay = subjectparcel.stimuliDelay){onTrialEnd()}
+            TEST_SAMPLE_ALIGNED ->  deliverAlignedStimulus((trial as TrialSample).source){onTrialEnd()}
 
             TEST_SAMPLE_SHIFTED ->  {
-                val corr_delays = arrangeDelays(((trial as TrialSample).extraTrial as List<Long>)[0],
-                                                                 (trial.extraTrial as List<Long>)[1],
-                                                                  trial.extraTrial[2], subjectparcel.stimuliDelay)
+                val corr_delays = delaysAligner.arrangeDelays((subjectparcel as SubjectSampleParcel).stim_sources,
+                                                ((trial as TrialSample).extraTrial as List<Long>)[0],
+                                                (trial.extraTrial as List<Long>)[1],
+                                                trial.extraTrial[2])
 
                 deliverShiftedStimulus(trial.source, corr_delays.a, corr_delays.t, corr_delays.v){onTrialEnd()}
             }
-            TEST_SAMPLE_PAIR    ->  deliverAlignedStimuliPair((trial as TrialSample).extraTrial as Long, trial.source, stimuliDelay = subjectparcel.stimuliDelay){onTrialEnd()}
+            TEST_SAMPLE_PAIR    ->  deliverAlignedStimuliPair((trial as TrialSample).extraTrial as Long, trial.source){onTrialEnd()}
         }
     }
     // =============================================================================================================================

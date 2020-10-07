@@ -23,6 +23,9 @@ class AnswerDialogFragment: DialogFragment()
 
     private var isDebug:Boolean = false
 
+    private var showResult:Boolean = false
+    private var correctAnswer:String = ""
+
     private lateinit var mAnswers:ArrayList<String>
     lateinit var onsetDate:Date
     private val mHandler:Handler = Handler()
@@ -47,13 +50,19 @@ class AnswerDialogFragment: DialogFragment()
         super.onViewCreated(view, savedInstanceState)
 
         // Fetch arguments from bundle and set title
-        val title       = requireArguments().getString("title", "Enter Name")
-        val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
-        val question    = requireArguments().getString("question", "Enter Name")
-        val answers     = requireArguments().getStringArrayList("answers")
-        val debug_info  = requireArguments().getString("debug")
+        val title           = requireArguments().getString("title", "Enter Name")
+        val str_trial       = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
+        val question        = requireArguments().getString("question", "Enter Name")
+        val answers         = requireArguments().getStringArrayList("answers")
+        val debug_info      = requireArguments().getString("debug")
+
+        showResult          = requireArguments().getBoolean("show_result", false)
+        if(showResult)
+            correctAnswer   = requireArguments().getString("correct_answer", answers?.get(0))
 
         dialog?.setTitle(title)
+        imgvResult.visibility   = View.INVISIBLE
+        bt_clear.visibility     = View.VISIBLE
 
         txt_trials.text     = str_trial
         txt_question.text   = question
@@ -61,9 +70,7 @@ class AnswerDialogFragment: DialogFragment()
 
         if (answers != null)
             if (answers.isNotEmpty()) {
-
                 mAnswers = answers
-
                 rb_a_0.text = mAnswers[0]
                 rb_a_1.text = mAnswers[1]
             }
@@ -92,14 +99,10 @@ class AnswerDialogFragment: DialogFragment()
 
         bt_confirm.setOnClickListener{
 
-            val elapsedms = getTimeDifference(onsetDate)
-            when(radioGroupAudio.checkedRadioButtonId != -1) {
-                true -> {
-                    val radioId = radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId))
-                    sendResult(mAnswers[radioId], elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
-                }
-                false -> showToast("Seleziona un'opzione", requireContext())
-            }
+            if(radioGroupAudio.checkedRadioButtonId != -1)
+                checkResult(mAnswers[radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId))])
+            else
+                showToast("Seleziona un'opzione", requireContext())
         }
 
         bt_clear.setOnClickListener{
@@ -111,6 +114,23 @@ class AnswerDialogFragment: DialogFragment()
             sendResult("", 0, TestBasic.EVENT_TRIAL_ABORT)
             dismiss()
         }
+    }
+
+    private fun checkResult(curr_answer:String){
+        val elapsedms = getTimeDifference(onsetDate)
+        if(showResult) {
+            if (curr_answer == correctAnswer)   imgvResult.setImageResource(R.drawable.success_icon)
+            else                                imgvResult.setImageResource(R.drawable.failure_icon)
+
+            bt_clear.visibility = View.INVISIBLE
+            bt_confirm.visibility = View.INVISIBLE
+            imgvResult.visibility = View.VISIBLE
+            mHandler.postDelayed({
+                imgvResult.visibility = View.INVISIBLE
+                sendResult(curr_answer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+            }, 1000L)
+        }
+        else    sendResult(curr_answer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
     }
 
     private fun sendResult(response: String, elapsedTime: Int, response_id: Int) {

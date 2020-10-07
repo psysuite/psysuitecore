@@ -2,11 +2,10 @@ package iit.uvip.psysuite.core.tests.tfi
 
 import android.app.Activity
 import android.content.Context
-import android.media.MediaPlayer
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
 import iit.uvip.psysuite.core.common.stimuli.*
@@ -21,15 +20,14 @@ import kotlin.math.roundToInt
 class TestTFI(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              override val subjectparcel: SubjectBasicParcel,
+              subjectparcel: SubjectBasicParcel,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               isDebug:Boolean
 ) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, isDebug = isDebug)
 {
-    var LOG_TAG:String = TestTFI::class.java.simpleName
+    override var LOG_TAG:String = TestTFI::class.java.simpleName
 
-    private var noise: MediaPlayer? = null
 
     private val soa_1:Long = 55L
     private val soa_2:Long = 85L
@@ -37,19 +35,24 @@ class TestTFI(ctx: Context,
     private val N_RIP_X_COND_X_BLOCK:Int = 5
     private val NUM_BLOCKS:Int    = 2
 
-    private val WN_FIRSTSTIM_INTERVAL   = 500L
+    private val WN_PRESTIM_INTERVAL     = 1000L
+    private val WN_POSTTSTIM_INTERVAL   = 500L
     private val STIM_DURATION           = 35L
 
-    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
+    private val TRIMODAL_AUDIO_CODE     = STIM_TYPE_A1T1V2
+
+    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle, R.drawable.ape)
 
     companion object {
 
         @JvmStatic val TEST_BASIC_LABEL                 = "TFI"
+        @JvmStatic val TEST_BASIC_TODDLERS_LABEL        = "TFI toddlers"
         @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com",
                                                                     "psysuite.uvip@gmail.com",
                                                                     "tonelli.alessia@gmail.com")
 
-        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> = mutableListOf(TaskCodeLabels(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL))
+        fun getConditionsInfo(ctx: Context): List<SpinnerData> = mutableListOf( SpinnerData(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL),
+                                                                                SpinnerData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "TFITOD"))
 
         fun getNextTrialModes():List<List<Int>>{
             return listOf(  listOf(TEST_NEXTTRIAL_ANSWER))
@@ -70,9 +73,12 @@ class TestTFI(ctx: Context,
         else{
             initTest()
 
-            mAudioManager   = AudioManager(STIM_TYPE_A1, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx)
-            mTactileManager = TactileManager(vibrator,                duration = currStimulusDuration, handler = mStimuliHandler)
-            mVisualManager  = VisualManager(STIM_TYPE_V1, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler)
+            val onImage =   if(subjectparcel.type == TEST_TFI)    1
+                            else                                  2
+
+            mStimuliManager = StimuliManager(AudioManager(STIM_TYPE_A1, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                                             TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler),
+                                             VisualManager(STIM_TYPE_V2, mImageView, mDrawablesResource[onImage], mDrawablesResource[0], duration = currStimulusDuration, handler = mStimuliHandler))
         }
     }
     override fun initTest() {
@@ -89,7 +95,7 @@ class TestTFI(ctx: Context,
 
         currStimulusDuration    = STIM_DURATION // 35L
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    noise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         createTrials()
         // mTrials list
@@ -97,7 +103,6 @@ class TestTFI(ctx: Context,
         currTrial       = 0
 
         mListBlocks     = mutableListOf((nTrials / 2F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-//        mListBlocks     = mutableListOf(0,2)    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
         mTestLabel      = ""
         getConditionsInfo(ctx).map {
@@ -195,8 +200,8 @@ class TestTFI(ctx: Context,
     // =============================================================================================================================
     override fun onTrialEnd() {
 
-        noise?.stop()
-        noise?.prepare()
+        mNoise?.stop()
+        mNoise?.prepare()
 
         when (nextTrailModality) {
 
@@ -223,24 +228,26 @@ class TestTFI(ctx: Context,
     // =============================================================================================================================
     override fun show(trial: TrialBasic, isRepeat: Boolean) {
 
-        noise?.start()
+        mNoise?.start()
 
-        val corr_delays = arrangeDelays(0,0,0, subjectparcel.stimuliDelay)
+        val corr_delays = delaysAligner.arrangeDelays(TRIMODAL_AUDIO_CODE, 0,0, 0)
         mStimuliHandler.postDelayed({
             if((trial as TrialTFI).stims[0] > 0)
-                deliverShiftedStimulus(trial.stims[0], corr_delays.a, corr_delays.t, corr_delays.v, mAudioManager!!, mTactileManager, mVisualManager)
-        }, WN_FIRSTSTIM_INTERVAL + (trial as TrialTFI).soa - corr_delays.shift)
+                deliverShiftedStimulus(trial.stims[0], corr_delays.a, corr_delays.t, corr_delays.v)
+        }, WN_PRESTIM_INTERVAL + (trial as TrialTFI).soa - corr_delays.shift)
 
         mStimuliHandler.postDelayed({
             if(trial.stims[1] > 0)
-                deliverShiftedStimulus(trial.stims[1], corr_delays.a, corr_delays.t, corr_delays.v, mAudioManager!!, mTactileManager, mVisualManager)
-        }, WN_FIRSTSTIM_INTERVAL + 2* trial.soa - corr_delays.shift)
+                deliverShiftedStimulus(trial.stims[1], corr_delays.a, corr_delays.t, corr_delays.v)
+        }, WN_PRESTIM_INTERVAL + 2* trial.soa - corr_delays.shift)
 
         mStimuliHandler.postDelayed({
             if(trial.stims[2] > 0)
-                deliverShiftedStimulus(trial.stims[2], corr_delays.a, corr_delays.t, corr_delays.v, mAudioManager!!, mTactileManager, mVisualManager) { onTrialEnd()}
-            else
-                onTrialEnd()
-        }, WN_FIRSTSTIM_INTERVAL + 3* trial.soa - corr_delays.shift)
+                deliverShiftedStimulus(trial.stims[2], corr_delays.a, corr_delays.t, corr_delays.v)
+        }, WN_PRESTIM_INTERVAL + 3* trial.soa - corr_delays.shift)
+
+        mStimuliHandler.postDelayed({
+            onTrialEnd()
+        }, WN_PRESTIM_INTERVAL + 3* trial.soa - corr_delays.shift + currStimulusDuration + WN_POSTTSTIM_INTERVAL)
     }
 }
