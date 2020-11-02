@@ -1,18 +1,18 @@
-package iit.uvip.psysuite.core.tests.temporalbinding.atb
+package iit.uvip.psysuite.core.tests.temporalbinding.tvb
 
 import android.content.Context
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsUnBalancedSummary
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB.Companion.TYPE_A
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB.Companion.TYPE_AT
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB.Companion.TYPE_A_T
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB.Companion.TYPE_T
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB.Companion.TYPE_T_A
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_T
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_T_V
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_V_T
 
 
-class ATBUnBalancedSummary(ctx:Context) : BindingsUnBalancedSummary(ctx){
+class TVBUnBalancedSummary(ctx:Context) : BindingsUnBalancedSummary(ctx){
     override var condition:BindingsSummaryCondition = ATBsummaryCondition()
 }
 
@@ -20,25 +20,26 @@ class ATBUnBalancedSummary(ctx:Context) : BindingsUnBalancedSummary(ctx){
 class ATBsummaryCondition():BindingsSummaryCondition(){
 
     override var latencies:MutableList<BindingsSummaryRow> = mutableListOf(
-        ATBsummaryRow(TYPE_A,  "A",0),
-        ATBsummaryRow(TYPE_A_T,"A_T", 800),
-        ATBsummaryRow(TYPE_A_T,"A_T",400),
-        ATBsummaryRow(TYPE_A_T,"A_T",300),
-        ATBsummaryRow(TYPE_A_T,"A_T",200),
-        ATBsummaryRow(TYPE_A_T,"A_T",100),
-        ATBsummaryRow(TYPE_AT, "AT",0),
-        ATBsummaryRow(TYPE_T_A,"T_A",100),
-        ATBsummaryRow(TYPE_T_A,"T_A",200),
-        ATBsummaryRow(TYPE_T_A,"T_A",300),
-        ATBsummaryRow(TYPE_T_A,"T_A",400),
-        ATBsummaryRow(TYPE_T_A,"T_A",800),
-        ATBsummaryRow(TYPE_T,  "T",0)
+        TVBsummaryRow(TYPE_T,  "T",0),
+        TVBsummaryRow(TYPE_T_V,"T_V", 800),
+        TVBsummaryRow(TYPE_T_V,"T_V",400),
+        TVBsummaryRow(TYPE_T_V,"T_V",300),
+        TVBsummaryRow(TYPE_T_V,"T_V",200),
+        TVBsummaryRow(TYPE_T_V,"T_V",100),
+        TVBsummaryRow(TYPE_TV, "TV",0),
+        TVBsummaryRow(TYPE_V_T,"V_T",100),
+        TVBsummaryRow(TYPE_V_T,"V_T",200),
+        TVBsummaryRow(TYPE_V_T,"V_T",300),
+        TVBsummaryRow(TYPE_V_T,"V_T",400),
+        TVBsummaryRow(TYPE_V_T,"V_T",800),
+        TVBsummaryRow(TYPE_V,  "V",0)
     )
 
     override fun add(trial: TrialBindingsUnBalanced){
+
         when(trial.type){
-            TYPE_A          ->   latencies[0].add(trial)
-            TYPE_A_T        -> {
+            TYPE_T          ->   latencies[0].add(trial)
+            TYPE_T_V        -> {
                 when(trial.delay){
                     800L    -> latencies[1].add(trial)
                     400L    -> latencies[2].add(trial)
@@ -47,8 +48,8 @@ class ATBsummaryCondition():BindingsSummaryCondition(){
                     100L    -> latencies[5].add(trial)
                 }
             }
-            TYPE_AT         ->  latencies[6].add(trial)
-            TYPE_T_A        -> {
+            TYPE_TV         ->  latencies[6].add(trial)
+            TYPE_V_T        -> {
                 when(trial.delay){
                     100L    -> latencies[7].add(trial)
                     200L    -> latencies[8].add(trial)
@@ -57,16 +58,16 @@ class ATBsummaryCondition():BindingsSummaryCondition(){
                     800L    -> latencies[11].add(trial)
                 }
             }
-            TYPE_T          ->  latencies[12].add(trial)
+            TYPE_V          ->  latencies[12].add(trial)
         }
     }
 }
 
 // type is one of those defined in TestATVB::mTrial
-class ATBsummaryRow(type:Int, label:String, latency:Int):BindingsSummaryRow(type, label, latency){
+class TVBsummaryRow(type:Int, label:String, latency:Int): BindingsSummaryRow(type, label, latency){
 
     override fun setPercDiscrim(trial: TrialBindingsUnBalanced):Int{
-        return  if((trial.type == TYPE_AT && trial.success) || (trial.type != TYPE_AT && !trial.success))
+        return  if((trial.type == TYPE_TV && trial.success) || (trial.type != TYPE_TV && !trial.success))
                         perc_discrimination + 1
                 else    perc_discrimination
     }

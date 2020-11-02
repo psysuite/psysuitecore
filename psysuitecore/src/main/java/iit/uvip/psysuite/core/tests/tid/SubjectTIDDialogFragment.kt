@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectLongitudinalDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
@@ -22,7 +22,6 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         return inflater.inflate(R.layout.fragment_subject_info_tid, container)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         spinner.onItemSelectedListener = this
@@ -35,7 +34,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         //------------------------------------------------------
         // GROUPS <=> mTaskCodes
         //------------------------------------------------------
-        val adapter:ArrayAdapter<TaskCodeLabels> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodeLabels)
+        val adapter:ArrayAdapter<SpinnerData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodeLabels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spGroup.adapter = adapter
 
@@ -114,8 +113,14 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         (subject as SubjectTIDParcel).group     = mTaskCodeLabels[spGroup.selectedItemPosition].id
         (subject as SubjectTIDParcel).session   = spinner.selectedItemPosition - 1
 
-        subject.type = if(spinner.selectedItemPosition in 2..6) mTaskCodeLabels[spGroup.selectedItemPosition].id
-                       else                                     mTaskCodeLabels[spCondition.selectedItemPosition].id
+        subject.type = if(spinner.selectedItemPosition in 2..6){
+                                subject.showResult = true
+                                mTaskCodeLabels[spGroup.selectedItemPosition].id
+                       }
+                       else{
+                                subject.showResult = false
+                                mTaskCodeLabels[spCondition.selectedItemPosition].id
+                        }
 
         return subject as SubjectTIDParcel
     }

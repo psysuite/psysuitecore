@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-import kotlinx.android.synthetic.main.fragment_subject_info_atb.*
+import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
 
 // add whitenoise check button
 class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.OnItemSelectedListener
@@ -18,7 +18,7 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
     override val LOG_TAG: String = SubjectBindingsDialogFragment::class.java.simpleName
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_subject_info_atb, container)
+        return inflater.inflate(R.layout.fragment_subject_info_basic, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,21 +26,11 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
         spCondition.onItemSelectedListener = this
     }
 
-    override fun initData(subj: SubjectBasicParcel) {
-        super.initData(subj)
-        swWhiteNoise.isChecked = (subj as SubjectBindingsParcel).whitenoise
-    }
-
-    override fun clear() {
-        super.clear()
-        swWhiteNoise.isChecked = true
-    }
-
     override fun onNothingSelected(parent: AdapterView<*>) {}
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-        when((spCondition.selectedItem as TaskCodeLabels).id){
+        when((spCondition.selectedItem as SpinnerData).id){
              TestBasic.TEST_ATB_TIME_DOUBLESTIM,
              TestBasic.TEST_ATB_TIME_SINGLESTIM,
              TestBasic.TEST_ATVB_TIME_D_UNBAL,
@@ -61,11 +51,9 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
         }
     }
 
-    override fun updateSubject(): SubjectBindingsParcel {
+    override fun updateSubject(): SubjectBasicParcel {
 
-        subject = super.updateSubject() as SubjectBindingsParcel
-
-        (subject as SubjectBindingsParcel).whitenoise = swWhiteNoise.isChecked
+        subject = super.updateSubject()
 
         subject.nextTrailModality = when(subject.type) {                // could choose whether pausing each trial
             TestBasic.TEST_ATB_TIME_INF         ->  if(swInteractive.isChecked) TestBasic.TEST_NEXTTRIAL_BUTTON
@@ -77,11 +65,11 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
             TestBasic.TEST_ATVB_TIME_D_BAL,
             TestBasic.TEST_ATVB_TIME_S_UNBAL,
             TestBasic.TEST_ATVB_TIME_S_BAL ->  if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
-                                                     else                        TestBasic.TEST_NEXTTRIAL_ANSWER
+                                               else                        TestBasic.TEST_NEXTTRIAL_ANSWER
 
             else                                ->   subject.nextTrailModality
         }
 
-        return subject as SubjectBindingsParcel
+        return subject
     }
 }

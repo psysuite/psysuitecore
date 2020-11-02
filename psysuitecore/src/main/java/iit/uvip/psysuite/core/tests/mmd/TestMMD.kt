@@ -4,10 +4,11 @@ import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.TrialBasic
 import iit.uvip.psysuite.core.common.stimuli.AudioManager
+import iit.uvip.psysuite.core.common.stimuli.StimuliManager
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
 import org.albaspazio.core.ui.showToast
 
@@ -16,18 +17,17 @@ import org.albaspazio.core.ui.showToast
 class TestMMD(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              data: SubjectBasicParcel,
-              isDebug:Boolean
-) : TestBasic(ctx, activity, hostfragment, data, isDebug = isDebug) {
+              data: SubjectBasicParcel
+) : TestBasic(ctx, activity, hostfragment, data) {
 
-    var LOG_TAG: String = TestMMD::class.java.simpleName
+    override var LOG_TAG: String = TestMMD::class.java.simpleName
 
     companion object {
         @JvmStatic val NUM_TRIALS = 18
         @JvmStatic val TEST_BASIC_LABEL = "MMD"
 
-        fun getConditionsInfo(ctx: Context): List<TaskCodeLabels> {
-            return mutableListOf(TaskCodeLabels(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL))
+        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
+            return mutableListOf(SpinnerData(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL))
         }
 
         fun getNextTrialModes():List<List<Int>>{
@@ -39,16 +39,13 @@ class TestMMD(ctx: Context,
     // =============================================================================================================================
     // INIT
     // =============================================================================================================================
-    init{
-        initTest()
-    }
-
     override fun initTest(){
         // set question & create mTrials list
         validAnswers = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
         mQuestion = ctx.resources.getString(R.string.mmeters_question_text)
-        createTrials()
 
+        if(!subjectparcel.isDebug)  createTrials()
+        else                        createTrialsDebug()
 
         nTrials     = mTrials.size
         currTrial   = 0
@@ -60,6 +57,9 @@ class TestMMD(ctx: Context,
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
         createResultFile(subjectparcel, TrialMMD.LOG_HEADER)
+
+        mStimuliManager = StimuliManager(AudioManager(STIM_TYPE_A1, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx), null, null)
+        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
     }
 
     // =============================================================================================================================
@@ -75,6 +75,14 @@ class TestMMD(ctx: Context,
         // set trial id according to its order in the list
         for(i in 0 until mTrials.size)
             mTrials[i].id = (i + 1)
+    }
+
+    private fun createTrialsDebug(){
+        for(i in 1 until 10000 ){
+            mTrials.add(TrialMMD(-1, 0, "same", validAnswers[0], i))
+            mTrials.add(TrialMMD(-1, 1, "diff", validAnswers[1], i))
+        }
+        setTrialsID()   // set trial id according to its order in the list
     }
 
     // =============================================================================================================================

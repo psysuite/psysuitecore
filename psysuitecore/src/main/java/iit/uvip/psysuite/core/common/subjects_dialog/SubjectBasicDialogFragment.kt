@@ -10,10 +10,10 @@ import android.view.WindowManager
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TaskCodeLabels
+import iit.uvip.psysuite.core.common.SpinnerData
 import iit.uvip.psysuite.core.common.TestBasic
 import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
-import kotlinx.android.synthetic.main.fragment_subject_info_basic_spinner.*
+import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
 import org.albaspazio.core.accessory.deleteFilesStartingWith
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.ui.show2ChoisesDialog
@@ -22,10 +22,15 @@ import org.albaspazio.core.ui.showAlert
 open class SubjectBasicDialogFragment: DialogFragment(){
 
     open val LOG_TAG: String = SubjectBasicDialogFragment::class.java.simpleName
+
+
+    protected var nPopulations: Int = 0
+    protected var selPopulation: Int = -1
+
     protected var nConditions: Int = 0
     protected var selCondition: Int = -1
 
-    protected lateinit var mTaskCodeLabels: List<TaskCodeLabels>
+    protected lateinit var mTaskCodeLabels: List<SpinnerData>
     protected lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
 
@@ -51,11 +56,11 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             return
         } else subject = subj
 
-        val ntm         = getCompanionObjectMethod(subject.testClass, "getNextTrialModes")
+        val ntm         = getCompanionObjectMethod(subject.classes[0], "getNextTrialModes")
         mNextTrialModes = ntm.first?.call(ntm.second) as List<List<Int>>
 
-        val ci          = getCompanionObjectMethod(subject.testClass, "getConditionsInfo")
-        mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<TaskCodeLabels>
+        val ci          = getCompanionObjectMethod(subject.classes[0], "getConditionsInfo")
+        mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<SpinnerData>
 
         initData(subject)
 
@@ -85,11 +90,9 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
     protected open fun initData(subj: SubjectBasicParcel) {
 
-        //------------------------------------------------------
-        // SUB TASKS
-        //------------------------------------------------------
+        // SUB TASKS & POPULATION
         setConditions(mTaskCodeLabels)
-
+        setPopulation()
         //------------------------------------------------------
         // NEXT TRIAL MODALITY
         //------------------------------------------------------
@@ -124,11 +127,13 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         if (subj.gender != -1)  radioGroupGender.check(radioGroupGender.getChildAt(subj.gender).id)
         else                    radioGroupGender.clearCheck()
         //------------------------------------------------------
+        swWhiteNoise.isChecked = (subj.whitenoise > TestBasic.TEST_WNOISE_CHOOSE_OFF)
+
     }
 
-    protected fun setConditions(tc:List<TaskCodeLabels>){
+    protected fun setConditions(tc:List<SpinnerData>){
 
-        val adapter: ArrayAdapter<TaskCodeLabels> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
+        val adapter: ArrayAdapter<SpinnerData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spCondition.adapter = adapter
         nConditions         = adapter.count
@@ -155,6 +160,23 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 selCondition = 0
                 spCondition.setSelection(selCondition)
                 subject.type            = mTaskCodeLabels[0].id
+            }
+        }
+    }
+
+    protected fun setPopulation(){
+
+        nPopulations = TestBasic.populations.size
+
+        val adapter: ArrayAdapter<SpinnerData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, TestBasic.populations)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spPopulation.adapter = adapter
+
+        // set condition spinner to subject.type
+        TestBasic.populations.mapIndexed { index, pair ->
+            if (pair.id == subject.population){
+                spPopulation.setSelection(index)
+                selPopulation            = index
             }
         }
     }
@@ -193,6 +215,8 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             swInteractive?.isChecked    = false
             subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
         }
+
+        swWhiteNoise.isChecked = true
     }
 
     //------------------------------------------------------------------------------------
@@ -217,6 +241,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         val gender:Int              = radioGroupGender.indexOfChild(radioGroupGender.findViewById(radioGroupGender.checkedRadioButtonId))
 
         subject.type                = mTaskCodeLabels[spCondition.selectedItemPosition].id
+        subject.population          = TestBasic.populations[spPopulation.selectedItemPosition].id
 
         subject.label               = txtName.text.toString()
         subject.age                 = txtAge.text.toString().toInt()
@@ -234,6 +259,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 null -> subject.nextTrailModality
             }
         }
+
+        subject.whitenoise =    if(swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
+                                else                        TestBasic.TEST_WNOISE_CHOOSE_OFF
+
         return subject
     }
 

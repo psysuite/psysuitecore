@@ -114,25 +114,32 @@
         android:id="@+id/etPairStimDistance"
         android:layout_width="62dp"
         android:layout_height="45dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="72dp"
         android:ems="10"
         android:inputType="number"
         android:text="0"
         app:layout_constraintStart_toEndOf="@+id/labPairDistance2"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
-    <EditText
-        android:id="@+id/etShiftedAudio"
-        android:layout_width="55dp"
-        android:layout_height="47dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:ems="10"
-        android:inputType="numberSigned|number"
-        android:text="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/labShiftedAudio" />
+    <TextView
+        android:id="@+id/labShiftedVisual"
+        android:layout_width="19dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/visual_short"
+        app:layout_constraintStart_toEndOf="@+id/labShiftedAudio"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+    <TextView
+        android:id="@+id/labPairDistance2"
+        android:layout_width="37dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="88dp"
+        android:text="@string/distance"
+        app:layout_constraintStart_toEndOf="@+id/etShiftedTactile"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <EditText
         android:id="@+id/etShiftedTactile"
@@ -145,16 +152,6 @@
         android:text="0"
         app:layout_constraintStart_toEndOf="@+id/etShiftedVisual"
         app:layout_constraintTop_toBottomOf="@+id/labShiftedTactile" />
-
-    <TextView
-        android:id="@+id/labShiftedVisual"
-        android:layout_width="19dp"
-        android:layout_height="23dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="56dp"
-        android:text="@string/visual_short"
-        app:layout_constraintStart_toEndOf="@+id/labShiftedAudio"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <EditText
         android:id="@+id/etShiftedVisual"
@@ -169,34 +166,36 @@
         app:layout_constraintTop_toBottomOf="@+id/labShiftedVisual" />
 
     <TextView
-        android:id="@+id/labShiftedAudio"
-        android:layout_width="17dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="56dp"
-        android:text="@string/audio_short"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
-
-    <TextView
         android:id="@+id/labShiftedTactile"
         android:layout_width="19dp"
         android:layout_height="23dp"
         android:layout_marginStart="36dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="48dp"
         android:text="@string/tactile_short"
         app:layout_constraintStart_toEndOf="@+id/labShiftedVisual"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <TextView
-        android:id="@+id/labPairDistance2"
-        android:layout_width="37dp"
+        android:id="@+id/labShiftedAudio"
+        android:layout_width="17dp"
         android:layout_height="22dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="96dp"
-        android:text="@string/distance"
-        app:layout_constraintStart_toEndOf="@+id/etShiftedTactile"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/audio_short"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+    <EditText
+        android:id="@+id/etShiftedAudio"
+        android:layout_width="55dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:inputType="numberSigned|number"
+        android:text="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labShiftedAudio" />
 
     <TextView
         android:id="@+id/labTactileAmplitude"
@@ -250,12 +249,22 @@
         android:id="@+id/etTactileSchema"
         android:layout_width="271dp"
         android:layout_height="46dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
         android:ems="10"
         android:inputType="number"
         android:text="100"
         app:layout_constraintStart_toEndOf="@+id/labTactileDuration"
+        app:layout_constraintTop_toTopOf="@+id/guideline5" />
+
+    <TextView
+        android:id="@+id/labTactileDuration"
+        android:layout_width="53dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="56dp"
+        android:text="@string/duration"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5" />
 
     <TextView
@@ -386,29 +395,19 @@
         app:layout_constraintStart_toEndOf="@+id/labITI"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <TextView
-        android:id="@+id/labTactileDuration"
-        android:layout_width="53dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="64dp"
-        android:text="@string/duration"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline5" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="302dp" />
+        app:layout_constraintGuide_begin="288dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="432dp" />
+        app:layout_constraintGuide_begin="410dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

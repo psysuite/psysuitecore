@@ -56,6 +56,7 @@
     <string name="time">tempo</string>
     <string name="frequency">frequenza</string>
     <string name="condition">condizione sperimentale</string>
+    <string name="population">popolazione</string>
 
     <string name="warning">Attenzione</string>
 
@@ -70,27 +71,40 @@
 
     <string name="yes">yes</string>
     <string name="no">no</string>
+    <string name="whitenoise">aggiungi rumore bianco</string>
 
     <string name="session">sessione</string>
+
+    <string-array name="populations_array">
+        <item>TD</item>
+        <item>CB</item>
+        <item>LB</item>
+        <item>CLV</item>
+        <item>LLV</item>
+        <item>CAI</item>
+        <item>LAI</item>
+        <item>ADHD</item>
+    </string-array>
+
 
     <string name="empty_subject_parcel">SOGGETTO E\' VUOTO</string>
     <string name="critical_error">ERRORE IRRECUPERABILE</string>
     <string name="restart_app_suggestion">E\' consigliabile riavviare l\'app</string>
     <string name="contact_developer">E\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
+    <string name="test_failure">Questo test appare corrotto.\nE\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
 
     <string name="error">Errore</string>
+
+    <string name="error_audiomanager">gestore dell\'audio non valido</string>
+    <string name="error_tactilemanager">gestore dell\'tattile non valido</string>
+    <string name="error_visualmanager">gestore dell\'visuale non valido</string>
     <string name="internal_error">Il codice ha generato il seguente errore\n%1$s</string>
 
 
-    <!-- ATB -->
-    <string name="start_atb">Audio-Tactile Binding (AT-B)</string>
+    <string name="start_bindings">Temporal Bindings</string>
 
-    <string-array name="unused_atb_tests_array">
-        <item>normale</item>
-        <item>infanti latenze</item>
-        <item>infanti frequenze</item>
-    </string-array>
-    <string name="whitenoise">aggiungi rumore bianco</string>
+    <!-- ATB -->
+    <string name="start_atb">AT Binding (AT-B)</string>
 
     <string name="atb_subtask_time_single">Singolo Stimolo</string>
     <string name="atb_subtask_time_single_tag">SSU</string>
@@ -105,13 +119,12 @@
     <string name="atb_subtask_time_infants">tempo infanti</string>
     <string name="atb_subtask_time_infants_tag">INF</string>
 
-
     <string name="atb_rb1_text">uguali</string>
     <string name="atb_rb3_text">diversi</string>
     <string name="atb_question">Sono uguali?</string>
 
     <!-- ATVB -->
-    <string name="start_atvb">Audio-Tactile-Visual Binding (ATV-B)</string>
+    <string name="start_atvb">ATV Binding (ATV-B)</string>
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
     <string name="atvb_subtask_time_single_tag">SSU</string>
@@ -127,6 +140,39 @@
     <string name="atvb_question_equal">Sono uguali?</string>
     <string name="atvb_question_synchro">Sono simultanei?</string>
 
+    <!-- TVB -->
+    <string name="start_tvb">TV Binding (TV-B)</string>
+
+    <string name="tvb_subtask_time_single">Singolo Stimolo</string>
+    <string name="tvb_subtask_time_single_tag">SSU</string>
+    <string name="tvb_subtask_time_double">Doppio Stimolo</string>
+    <string name="tvb_subtask_time_double_tag">DSU</string>
+
+    <string name="tvb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
+    <string name="tvb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="tvb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
+    <string name="tvb_subtask_time_double_tod_tag">DSUT</string>
+
+    <string name="tvb_rb1_text">uguali</string>
+    <string name="tvb_rb3_text">diversi</string>
+    <string name="tvb_question">Sono uguali?</string>
+
+    <!-- AVB -->
+    <string name="start_avb">AV Binding (AV-B)</string>
+
+    <string name="avb_subtask_time_single">Singolo Stimolo</string>
+    <string name="avb_subtask_time_single_tag">SSU</string>
+    <string name="avb_subtask_time_double">Doppio Stimolo</string>
+    <string name="avb_subtask_time_double_tag">DSU</string>
+
+    <string name="avb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
+    <string name="avb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="avb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
+    <string name="avb_subtask_time_double_tod_tag">DSUT</string>
+
+    <string name="avb_rb1_text">uguali</string>
+    <string name="avb_rb3_text">diversi</string>
+    <string name="avb_question">Sono uguali?</string>
 
     <!-- TID -->
 
@@ -204,14 +250,21 @@
     <string name="mmeters_rb2_text">Uguale</string>
     <string name="mmeters_rb3_text">no</string>
 
+    <!-- TFI TEST -->
+    <string name="tfi_label">TRIPLE FLASH ILLUSION (TFI)</string>
+    <string name="tfi_question">Indica il numero di stimoli che hai visto per ciascuna delle 3 modalità</string>
+
+
     <!-- SAMPLE TEST -->
-    <string name="sample_label">TRIALS GENERATION</string>
+
+    <string name="samples_test">TRIALS GENERATION</string>
 
     <string name="select_source">Seleziona almeno una modalità di stimolazione</string>
 
     <string-array name="sample_audio_types">
         <item>tone</item>
         <item>resource</item>
+        <item>assets</item>
     </string-array>
 
     <string-array name="sample_visual_types">
@@ -232,6 +285,12 @@
         <item>t200hz_1s</item>
         <item>t200hz_2s</item>
         <item>wnoise_20s</item>
+    </string-array>
+
+    <string-array name="sample_audioassets_array">
+        <item>t1000hz_10ms.wav</item>
+        <item>t1000hz_30ms.wav</item>
+        <item>t200hz_1s.wav</item>
     </string-array>
 
 </resources>

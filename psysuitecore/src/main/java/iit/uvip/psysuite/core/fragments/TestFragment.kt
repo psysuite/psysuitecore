@@ -7,6 +7,7 @@ import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.navigation.Navigation
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.common.TestBasic
@@ -16,19 +17,18 @@ import iit.uvip.psysuite.core.tests.bis.TestBIS
 import iit.uvip.psysuite.core.tests.mmd.TestMMD
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.sample.TestSample
-import iit.uvip.psysuite.core.tests.temporalbinding.SubjectBindingsParcel
 import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
 import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
+import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB
+import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB
+import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
-import org.albaspazio.core.accessory.VibrationManager
-import org.albaspazio.core.accessory.getAbsoluteFilePath
-import org.albaspazio.core.accessory.getTimeDifference
+import org.albaspazio.core.accessory.*
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
 import org.albaspazio.core.speech.SpeechManager
@@ -37,6 +37,7 @@ import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.ui.showToast
 import java.util.*
+import kotlin.reflect.KFunction
 
 /*
 Three operative modalities:
@@ -67,9 +68,7 @@ class TestFragment : BaseFragment(
     private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
     private val TARGET_FRAGMENT_REQUEST_CODE:Int    = 1
 
-    private val disposable                          = CompositeDisposable()
-
-    private var answerDialogFragment:AnswerDialogFragment?      = null
+    private var answerDialogFragment:DialogFragment? = null
     private var isAnswerDialogOn:Boolean            = false
 
     private var isPaused:Boolean                    = false
@@ -85,6 +84,10 @@ class TestFragment : BaseFragment(
     private val isDebug:Boolean                     = false
     private var currDebugInfo:String                = ""
 
+    var showResult:Boolean                          = false
+    var correctAnswer:String                        = ""
+
+    private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
     // ==========================================================================================================================
     // ==========================================================================================================================
     companion object {
@@ -102,9 +105,16 @@ class TestFragment : BaseFragment(
         }
     }
 
+    // main access point. it does:
+    // (try) instanciate the correct TestClass
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         super.onActivityCreated(savedInstanceState)
+
+        bt_next.visibility      = View.INVISIBLE
+        bt_abort.visibility     = View.INVISIBLE
+        bt_pause.visibility     = View.INVISIBLE
+        txtDebugInfo.visibility = View.INVISIBLE
 
         speechRecognitionManager    = SpeechRecognitionManager(requireContext())
         speechManager               = SpeechManager(resources, requireContext())
@@ -113,34 +123,50 @@ class TestFragment : BaseFragment(
         mSubjectParcel              = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
 
         try{
-            when(mSubjectParcel!!.type)
-            {
+            when(mSubjectParcel!!.type){
+
                 TestBasic.TEST_BISECTION_AUDIO,
                 TestBasic.TEST_BISECTION_TACTILE,
                 TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-                TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, isDebug)
+                TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView)
 
-                TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel!!, isDebug)
+                TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel!!)
 
                 TestBasic.TEST_TID_SHORT_AUDIO,
                 TestBasic.TEST_TID_SHORT_TACTILE,
                 TestBasic.TEST_TID_LONG_AUDIO,
-                TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, isDebug)
+                TestBasic.TEST_TID_LONG_TACTILE         -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator)
 
                 TestBasic.TEST_ATB_TIME_SINGLESTIM,
                 TestBasic.TEST_ATB_TIME_DOUBLESTIM,
                 TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
                 TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
-                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, isDebug)
+                TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator)
+
+
+                TestBasic.TEST_AVB_TIME_SINGLESTIM,
+                TestBasic.TEST_AVB_TIME_DOUBLESTIM,
+                TestBasic.TEST_AVB_TIME_SINGLESTIM_TOD,
+                TestBasic.TEST_AVB_TIME_DOUBLESTIM_TOD,
+                TestBasic.TEST_AVB_TIME_INF             -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel!!, circleView)
+
+                TestBasic.TEST_TVB_TIME_SINGLESTIM,
+                TestBasic.TEST_TVB_TIME_DOUBLESTIM,
+                TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
+                TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
+                TestBasic.TEST_TVB_TIME_INF             -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView)
 
                 TestBasic.TEST_ATVB_TIME_S_UNBAL,
                 TestBasic.TEST_ATVB_TIME_S_BAL,
                 TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel as SubjectBindingsParcel, vibrator, circleView, isDebug)
+                TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView)
 
                 TestBasic.TEST_SAMPLE_ALIGNED,
                 TestBasic.TEST_SAMPLE_SHIFTED,
-                TestBasic.TEST_SAMPLE_PAIR              -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView, isDebug)
+                TestBasic.TEST_SAMPLE_PAIR              -> mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView)
+
+                TestBasic.TEST_TFI,
+                TestBasic.TEST_TFI_TODDLERS             -> mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView)
 
                 else    -> {
                     showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
@@ -148,18 +174,28 @@ class TestFragment : BaseFragment(
                     return
                 }
             }
+
+            // get a reference to the AnswerDialogFragment
+            val answerDialogClass = if(mSubjectParcel!!.classes.size > 1 && mSubjectParcel!!.classes[1].isNotEmpty())
+                mSubjectParcel!!.classes[1]
+            else    "iit.uvip.psysuite.core.fragments.AnswerDialogFragment"
+            answerDialogRef       = getCompanionObjectMethod(answerDialogClass, "newInstance")
+
+            setTestEventsObservable()
+            mTest.initTest()    // then wait for EVENT_TEST_SETUP_COMPLETED
+
         }
         catch (e:Exception){
+            e.logLastTwo(LOG_TAG)
             showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
             showAlert(requireActivity(),resources.getString(R.string.critical_error), e.toString())
             Navigation.findNavController(requireView()).popBackStack()
             return
         }
+    }
 
-        bt_next.visibility      = View.INVISIBLE
-        bt_abort.visibility     = View.INVISIBLE
-        bt_pause.visibility     = View.INVISIBLE
-        txtDebugInfo.visibility = View.INVISIBLE
+    // triggered by testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
+    private fun onTestSetupComplete(){
 
         if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS){
             bt_abort.visibility = View.VISIBLE
@@ -182,7 +218,16 @@ class TestFragment : BaseFragment(
     override fun onResume() {
         super.onResume()
 
-        setEventsFlow()
+        setTestEventsObservable()
+
+        // button is shown when an answer dialog is not displayed
+        bt_next.setOnClickListener{
+
+            bt_next.visibility      = View.INVISIBLE
+            bt_pause.visibility     = View.INVISIBLE
+
+            onNewTrial()
+        }
 
         bt_abort.setOnClickListener{
             onAbortTest()
@@ -208,24 +253,18 @@ class TestFragment : BaseFragment(
     }
 
     // here I manage all trial-by-trial behaviours invoked by Tests
-    // normal flow is
-    private fun setEventsFlow(){
-
-        // button is shown when an answer dialog is not displayed
-        bt_next.setOnClickListener{
-
-            bt_next.visibility      = View.INVISIBLE
-            bt_pause.visibility     = View.INVISIBLE
-
-            onNewTrial()
-        }
+    private fun setTestEventsObservable(){
 
         if(!this::mTest.isInitialized) return
+
+        if(disposable.size() > 0) return
 
         mTest.testEvent
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
             when(it.first){
+
+                TestBasic.EVENT_TEST_SETUP_COMPLETED-> onTestSetupComplete()
                 TestBasic.EVENT_STIMULI_START       -> {}
                 TestBasic.EVENT_STIMULI_END         -> {}
 
@@ -264,6 +303,7 @@ class TestFragment : BaseFragment(
                                                             showDebugInfo(e.toString())
                                                         }
                 }
+                TestBasic.EVENT_TEST_ERROR          ->   onTestError(it.second as String)
             }
         }
         .addTo(disposable)
@@ -288,6 +328,7 @@ class TestFragment : BaseFragment(
         when(mTest.nextTrial(prev_result, elapsed)){
             TestBasic.EVENT_TEST_END    -> onTestEnded()
             TestBasic.EVENT_BLOCK_END   -> onBlockEnded()       // ask whether interrupting the test
+            TestBasic.EVENT_TEST_ERROR  -> {}                   // do nothing, test class close the test and send EVENT_TEST_ERROR with error message
             else                        -> onBeforeTrialShow()  // next trial has been started
         }
     }
@@ -303,7 +344,6 @@ class TestFragment : BaseFragment(
             TestBasic.TEST_SHOWTRIALS_TRIALEND  -> showTrialId(1000L)
         }
         if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS)  bt_abort.visibility = View.VISIBLE
-
     }
 
     private fun onTestEnded(){
@@ -337,6 +377,11 @@ class TestFragment : BaseFragment(
             { /* cancelClb*/    onStoppedAfterBlock() })
     }
 
+    private fun onTestError(msg:String){
+        mHandler.removeCallbacksAndMessages(null)
+        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
+        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, listOf(mTest.getAbsoluteResultFilePath(), mTest.closeSummary()))
+    }
     // user wanted to interrupt test after an end block (send data). rename current res file
     private fun onStoppedAfterBlock(){
         val newresfilename = mTest.stopTestAfterBlock()
@@ -416,23 +461,31 @@ class TestFragment : BaseFragment(
     private fun showAnswerDialog(){
 
         val b = Bundle()
-        b.putInt("trial_id",    mTest.currTrial)
-        b.putInt("tot_trials",  mTest.nTrials)
-        b.putString("question", mTest.mQuestion)
+        b.putInt("trial_id",            mTest.currTrial)
+        b.putInt("tot_trials",          mTest.nTrials)
+        b.putString("question",         mTest.mQuestion)
         b.putStringArrayList("answers", mTest.validAnswers as ArrayList<String>)
-        b.putString("debug", currDebugInfo)
+        b.putString("debug",            currDebugInfo)
+        b.putBoolean("isDebug",         mSubjectParcel?.isDebug ?: false)
 
-        answerDialogFragment = AnswerDialogFragment.newInstance("Some Title")
-        (answerDialogFragment as AnswerDialogFragment).setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
-        (answerDialogFragment as AnswerDialogFragment).arguments    = b
-        (answerDialogFragment as AnswerDialogFragment).isCancelable = false
-        (answerDialogFragment as AnswerDialogFragment).show(parentFragmentManager, ANSWER_DIALOG_TAG)
+        b.putBoolean("show_result",     mTest.showResult)
+        b.putString("correct_answer",   mTest.getTrialCorrectAnswer())
+
+        answerDialogFragment = answerDialogRef.first?.call(answerDialogRef.second, "") as DialogFragment
+        if(answerDialogFragment == null){
+            showAlert(requireActivity(),resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer) + "\nAnswer dialog was not available")
+            return
+        }
+        answerDialogFragment?.setTargetFragment(this , TARGET_FRAGMENT_REQUEST_CODE)
+        answerDialogFragment?.arguments    = b
+        answerDialogFragment?.isCancelable = false
+        answerDialogFragment?.show(parentFragmentManager, ANSWER_DIALOG_TAG)
         isAnswerDialogOn = true
     }
 
     private fun closeAnswerDialog(){
         if(isAnswerDialogOn) {
-            (answerDialogFragment as AnswerDialogFragment).dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
+            answerDialogFragment?.dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
             isAnswerDialogOn = false
         }
     }

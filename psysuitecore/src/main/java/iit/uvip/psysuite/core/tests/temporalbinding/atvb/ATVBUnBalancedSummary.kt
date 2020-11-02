@@ -162,7 +162,7 @@ class ATVBUnBalancedSummary(ctx:Context) : Summary(ctx){
         fun close(){
 
             if(ntrial > 0){
-                rt                  = ((rt / ntrial) * 1F).roundToInt()
+                rt                  = (((rt*1F) / ntrial) * 1F).roundToInt()
                 perc_succ           = (((perc_succ*1F) / ntrial) * 100F).roundToInt()
                 perc_discrimination = (((perc_discrimination*1F) / ntrial) * 100F).roundToInt()
             }

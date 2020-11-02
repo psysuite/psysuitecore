@@ -1,0 +1,549 @@
+package iit.uvip.psysuite.core.tests.temporalbinding.avb
+
+import android.app.Activity
+import android.content.Context
+import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.common.*
+import iit.uvip.psysuite.core.common.stimuli.AudioManager
+import iit.uvip.psysuite.core.common.stimuli.ImageViewDefinedException
+import iit.uvip.psysuite.core.common.stimuli.StimuliManager
+import iit.uvip.psysuite.core.common.stimuli.VisualManager
+import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
+import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
+import org.albaspazio.core.ui.showToast
+import kotlin.math.roundToInt
+
+
+class TestAVB(ctx: Context,
+              activity: Activity,
+              hostfragment: Fragment,
+              subjectparcel: SubjectBasicParcel,
+              mImageView: ImageView?
+) : TestBasic(ctx, activity, hostfragment, subjectparcel, mImageView = mImageView)
+{
+    override var LOG_TAG:String = TestAVB::class.java.simpleName
+
+    private var curISI: Long = 0L
+
+    // stimuli combinations
+    private val BIMODAL_CODE            = STIM_TYPE_A1V1
+
+    private var allQuestions:MutableList<String> = mutableListOf()
+    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
+
+    // 26 different elements
+    private val lStimuliUnBalanced: List<StimulusBindingsUnbalanced> = listOf(
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 50),
+        StimulusBindingsUnbalanced( TYPE_V_A, 50),
+        StimulusBindingsUnbalanced( TYPE_A_V, 50),
+        StimulusBindingsUnbalanced( TYPE_V_A, 50),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 100),
+        StimulusBindingsUnbalanced( TYPE_V_A, 100),
+        StimulusBindingsUnbalanced( TYPE_A_V, 100),
+        StimulusBindingsUnbalanced( TYPE_V_A, 100),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 200),
+        StimulusBindingsUnbalanced( TYPE_V_A, 200),
+        StimulusBindingsUnbalanced( TYPE_A_V, 200),
+        StimulusBindingsUnbalanced( TYPE_V_A, 200),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 300),
+        StimulusBindingsUnbalanced( TYPE_V_A, 300),
+        StimulusBindingsUnbalanced( TYPE_A_V, 300),
+        StimulusBindingsUnbalanced( TYPE_V_A, 300),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 400),
+        StimulusBindingsUnbalanced( TYPE_V_A, 400),
+        StimulusBindingsUnbalanced( TYPE_A_V, 400),
+        StimulusBindingsUnbalanced( TYPE_V_A, 400),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 800),
+        StimulusBindingsUnbalanced( TYPE_V_A, 800),
+        StimulusBindingsUnbalanced( TYPE_A_V, 800),
+        StimulusBindingsUnbalanced( TYPE_V_A, 800),
+
+        StimulusBindingsUnbalanced( TYPE_A_V, 1200),
+        StimulusBindingsUnbalanced( TYPE_V_A, 1200)
+    )
+
+    private val WN_FIRSTSTIM_INTERVAL   = 1000L
+    private val STIM_DURATION_INF       = 1000L
+    private val STIM_DURATION_TOD       = 200L
+    private val STIM_DURATION           = 50L
+    private val ISI                     = 1000L
+    private val ISI_INF                 = 2000L // distance between stimuli onsets
+
+    private val EVENT_SECOND_TRAIN      = 1201
+
+    private val amplitude = 100
+
+    companion object {
+
+        @JvmStatic val TEST_BASIC_LABEL         = "AVB"
+        @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
+        @JvmStatic val NUM_REPETITIONS          = 5
+
+        @JvmStatic val TYPE_AV     = 0
+        @JvmStatic val TYPE_A      = 1
+        @JvmStatic val TYPE_V      = 2
+        @JvmStatic val TYPE_A_V    = 3
+        @JvmStatic val TYPE_V_A    = 4
+
+         @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
+
+        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
+            return mutableListOf(
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_AVB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_AVB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_AVB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_AVB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}"),
+                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_AVB_TIME_INF                 ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}"))
+        }
+
+        fun getNextTrialModes():List<List<Int>> {
+            return listOf(
+                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+                listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
+        }
+
+        fun getEmailRecipients():Array<String> = recipients
+    }
+
+    // =============================================================================================================================
+    // INIT
+    // =============================================================================================================================
+    override fun initTest() {
+
+        if(mImageView == null) throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+
+        nextTrailModality   = subjectparcel.nextTrailModality
+        abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
+        showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
+
+        allQuestions        = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
+        validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
+
+        // set stim duration (presently the same in the two subtasks
+        when (subjectparcel.type) {
+            TEST_AVB_TIME_SINGLESTIM ->{
+                mQuestion               = allQuestions[0]
+                curISI                  = ISI           // 1000L
+                currStimulusDuration    = STIM_DURATION // 50L
+            }
+            TEST_AVB_TIME_DOUBLESTIM ->{
+                mQuestion               = allQuestions[1]
+                curISI                  = ISI           // 1000L
+                currStimulusDuration    = STIM_DURATION // 50L
+            }
+            TEST_AVB_TIME_SINGLESTIM_TOD ->{
+                mQuestion               = allQuestions[0]
+                curISI                  = ISI               // 1000L
+                currStimulusDuration    = STIM_DURATION_TOD // 200L
+            }
+            TEST_AVB_TIME_DOUBLESTIM_TOD ->{
+                mQuestion               = allQuestions[1]
+                curISI                  = ISI               // 1000L
+                currStimulusDuration    = STIM_DURATION_TOD // 200L
+            }
+            TEST_AVB_TIME_INF   -> {
+                curISI                  = ISI_INF           // 2000L
+                currStimulusDuration    = STIM_DURATION_INF // 1000L
+            }
+        }
+
+        if(!subjectparcel.isDebug) {
+            // create trials/summary
+            when (subjectparcel.type) {
+                TEST_AVB_TIME_DOUBLESTIM_TOD,
+                TEST_AVB_TIME_DOUBLESTIM ->{
+                    createTrialsTimeDouble()
+                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    initSummary()
+
+                }
+                TEST_AVB_TIME_SINGLESTIM_TOD,
+                TEST_AVB_TIME_SINGLESTIM       -> {
+                    createTrialsTimeSingle()
+                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    initSummary()
+                }
+                TEST_AVB_TIME_INF   -> {
+                    createTrialsTimeInfants()
+                    createResultFile(subjectparcel, TrialBindingsInfants.LOG_HEADER)
+                }
+            }
+        }
+        else{
+            createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+            createTrialsDebug()
+        }
+
+        nTrials     = mTrials.size
+        currTrial   = 0
+
+        mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+
+        mTestLabel = ""
+        getConditionsInfo(ctx).map {
+            if (it.id == subjectparcel.type) mTestLabel = it.label
+        }
+        if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
+
+        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+
+        mStimuliManager = StimuliManager(AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+            null,
+            VisualManager(STIM_TYPE_V1, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler))
+
+        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+    }
+
+    // =============================================================================================================================
+    // CREATE TRIALS
+    // =============================================================================================================================
+    private fun createTrialsTimeInfants() {
+        var cnt = -1
+        for (i in 0 until NUM_REPETITIONS_INFANTS) {
+            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_A, 800, validAnswers[1]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, validAnswers[1]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_V, 800, validAnswers[1]))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, validAnswers[1]))
+
+            mTrials.addAll(trials)
+        }
+    }
+
+    // [(4x2) x 6lat + 4 + 4 + 4 + 4] = 64
+    private fun createTrialsTimeDouble() {
+        var cnt = -1
+        mTrials = mutableListOf()
+        for (i in 0 until NUM_REPETITIONS) {
+            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            for (j in 0 until 2) {
+
+                // 6
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, validAnswers[1]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, validAnswers[1]))
+
+                // 26
+                lStimuliUnBalanced.map {
+                    trials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, validAnswers[1]))
+                }
+            }
+            trials.shuffle()
+            mTrials.addAll(trials)
+        }
+        setTrialsID()   // set id according to their order
+    }
+
+    // only-A & only-T were removed in single stimulus sub-task. 7/8/2020
+    private fun createTrialsTimeSingle() {
+        var cnt = -1
+        mTrials = mutableListOf()
+        for (i in 0 until NUM_REPETITIONS) {
+            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            for (j in 0 until 2) {
+
+                // 2
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+
+                // 26
+                lStimuliUnBalanced.map {
+                    trials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, validAnswers[1]))
+                }
+            }
+            trials.shuffle()
+            mTrials.addAll(trials)
+        }
+        setTrialsID()   // set id according to their order
+    }
+
+    private fun createTrialsDebug(){
+        var cnt = -1
+        mTrials = mutableListOf()
+        for (i in 0 until 100000) {
+
+            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            for (j in 0 until 2) {
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_V, 50, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_A, 50, validAnswers[0]))
+            }
+            mTrials.addAll(trials)
+        }
+    }
+    // =============================================================================================================================
+    // MANAGE TRIALS STIMULI
+    // =============================================================================================================================
+    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
+        return super.nextTrial(prev_result, elapsed)
+    }
+
+    // called by secondTrain
+    override fun onTrialEnd(){
+
+        mNoise?.stop()
+        mNoise?.prepare()
+
+        when (nextTrailModality) {
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_AUTO         ->  {
+                // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
+                mStimuliHandler.postDelayed({
+                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
+                }, currStimulusDuration)
+            }
+
+            TEST_NEXTTRIAL_VOICE_ANSWER ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
+            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER -> {
+                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
+                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            }
+        }
+    }
+
+    override fun initSummary(){
+
+        mSummary = when (subjectparcel.type) {
+            TEST_AVB_TIME_DOUBLESTIM,
+            TEST_AVB_TIME_SINGLESTIM,
+            TEST_AVB_TIME_DOUBLESTIM_TOD,
+            TEST_AVB_TIME_SINGLESTIM_TOD    ->  AVBUnBalancedSummary(ctx)
+
+            else                            ->  AVBUnBalancedSummary(ctx)
+        }
+    }
+    // =============================================================================================================================
+    // DELIVER STIMULI
+    // =============================================================================================================================
+    override fun show(trial: TrialBasic, isRepeat:Boolean){
+
+        if(isRepeat)    trial.repetitions++
+
+        mNoise?.start()
+
+        when(subjectparcel.type) {
+
+            TEST_AVB_TIME_INF ->    deliverInfants(trial as TrialBindingsUnBalanced)
+
+            TEST_AVB_TIME_SINGLESTIM,
+            TEST_AVB_TIME_SINGLESTIM_TOD -> {
+                mStimuliHandler.postDelayed({
+                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced){ onTrialEnd() }
+                }, WN_FIRSTSTIM_INTERVAL)
+            }
+            TEST_AVB_TIME_DOUBLESTIM,
+            TEST_AVB_TIME_DOUBLESTIM_TOD -> {
+
+                // since I have to apply the possible shift, I calculate here the correction and thus call deliverShiftedStimulus for the 1st stim.
+                // for the second I call instead deliverUnBalancedStimuli
+                val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subjectparcel.stimuliDelay)
+                val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
+
+                mStimuliHandler.postDelayed({
+                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+                }, shift)
+                mStimuliHandler.postDelayed({
+                    deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced){ onTrialEnd() }
+                }, shift + curISI)     // to preserve the desired ISI between 1st and 2nd stimuli,
+                                                                                                    // I also add the shift that could be eventually imposed to the fastest modality
+            }
+        }
+    }
+
+    private fun deliverInfants(trial:TrialBindingsUnBalanced) {
+
+        // since I have to apply the possible shift, I calculate here the correction and thus call deliverShiftedStimulus for the 1st stim.
+        // to preserve the desired ISI between stimuli, I also subtract the positive shift that could be eventually imposed to the fastest modality
+
+        val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subjectparcel.stimuliDelay)
+        val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
+        // first train
+        mStimuliHandler.postDelayed({
+            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+        }, shift)
+
+        mStimuliHandler.postDelayed({
+            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+        }, shift + curISI)
+
+        mStimuliHandler.postDelayed({
+            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+        }, shift + 2*curISI)
+
+        // second train
+        mStimuliHandler.postDelayed({
+            deliverUnBalancedStimuli(trial)
+        }, shift + 3*curISI)
+
+        mStimuliHandler.postDelayed({
+            deliverUnBalancedStimuli(trial)
+        }, shift + 4*curISI)
+
+        mStimuliHandler.postDelayed({
+            onTrialEnd()
+        }, shift + 5*curISI)
+    }
+
+    private fun deliverUnBalancedStimuli(trial:TrialBindingsUnBalanced, onEnd:() -> Unit = {}){
+
+        var type = 0
+        val corr_delays:CorrectedStimuliDelay = when(trial.type) {
+            TYPE_AV     -> {
+                type = mStimuliManager.typeAV
+                delaysAligner.arrangeDelays(type, 0,-1, 0)
+            }
+            TYPE_A      -> {
+                type = mStimuliManager.typeA
+                CorrectedStimuliDelay(0, -1, -1)
+            }
+            TYPE_V      -> {
+                type = mStimuliManager.typeV
+                CorrectedStimuliDelay(-1, -1, 0)
+            }
+            TYPE_A_V    -> {
+                type = mStimuliManager.typeAV
+                delaysAligner.arrangeDelays(type, 0,-1, trial.delay)
+            }
+            TYPE_V_A    -> {
+                type = mStimuliManager.typeAV
+                delaysAligner.arrangeDelays(type, trial.delay,-1, 0)
+            }
+            else        -> {
+                type = mStimuliManager.typeAV
+                CorrectedStimuliDelay(0, -1, 0)
+            }
+        }
+        deliverShiftedStimulus(type, corr_delays.a, corr_delays.t, corr_delays.v){ onEnd()}
+    }
+    // =============================================================================================================================
+}
+
+/*
+This App perform an Audio-Visual Binding (AVB) test:
+
+It has two versions: infant and children/adults
+
+
+1) INFANT:
+
+It has one single experimental condition composed by 24 trials (with fixed scheme!).
+Each trial consists in a pair of stimulation modalities (audio and tactle) each composed by two consecutive trains of respectively 3 and 2 either audio and/or tactile stimuli (stim duration 1sec, isi=1sec). ITI=2sec.
+
+single trial:
+       1st train    2nd train
+        ___   __    __  |  __    __
+A    __|  |__|  |__|  |_|_|  |__|  |__
+                        |
+        __    __    __  |  __    __
+T    __|  |__|  |__|  |_|_|  |__|  |__
+                        |
+                        |
+
+in the second train, one of the two modalities can be in synch with other, delayed/anticipated by 800 ms or absent
+in total, there are 5 types of stimuli
+
+CODE    #REP    TYPE
+0       6       A,T
+3       6       A
+6       6       T
+7       3       A+800,T
+8       3       A,T+800
+
+The presentation order is fixed, 3 repetitions of the following 12 trials:
+
+codes order: 0,3,7,6,3,0,8,6
+
+A,T
+A
+A+800,T
+T
+A
+A,T
+A,T+800
+T
+
+Exported Data: trial_id, type
+
+2) CHILDREN / ADULTS
+
+single trial:
+
+        __  | __
+A    __|  |_|_|  |__
+            |
+        __  |  __
+T    __|  |_|_|  |__
+            |
+
+CODE    #REP    TYPE
+0       10       A,T
+3       10       A
+6       10       T
+7       5       A+100,T
+8       5       A,T+100
+7       5       A+200,T
+8       5       A,T+200
+7       5       A+300,T
+8       5       A,T+300
+7       5       A+400,T
+8       5       A,T+400
+7       5       A+800,T
+8       5       A,T+800
+
+Tot trials = 80
+
+CODE    #REP    TYPE
+0       6       A,T
+1       3       A+200,T
+2       3       A,T+200
+3       6       A
+4       3       A+500,T
+5       3       A,T+500
+6       6       T
+7       3       A+800,T
+8       3       A,T+800
+
+7       3       A+1200,T
+8       3       A,T+1200
+
+
+A,T
+A,T+200
+A
+A+800,T
+T
+A,T+500
+A
+A+200,T
+A,T
+A,T+800
+T
+A+500,T
+ */
