@@ -275,7 +275,7 @@ class TestTFI(ctx: Context,
 //
 //        mStimuliHandler.postDelayed({   onTrialEnd()    }, onsetEnd)
 
-        val corr_delays = delaysAligner.arrangeDelays(TRIMODAL_AUDIO_CODE, -25,0, 0)
+        var corr_delays = delaysAligner.arrangeDelays(TRIMODAL_AUDIO_CODE, -25,0, 0)
 
 //        Log.d("TFI show1", "Trial type ${trial.correct_answer}")
 //        Log.d("TFI show2", "delays ${corr_delays.a} | , ${corr_delays.t} | ${corr_delays.v}")
@@ -283,15 +283,17 @@ class TestTFI(ctx: Context,
 
         mStimuliHandler.postDelayed({
 
-//            if(trial.stims[0] > 0)
+            if(trial.stims[0] > 0)
                 deliverShiftedStimulus(trial.stims[0], corr_delays.a, corr_delays.t, corr_delays.v)
 //                mStimuliHandler.postDelayed({   deliverShiftedStimulus(trial.stims[0], corr_delays.a, corr_delays.t, corr_delays.v) }, onset0)
 
             if(trial.stims[1] > 0)
                 mStimuliHandler.postDelayed({   deliverShiftedStimulus(trial.stims[1], corr_delays.a, corr_delays.t, corr_delays.v) }, onset1)
 
-            if(trial.stims[2] > 0)
-                mStimuliHandler.postDelayed({   deliverShiftedStimulus(trial.stims[2], corr_delays.a+25, corr_delays.t, corr_delays.v) }, onset2)
+            if(trial.stims[2] > 0){
+                corr_delays = delaysAligner.arrangeDelays(TRIMODAL_AUDIO_CODE, 0,0, 0)
+                mStimuliHandler.postDelayed({   deliverShiftedStimulus(trial.stims[2], corr_delays.a, corr_delays.t, corr_delays.v) }, onset2)
+            }
 
             mStimuliHandler.postDelayed({   onTrialEnd()    }, onsetEnd)
 

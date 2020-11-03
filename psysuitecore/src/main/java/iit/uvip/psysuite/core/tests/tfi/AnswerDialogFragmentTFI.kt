@@ -59,6 +59,10 @@ class AnswerDialogFragmentTFI: DialogFragment()
         txt_question.text   = question
         txt_debug.text      = debug_info
 
+        radioGroupAudio.check(radioGroupAudio.getChildAt(0).id)
+        radioGroupTactile.check(radioGroupTactile.getChildAt(0).id)
+        radioGroupVisual.check(radioGroupVisual.getChildAt(0).id)
+
         onsetDate           = Date()
 
         if(isDebug){
@@ -83,7 +87,12 @@ class AnswerDialogFragmentTFI: DialogFragment()
 
             val elapsedms = getTimeDifference(onsetDate)
             val res = getRadioSelection()
-            if(res.isNotEmpty())    sendResult(res, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+
+            when(res){
+                "0,0,0" ->  showToast(getText(R.string.tfi_warning_null_answer).toString(), requireContext())
+                ""      ->  return@setOnClickListener
+                else    ->  sendResult(res, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+            }
         }
 
         bt_clear.setOnClickListener{
