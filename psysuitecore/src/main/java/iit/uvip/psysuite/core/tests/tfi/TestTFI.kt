@@ -35,7 +35,7 @@ class TestTFI(ctx: Context,
     private val soa_2:Long = 85L
 
     private val N_RIP_X_COND_X_BLOCK:Int = 6
-    private val NUM_BLOCKS:Int    = 4
+    private val NUM_BLOCKS:Int          = 4
 
     private val WN_PRESTIM_INTERVAL     = 1000L
     private val WN_POSTTSTIM_INTERVAL   = 500L

@@ -20,8 +20,11 @@
     <string name="cancel">cancella</string>
     <string name="continue_label">CONTINUA</string>
     <string name="block_ended">Questa parte del test è terminata\nVuoi continuare o interrompere per poi proseguire un\'altra volta?</string>
-    <string name="test_ended">Il Test è terminato</string>
+    <string name="block_ended_blind">Questa parte del test è terminata...Chiedi assistenza per continuare</string>
+    <string name="test_ended">Il Test è terminato...grazie per aver partecipato</string>
     <string name="test_aborted">Hai deciso di interrompere il test. Vuoi cancellare i risultati fin qui scritti\n o li vuoi mantenere?</string>
+
+    <string name="test_aborted_blind">Hai deciso di interrompere il test. Chiedi assistenza per completare</string>
     <string name="new_trial">Nuovo stimolo</string>
 
     <string name="name">NOME</string>
@@ -70,7 +73,16 @@
     <string name="select_session">Seleziona una sessione sperimentale</string>
     <string name="select_spinner">Seleziona %1$s</string>
     <string name="select_one_answer">Seleziona una risposta</string>
-    <string name="warning_dt_again2abort">Vuoi interrompere il test? esegui un altro doppio tocco per confermare o un tocco singolo per continuare il test</string>
+    <string name="warning_dt_again2abort">Vuoi interrompere il test? esegui un altro tocco lungo per confermare o un tocco singolo per continuare il test</string>
+
+    <string name="exp_intro_blind1">Benvenuto in questo esperimento ... Proverai ora come poter rispondere alla domanda che ti verrà posta </string>
+    <string name="exp_intro_blind2">La domanda è</string>
+    <string name="exp_intro_blind3">Scorri un dito verso l\'alto per scegliere l\'opzione</string>
+    <string name="exp_intro_blind4">scorri verso il basso per l\'opzione</string>
+    <string name="exp_intro_blind5">quando sei sicuro della scelta fai un doppio tap veloce</string>
+
+    <string name="exp_intro_blind_assisted">Benvenuto in questo esperimento ... prova a rispondere e quando sei pronto per iniziare, fai un doppio tap veloce </string>
+    <string name="exp_letsstart_blind">L\'esperimento sta per iniziare</string>
 
     <string name="answer_selected">risposta %1$s</string>
     <string name="subject_info_notcorrected">Le seguenti informazioni del soggetto sono errate:\n\n%1$s</string>

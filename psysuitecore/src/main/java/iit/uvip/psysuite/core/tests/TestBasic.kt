@@ -168,7 +168,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     // this instance is defined and validated during sub-class init{}
     // in case of error an exception is thrown and test is aborted.
-    // the only susceptible to error is MediaPlayer in case of the test involves different resources to be loaded
+    // the only susceptible to error is AudioManager in case of the test involves different resources to be loaded
     protected lateinit var mStimuliManager: StimuliManager
 
     protected var mNoise: MediaPlayer? = null
@@ -196,10 +196,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     // ===============================================================================================================
     fun start():Boolean{
-
         return  try {
-                    adjustBlocks(subjectparcel.block)     // set currTrial, mCurrBlock, mTrial
-
                     if(!mStimuliManager.isValid || !this::mTrial.isInitialized){
                         onCriticalError(ctx.resources.getString(R.string.test_failure), true)
                         return false
@@ -303,7 +300,10 @@ abstract class TestBasic(protected val ctx: Context,
         return newresname
     }
 
-    fun getTrialCorrectAnswer():String = mTrial.getCorrectAnswer()
+    fun getTrialCorrectAnswer():String{
+        return  if(!this::mTrial.isInitialized)     validAnswers[0]
+                else                                mTrial.getCorrectAnswer()
+    }
 
     private fun onCriticalError(msg:String, delete:Boolean=false){
         abortTest(delete)
@@ -313,7 +313,7 @@ abstract class TestBasic(protected val ctx: Context,
     // ACCESSORY
     // ===============================================================================================================
 
-    private fun adjustBlocks(blk:Int){      // blk is 0-based
+    fun adjustBlocks(blk:Int){      // blk is 0-based
 
         if((nBlocks == 1 && blk > 0) || (blk >= nBlocks)){
             // incongruent condition
@@ -351,4 +351,5 @@ abstract class TestBasic(protected val ctx: Context,
 
     fun getResultFile(): String =   if(existFile(mResultFile).first)    mResultFile
     else                                ""
+
 }

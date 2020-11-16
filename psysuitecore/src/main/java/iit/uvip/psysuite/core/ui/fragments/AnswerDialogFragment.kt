@@ -22,14 +22,16 @@ open class AnswerDialogFragment: DialogFragment()
 {
     open val LOG_TAG = AnswerDialogFragment::class.java.simpleName
 
-    protected var isDebug:Boolean = false
+    protected var isDebug:Boolean           = false
+    protected var isInstructions:Boolean    = false
 
     protected var showResult:Boolean = false
     private var correctAnswer:String = ""
+    protected var mQuestion:String              = ""
+    protected var mAnswers:ArrayList<String>    = arrayListOf()
 
-    protected var mAnswers:ArrayList<String> = arrayListOf()
-    protected var onsetDate:Date  = Date()
-    private val mHandler:Handler = Handler()
+    protected var onsetDate:Date                = Date()
+    private val mHandler:Handler                = Handler()
 
     protected var tts: SpeechManager?                     = null
 
@@ -56,10 +58,11 @@ open class AnswerDialogFragment: DialogFragment()
         // Fetch arguments from bundle and set title
         val title           = requireArguments().getString("title", "Enter Name")
         val str_trial       = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
-        val question        = requireArguments().getString("question", "Enter Name")
+        mQuestion           = requireArguments().getString("question", "Enter Name")
         mAnswers            = requireArguments().getStringArrayList("answers") ?: arrayListOf<String>()
         val debug_info      = requireArguments().getString("debug")
         isDebug             = requireArguments().getBoolean("isDebug", false)
+        isInstructions      = (targetRequestCode == TestFragment.TRG_REQ_CODE_INSTRUCTIONS)
 
         showResult          = requireArguments().getBoolean("show_result", false)
         if(showResult && mAnswers.size > 0)
@@ -70,7 +73,7 @@ open class AnswerDialogFragment: DialogFragment()
         bt_clear.visibility     = View.VISIBLE
 
         txt_trials.text     = str_trial
-        txt_question.text   = question
+        txt_question.text   = mQuestion
         txt_debug.text      = debug_info
 
         if (mAnswers.isNotEmpty()) {
@@ -141,8 +144,11 @@ open class AnswerDialogFragment: DialogFragment()
         else    sendResult(curr_answer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
     }
 
+    // last point of the exit/dismiss procedure
     protected fun sendResult(response: String, elapsedTime: Int, response_id: Int) {
         if (targetFragment == null) return
+
+        tts?.stop()
 
         val intent = TestFragment.newIntent(response, elapsedTime, response_id)
         targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)

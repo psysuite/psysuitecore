@@ -208,11 +208,11 @@ class TestATB(ctx: Context,
             createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
         }
 
-
         nTrials     = mTrials.size
         currTrial   = 0
 
         mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+//        mListBlocks = mutableListOf(1,2)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {

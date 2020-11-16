@@ -43,6 +43,16 @@ class AnswerGestureDialogFragment: AnswerDialogFragment()
 
         showResult      = false
         selectedAnswer  = ""
+
+        if(isInstructions)
+            tts?.speak(listOf(  resources.getString(R.string.exp_intro_blind1),
+                                resources.getString(R.string.exp_intro_blind2),
+                                mQuestion,
+                                resources.getString(R.string.exp_intro_blind3),
+                                mAnswers[0],
+                                resources.getString(R.string.exp_intro_blind4),
+                                mAnswers[1],
+                                resources.getString(R.string.exp_intro_blind5)))
     }
 
     override fun onResume() {
@@ -95,9 +105,14 @@ class AnswerGestureDialogFragment: AnswerDialogFragment()
     override fun confirm() {
         if(selectedAnswer.isNotEmpty()){
 
-            tts?.speak(resources.getString(R.string.new_trial)) {
-                val elapsedms = getTimeDifference(onsetDate)
-                sendResult(selectedAnswer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+            val msg =   if(isInstructions)  resources.getString(R.string.exp_letsstart_blind)
+                        else                resources.getString(R.string.new_trial)
+
+            tts?.speak(msg){
+                requireActivity().runOnUiThread {
+                    val elapsedms = getTimeDifference(onsetDate)
+                    sendResult(selectedAnswer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+                }
             }
         }
         else tts?.speak(resources.getString(R.string.select_one_answer))
@@ -114,6 +129,5 @@ class AnswerGestureDialogFragment: AnswerDialogFragment()
             isAborting = true
             tts?.speak(resources.getString(R.string.warning_dt_again2abort))
         }
-
     }
 }
