@@ -373,7 +373,7 @@ class TestTVB(ctx: Context,
             TEST_TVB_TIME_DOUBLESTIM_TOD,
             TEST_TVB_TIME_SINGLESTIM_TOD    ->  TVBUnBalancedSummary(ctx)
 
-            else                            ->  TVBUnBalancedSummary(ctx)
+            else                            ->  null
         }
     }
     // =============================================================================================================================

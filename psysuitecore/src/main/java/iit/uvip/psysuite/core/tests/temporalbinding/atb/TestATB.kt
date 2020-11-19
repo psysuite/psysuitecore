@@ -378,7 +378,7 @@ class TestATB(ctx: Context,
             TEST_ATB_TIME_DOUBLESTIM_TOD,
             TEST_ATB_TIME_SINGLESTIM_TOD    ->  ATBUnBalancedSummary(ctx)
 
-            else                            ->  ATBUnBalancedSummary(ctx)
+            else                            ->  null
         }
     }
     // =============================================================================================================================

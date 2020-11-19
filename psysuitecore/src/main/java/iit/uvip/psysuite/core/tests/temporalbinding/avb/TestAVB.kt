@@ -337,7 +337,7 @@ class TestAVB(ctx: Context,
             TEST_AVB_TIME_DOUBLESTIM_TOD,
             TEST_AVB_TIME_SINGLESTIM_TOD    ->  AVBUnBalancedSummary(ctx)
 
-            else                            ->  AVBUnBalancedSummary(ctx)
+            else                            ->  null
         }
     }
     // =============================================================================================================================

@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.stimuli.StimuliManager
-import iit.uvip.psysuite.core.utility.Summary
 import org.albaspazio.core.accessory.*
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showAlert
@@ -35,19 +35,19 @@ abstract class TestBasic(protected val ctx: Context,
 
     companion object {
 
-        @JvmStatic val TESTINFO_BUNDLE_LABEL           = "test"    // used as subject-test bundle element label
+        @JvmStatic val TESTINFO_BUNDLE_LABEL            = "test"    // used as subject-test bundle element label
         @JvmStatic val FILE_EXTENSION: String           = ".json"
         @JvmStatic val RES_EXTENSION: String            = ".txt"
-        @JvmStatic val TEST_BUNDLE_RES_FILE             = "result_file"    // used as subject-test bundle element label
+//        @JvmStatic val TEST_BUNDLE_RES_FILE             = "result_file"    // used as subject-test bundle element label
         @JvmStatic val TEST_BUNDLE_RESULT_LABEL: String = "result"
         // --------------------------------------------------------------------------------------------
         // trial-by-trial management
         //-----------------------------------------------------------------------------------------
-        @JvmStatic val TEST_SHOWTRIALS_NEVER            = 0         //  SHOWTRIALS_NEVER
+//        @JvmStatic val TEST_SHOWTRIALS_NEVER            = 0         //  SHOWTRIALS_NEVER
         @JvmStatic val TEST_SHOWTRIALS_TRIALEND         = 1         //  SHOWTRIALS_TRIALEND
         @JvmStatic val TEST_SHOWTRIALS_ALWAYS           = 2         //  SHOWTRIALS_ALWAYS
 
-        @JvmStatic val TEST_ABORT_ANSWER                = 0         //  never show abort button (it is displayed in the answer dialog)
+//        @JvmStatic val TEST_ABORT_ANSWER                = 0         //  never show abort button (it is displayed in the answer dialog)
         @JvmStatic val TEST_ABORT_TRIALEND              = 1         //  show abort button at each trial end (when answer dialog does not appear)
         @JvmStatic val TEST_ABORT_ALWAYS                = 2         //  keep abort button always active
 
@@ -61,7 +61,7 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_WNOISE_DISABLED             = 0         //  disabled, cannot enable it
         @JvmStatic val TEST_WNOISE_CHOOSE_OFF           = 1         //  can choose, disabled by default
         @JvmStatic val TEST_WNOISE_CHOOSE_ON            = 2         //  can choose, enabled by default
-        @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
+//        @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
 
         //-----------------------------------------------------------------------------------------
         //
@@ -181,8 +181,8 @@ abstract class TestBasic(protected val ctx: Context,
     private var mCurrBlock: Int                             = 0
 
     protected var currStimulusDuration:Long     = 100L          // default value to be used when stimulus duration in not given
-    protected var currVibrationAmplitude:Int    = -1            // default amplitude to be used when  not given
-    protected var currVolume:Float              = 1F            // default audio volume to be used when  not given
+//    protected var currVibrationAmplitude:Int    = -1            // default amplitude to be used when  not given
+//    protected var currVolume:Float              = 1F            // default audio volume to be used when  not given
     protected var currAudioResourceName:String  = "t200hz_2s"   // default amplitude to be used when  not given
     protected var ITI:Long                      = 0             // default ITI
 

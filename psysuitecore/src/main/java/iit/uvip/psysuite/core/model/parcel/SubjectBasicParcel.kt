@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
@@ -28,17 +29,17 @@ open class SubjectBasicParcel(
     open var age: Int = -1,
     open var gender: Int = -1,
     open var nextTrailModality: Int = -1,
-    open var canRecordAudio:Boolean = false,
-    open var classes:List<String> = listOf(),
-    open var device:Device? = null,
-    open var block:Int = -1,
+    open var canRecordAudio: Boolean = false,
+    open var classes: List<String> = listOf(),
+    open var device: Device? = null,
+    open var block: Int = -1,
     open var stimuliDelays: DelaysAligner = DelaysAligner(),
     open var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
     open var vercode: Int = -1,
     open var showResult: Boolean = false,
     open var population: Int = Populations.POPULATION_TD,
-    open var isDebug:Boolean = false
-    ) : Parcelable {
+    open var isDebug: Boolean = false
+) : Parcelable {
 
     @IgnoredOnParcel
     var subjectFileName:String = ""
@@ -48,13 +49,13 @@ open class SubjectBasicParcel(
 
         @JvmStatic val ERROR_SUBJECT_INCOMPLETE:Int = 2
 
-        fun validate(lab:String, ag:String):String{
+        fun validate(lab: String, ag: String):String{
             var res = ""
             if (lab.isBlank()) res = res + "\n" + "il nome è vuoto"
             try {
                 ag.toInt()
             }
-            catch(e:NumberFormatException){
+            catch (e: NumberFormatException){
                 res = res + "\n" + "l'eta inserita non è valida"
             }
             return res
@@ -74,7 +75,7 @@ open class SubjectBasicParcel(
         return this
     }
 
-    private fun loadJsonText(jsontext:String): SubjectBasicParcel {
+    private fun loadJsonText(jsontext: String): SubjectBasicParcel {
 
         val moshi           = Moshi.Builder().build()
         val jsonAdapter     = moshi.adapter(this.javaClass)
@@ -84,7 +85,7 @@ open class SubjectBasicParcel(
     // return   : -1 no file exist
     //          :  0 only one result file exist
     //          :  1-based last block file  (if it finds lab_type_2.txt => return 3)
-    open fun existSubjectFile(ctx:Context):Int{
+    open fun existSubjectFile(ctx: Context):Int{
         val prefix = getFilesPrefix(ctx)
         return  if(existFileStartingWith(prefix, allowedext = listOf(".json")))
                         getLastValidBlock(prefix, listOf(".json"))
@@ -92,7 +93,7 @@ open class SubjectBasicParcel(
                         -1
     }
 
-    private fun getLastValidBlock(prefix:String, allowedext:List<String> = listOf()):Int{
+    private fun getLastValidBlock(prefix: String, allowedext: List<String> = listOf()):Int{
         val list = getFileList(allowedext = allowedext, contains = prefix)
         var blk = -1
         list.map{
@@ -102,17 +103,19 @@ open class SubjectBasicParcel(
         return (blk+1)
     }
 
-    open fun getFilesPrefix(ctx:Context):String {
+    open fun getFilesPrefix(ctx: Context):String {
 
         val ci                  = getCompanionObjectMethod(classes[0], "getConditionsInfo")
-        val type_label          = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(type)
+        val type_label          = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(
+            type
+        )
         val population_label    = Populations.all_populations.getLabelLog(population)
 
         return "${label}_${type_label}_$population_label"
     }
 
     // label_type_population(_blk)_datetime.txt
-    open fun composeResultFileName(ctx:Context, blk:Int = -1):String{
+    open fun composeResultFileName(ctx: Context, blk: Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
                         else           ""
@@ -120,7 +123,7 @@ open class SubjectBasicParcel(
     }
 
     // label_type_population(_blk)_datetime.txt
-    open fun composeSummaryFileName(ctx:Context, blk:Int = -1):String{
+    open fun composeSummaryFileName(ctx: Context, blk: Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
                         else           ""
@@ -128,7 +131,7 @@ open class SubjectBasicParcel(
     }
 
     // label_type_population(_blk)_date.json
-    open fun composeSubjectFileName(ctx:Context, blk:Int = -1):String{
+    open fun composeSubjectFileName(ctx: Context, blk: Int = -1):String{
         if(label.isBlank() || type == -1)   return ""
 
         val blkstr =    if(blk > -1)    "_blk$blk"
@@ -144,7 +147,7 @@ open class SubjectBasicParcel(
     // =============================================================================================================
     // WRITE
     // =============================================================================================================
-    open fun writeJson(context:Context):Int{
+    open fun writeJson(context: Context):Int{
 
         val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val jsonAdapter = moshi.adapter(this.javaClass)

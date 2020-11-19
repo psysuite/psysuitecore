@@ -30,22 +30,19 @@ class TestTFI(ctx: Context,
 {
     override var LOG_TAG:String = TestTFI::class.java.simpleName
 
-
-    private val soa_1:Long = 55L
-    private val soa_2:Long = 85L
-
-    private val N_RIP_X_COND_X_BLOCK:Int = 6
-    private val NUM_BLOCKS:Int          = 4
+    private val N_RIP_X_COND_X_BLOCK:Int    = 6
+    private val NUM_BLOCKS:Int              = 3
 
     private val WN_PRESTIM_INTERVAL     = 1000L
     private val WN_POSTTSTIM_INTERVAL   = 500L
     private val STIM_DURATION           = 35L
 
-
-
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle, R.drawable.ape)
 
     companion object {
+
+        @JvmStatic val soa_1:Long = 55L
+        @JvmStatic val soa_2:Long = 85L
 
         @JvmStatic val STIM_A     = StimuliManager.STIM_TYPE_A1
         @JvmStatic val STIM_V     = StimuliManager.STIM_TYPE_V2
@@ -83,7 +80,7 @@ class TestTFI(ctx: Context,
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
         createResultFile(subjectparcel, TrialTFI.LOG_HEADER)
-//        initSummary()
+        initSummary()
 
         mQuestion           = ctx.resources.getString(R.string.tfi_question)
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
@@ -98,8 +95,7 @@ class TestTFI(ctx: Context,
         nTrials         = mTrials.size
         currTrial       = 0
 
-        mListBlocks     = mutableListOf((nTrials / 0.25F).roundToInt(), (nTrials / 0.5F).roundToInt(), (nTrials / 0.75F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-
+        mListBlocks     = mutableListOf((nTrials * 0.25F).roundToInt(), (nTrials * 0.5F).roundToInt(), (nTrials * 0.75F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
         mTestLabel      = ""
         getConditionsInfo(ctx).map {
             if (it.id == subjectparcel.type) mTestLabel = it.label
@@ -250,7 +246,7 @@ class TestTFI(ctx: Context,
     }
 
     override fun initSummary() {
-        TODO("Not yet implemented")
+        mSummary = TFISummary(ctx)
     }
 
     // =============================================================================================================================

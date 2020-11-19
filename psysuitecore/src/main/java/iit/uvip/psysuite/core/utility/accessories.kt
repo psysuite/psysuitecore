@@ -1,15 +1,10 @@
 package iit.uvip.psysuite.core.utility
 
-import android.content.Context
-import android.os.Environment
 import android.os.Parcelable
 import iit.uvip.psysuite.core.stimuli.TactileManager
-import iit.uvip.psysuite.core.tests.TrialBasic
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.VibrationManager
-import org.albaspazio.core.accessory.getAbsoluteFilePath
-import org.albaspazio.core.accessory.saveText
 import java.util.*
 import java.util.Collections.max
 
@@ -86,16 +81,3 @@ fun VibrationManager.vibrateSingle(paramsT: TactileManager) {
     this.vibrateSingle(paramsT.duration, paramsT.amplitude)
 }
 
-abstract class Summary(private val ctx: Context){
-
-    abstract fun add(trial: TrialBasic)
-    abstract fun close(filename:String, dir:String = Environment.DIRECTORY_DOWNLOADS):String
-
-    protected fun writeFile(summary:String, filename:String, dir:String = Environment.DIRECTORY_DOWNLOADS):String{
-        return when(saveText(ctx, filename, summary, dir, true, notifyDm=true)){
-            true    -> getAbsoluteFilePath(filename, dir).second
-            false   -> ""
-        }
-    }
-
-}
