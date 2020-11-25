@@ -22,11 +22,11 @@ import kotlin.math.roundToInt
 class TestTFI(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              subjectparcel: SubjectBasicParcel,
+              subject: SubjectBasicParcel,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, mImageView)
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView)
 {
     override var LOG_TAG:String = TestTFI::class.java.simpleName
 
@@ -75,11 +75,11 @@ class TestTFI(ctx: Context,
             vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
         }
 
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
-        createResultFile(subjectparcel, TrialTFI.LOG_HEADER)
+        createResultFile(subject, TrialTFI.LOG_HEADER)
         initSummary()
 
         mQuestion           = ctx.resources.getString(R.string.tfi_question)
@@ -87,9 +87,9 @@ class TestTFI(ctx: Context,
 
         currStimulusDuration    = STIM_DURATION // 35L
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
-        if(!subjectparcel.isDebug)  createTrials()
+        if(!subject.isDebug)  createTrials()
         else                        createTrialsDebug()
         // mTrials list
         nTrials         = mTrials.size
@@ -98,11 +98,11 @@ class TestTFI(ctx: Context,
         mListBlocks     = mutableListOf((nTrials * 0.25F).roundToInt(), (nTrials * 0.5F).roundToInt(), (nTrials * 0.75F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
         mTestLabel      = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        val onImage =   if(subjectparcel.type == TEST_TFI)    1
+        val onImage =   if(subject.type == TEST_TFI)    1
                         else                                  2
 
         mStimuliManager = StimuliManager(

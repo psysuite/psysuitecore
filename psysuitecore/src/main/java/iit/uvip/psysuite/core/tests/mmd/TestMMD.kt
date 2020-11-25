@@ -19,9 +19,9 @@ import org.albaspazio.core.ui.showToast
 class TestMMD(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              data: SubjectBasicParcel,
+              subject: SubjectBasicParcel,
               speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, data) {
+) : TestBasic(ctx, activity, hostfragment, subject) {
 
     override var LOG_TAG: String = TestMMD::class.java.simpleName
 
@@ -42,7 +42,7 @@ class TestMMD(ctx: Context,
         validAnswers = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
         mQuestion = ctx.resources.getString(R.string.mmeters_question_text)
 
-        if(!subjectparcel.isDebug)  createTrials()
+        if(!subject.isDebug)  createTrials()
         else                        createTrialsDebug()
 
         nTrials     = mTrials.size
@@ -50,11 +50,11 @@ class TestMMD(ctx: Context,
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subjectparcel, TrialMMD.LOG_HEADER)
+        createResultFile(subject, TrialMMD.LOG_HEADER)
 
         mStimuliManager = StimuliManager(AudioManager(StimuliManager.STIM_TYPE_A1, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx), null, null,
             delaysAligner, ctx)

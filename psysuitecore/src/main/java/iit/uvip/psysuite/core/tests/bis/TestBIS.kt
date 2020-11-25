@@ -20,11 +20,11 @@ class TestBIS(
     ctx: Context,
     activity: Activity,
     hostfragment: Fragment,
-    data: SubjectBasicParcel,
+    subject: SubjectBasicParcel,
     vibrator: VibrationManager?,
     mImageView: ImageView?,
     speechManager:SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, data, vibrator, mImageView, speechManager){
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager){
 
     override var LOG_TAG:String = TestBIS::class.java.simpleName
 
@@ -112,8 +112,8 @@ class TestBIS(
 
         validAnswers    = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
 
-        if(!subjectparcel.isDebug)
-            when(subjectparcel.type)
+        if(!subject.isDebug)
+            when(subject.type)
             {
                 TEST_BISECTION_AUDIO            -> initBisectionAudio()
                 TEST_BISECTION_TACTILE          -> initBisectionTactile()
@@ -127,13 +127,13 @@ class TestBIS(
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast(
             "Should not happen. given test code was not recognized",
             ctx
         )
-        createResultFile(subjectparcel, TrialBIS.LOG_HEADER)
+        createResultFile(subject, TrialBIS.LOG_HEADER)
 
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
@@ -155,7 +155,7 @@ class TestBIS(
                 val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)    validAnswers[0]
                                 else                                            validAnswers[1]
                 //                      id   type       label,          corr_answ, position          conflict_type     duration  duration2
-                mTrials.add(TrialBIS(-1, subjectparcel.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
+                mTrials.add(TrialBIS(-1, subject.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
             }
         mTrials.shuffle()
         setTrialsID()   // set trial id according to its order in the list
@@ -168,8 +168,8 @@ class TestBIS(
                 else                                                            validAnswers[1]
                 when(section.conflict == STIMULUS_TYPE_AUDIO_VIDEO_LOG){
                     //                                 id   type        label,                   corr_answ, position          conflict_type   duration       duration2
-                    true    -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationAudio, durationVideo))
-                    false   -> mTrials.add(TrialBIS(-1, subjectparcel.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationVideo, durationAudio))
+                    true    -> mTrials.add(TrialBIS(-1, subject.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationAudio, durationVideo))
+                    false   -> mTrials.add(TrialBIS(-1, subject.type, STIMULUS_TYPE_AUDIO_VIDEO, corr_answ, section.position, section.conflict, durationVideo, durationAudio))
                 }
             }
         mTrials.shuffle()
@@ -307,7 +307,7 @@ class TestBIS(
             for(i in 0 until 1){
                 val corr_answ = if(section.position < LAST_STIMULUS_DELAY/2)  validAnswers[0]
                 else                                        validAnswers[1]
-                mTrials.add(TrialBIS(-1, subjectparcel.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
+                mTrials.add(TrialBIS(-1, subject.type, stim_type_label, corr_answ, section.position, section.conflict, duration, duration2))
             }
         mTrials.shuffle()
 

@@ -26,10 +26,10 @@ import kotlin.math.roundToInt
 class TestAVB(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              subjectparcel: SubjectBasicParcel,
+              subject: SubjectBasicParcel,
               mImageView: ImageView?,
               speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, mImageView = mImageView, speechManager=speechManager)
+) : TestBasic(ctx, activity, hostfragment, subject, mImageView = mImageView, speechManager=speechManager)
 {
     override var LOG_TAG:String = TestAVB::class.java.simpleName
 
@@ -129,7 +129,7 @@ class TestAVB(ctx: Context,
 
         if(mImageView == null) throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
 
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
@@ -137,7 +137,7 @@ class TestAVB(ctx: Context,
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
 
         // set stim duration (presently the same in the two subtasks
-        when (subjectparcel.type) {
+        when (subject.type) {
             TEST_AVB_TIME_SINGLESTIM ->{
                 mQuestion               = allQuestions[0]
                 curISI                  = ISI           // 1000L
@@ -164,45 +164,46 @@ class TestAVB(ctx: Context,
             }
         }
 
-        if(!subjectparcel.isDebug) {
+        if(!subject.isDebug) {
             // create trials/summary
-            when (subjectparcel.type) {
+            when (subject.type) {
                 TEST_AVB_TIME_DOUBLESTIM_TOD,
                 TEST_AVB_TIME_DOUBLESTIM ->{
                     createTrialsTimeDouble()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
 
                 }
                 TEST_AVB_TIME_SINGLESTIM_TOD,
                 TEST_AVB_TIME_SINGLESTIM       -> {
                     createTrialsTimeSingle()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
                 }
                 TEST_AVB_TIME_INF   -> {
                     createTrialsTimeInfants()
-                    createResultFile(subjectparcel, TrialBindingsInfants.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
                 }
             }
         }
         else{
-            createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
             createTrialsDebug()
         }
 
         nTrials     = mTrials.size
         currTrial   = 0
 
-        mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+//        mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+        mListBlocks = mutableListOf((nTrials / 5F).roundToInt(), (2*nTrials / 5F).roundToInt(), (3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(AudioManager(STIM_A, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
             null,
@@ -331,7 +332,7 @@ class TestAVB(ctx: Context,
 
     override fun initSummary(){
 
-        mSummary = when (subjectparcel.type) {
+        mSummary = when (subject.type) {
             TEST_AVB_TIME_DOUBLESTIM,
             TEST_AVB_TIME_SINGLESTIM,
             TEST_AVB_TIME_DOUBLESTIM_TOD,
@@ -349,7 +350,7 @@ class TestAVB(ctx: Context,
 
         mNoise?.start()
 
-        when(subjectparcel.type) {
+        when(subject.type) {
 
             TEST_AVB_TIME_INF ->    deliverInfants(trial as TrialBindingsUnBalanced)
 
@@ -365,7 +366,7 @@ class TestAVB(ctx: Context,
 
                 // since I have to apply the possible shift, I calculate here the correction and thus call deliverShiftedStimulus for the 1st stim.
                 // for the second I call instead deliverUnBalancedStimuli
-                val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subjectparcel.stimuliDelay)
+                val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subject.stimuliDelay)
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
@@ -385,7 +386,7 @@ class TestAVB(ctx: Context,
         // since I have to apply the possible shift, I calculate here the correction and thus call deliverShiftedStimulus for the 1st stim.
         // to preserve the desired ISI between stimuli, I also subtract the positive shift that could be eventually imposed to the fastest modality
 
-        val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subjectparcel.stimuliDelay)
+        val corr_delays = delaysAligner.arrangeDelays(BIMODAL_CODE, 0,-1,0) //arrangeDelays(0,0,-1, subject.stimuliDelay)
         val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
         // first train
         mStimuliHandler.postDelayed({

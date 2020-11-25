@@ -28,10 +28,10 @@ import org.albaspazio.core.ui.showToast
 class TestTID(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              subjectparcel: SubjectTIDParcel,
+              subject: SubjectTIDParcel,
               vibrator: VibrationManager?,
               speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator)
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator)
 {
     override var LOG_TAG:String = TestTID::class.java.simpleName
 
@@ -114,7 +114,7 @@ class TestTID(ctx: Context,
 
         if(vibrator == null)    throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
 
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
@@ -122,7 +122,7 @@ class TestTID(ctx: Context,
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.tid_rb1_text), ctx.resources.getString(R.string.tid_rb3_text))
         
         currStimulusDuration = STIMULUS_DURATION_AUDIO
-        when(subjectparcel.type){
+        when(subject.type){
             TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO   -> currStimulusDuration = STIMULUS_DURATION_TACTILE
         }
 
@@ -132,7 +132,7 @@ class TestTID(ctx: Context,
         currNTRIALS_X_BLOCK = NUM_TRIALS_X_BLOCK_SHORT
         currREP_X_LATENCY   = shortLatencies.size
 
-        when(subjectparcel.type){
+        when(subject.type){
             TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE  -> {
                 currISI             = ISI_LONG
                 currREP_X_BLOCK     = NUM_REP_X_LATENCY_X_BLOCK_LONG
@@ -144,7 +144,7 @@ class TestTID(ctx: Context,
         mQuest      = QuestObject()
         currTrial   = 0
 
-        if(!subjectparcel.isDebug){
+        if(!subject.isDebug){
             // set question & create mTrials list
             if(isUsingQuest){
                 createQuestTrials(currStimulusDuration)
@@ -158,11 +158,11 @@ class TestTID(ctx: Context,
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subjectparcel, TrialTID.LOG_HEADER)
+        createResultFile(subject, TrialTID.LOG_HEADER)
 
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
@@ -179,7 +179,7 @@ class TestTID(ctx: Context,
     private fun createConstantTrials(duration:Long){
 
         var ref_delta = REF_STIM_DUR_SHORT
-        when(subjectparcel.type) {
+        when(subject.type) {
             TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE -> ref_delta = REF_STIM_DUR_LONG
         }
 
@@ -189,14 +189,14 @@ class TestTID(ctx: Context,
 
             for(t in 0 until currREP_X_BLOCK/2){
                 for(l in 0 until currREP_X_LATENCY){
-                    when(subjectparcel.type) {
+                    when(subject.type) {
                         TEST_TID_SHORT_AUDIO, TEST_TID_SHORT_TACTILE    -> {
-                            block_trials.add(TrialTID(-1, subjectparcel.type, b, (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  ref_delta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                            block_trials.add(TrialTID(-1, subjectparcel.type, b, subjectparcel.group, subjectparcel.session, shortLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                            block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                            block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, shortLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
                         }
                         TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE      -> {
-                            block_trials.add(TrialTID(-1, subjectparcel.type, b, (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  ref_delta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                            block_trials.add(TrialTID(-1, subjectparcel.type, b, subjectparcel.group, subjectparcel.session, longLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                            block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                            block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, longLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
                         }
                     }
                 }
@@ -212,7 +212,7 @@ class TestTID(ctx: Context,
     private fun createQuestTrials(duration:Long){
 
         var ref_delta = REF_STIM_DUR_SHORT
-        when(subjectparcel.type) {
+        when(subject.type) {
             TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE -> ref_delta = REF_STIM_DUR_LONG
         }
 
@@ -222,8 +222,8 @@ class TestTID(ctx: Context,
 
             for(t in 0 until NUM_TRIALS_X_BLOCK_SHORT /2){
                 // TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:Int, val delta1:Int, val delta2:Int, val ref_first:Int, val duration:Int)
-                block_trials.add(TrialTID(-1, subjectparcel.type, b, (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  ref_delta.toInt(), -1, true, duration.toInt(), validAnswers))
-                block_trials.add(TrialTID(-1, subjectparcel.type, b, subjectparcel.group, subjectparcel.session, -1, ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), -1, true, duration.toInt(), validAnswers))
+                block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, -1, ref_delta.toInt(),false, duration.toInt(), validAnswers))
             }
             block_trials.shuffle()
             mTrials.addAll(block_trials)
@@ -237,13 +237,13 @@ class TestTID(ctx: Context,
         val duration = currStimulusDuration
 
         for(b in 0 until 10000){
-            mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subjectparcel as SubjectTIDParcel).group, subjectparcel.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+            mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subject as SubjectTIDParcel).group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
             mTrials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b,
-                subjectparcel.group, subjectparcel.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+                subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
 
-            mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  subjectparcel.group, subjectparcel.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+            mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
             mTrials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b,
-                subjectparcel.group, subjectparcel.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+                subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
         }
         setTrialsID()   // set trial id according to its order in the list
     }

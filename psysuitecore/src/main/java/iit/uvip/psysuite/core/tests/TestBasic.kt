@@ -26,7 +26,7 @@ must contain all the possible codes
 abstract class TestBasic(protected val ctx: Context,
                          protected val activity: Activity,
                          protected val hostfragment: Fragment,
-                         protected val subjectparcel: SubjectBasicParcel,
+                         protected val subject: SubjectBasicParcel,
                          protected val vibrator: VibrationManager? = null,
                          protected val mImageView: ImageView? = null,
                          protected val speechManager: SpeechManager? = null
@@ -36,9 +36,8 @@ abstract class TestBasic(protected val ctx: Context,
     companion object {
 
         @JvmStatic val TESTINFO_BUNDLE_LABEL            = "test"    // used as subject-test bundle element label
-        @JvmStatic val FILE_EXTENSION: String           = ".json"
+        @JvmStatic val SUBJFILE_EXTENSION: String       = ".json"
         @JvmStatic val RES_EXTENSION: String            = ".txt"
-//        @JvmStatic val TEST_BUNDLE_RES_FILE             = "result_file"    // used as subject-test bundle element label
         @JvmStatic val TEST_BUNDLE_RESULT_LABEL: String = "result"
         // --------------------------------------------------------------------------------------------
         // trial-by-trial management
@@ -150,8 +149,8 @@ abstract class TestBasic(protected val ctx: Context,
     var mTestLabel: String                      = ""
     var mQuestion:String                        = ""
     var validAnswers: MutableList<String>       = mutableListOf()
-    val showResult:Boolean                      = this.subjectparcel.showResult
-    val delaysAligner: DelaysAligner = this.subjectparcel.stimuliDelays
+    val showResult:Boolean                      = this.subject.showResult
+    val delaysAligner: DelaysAligner = this.subject.stimuliDelays
 
 
     // they are just proxy for properties (implemented / edited / accessed) in each subclass
@@ -192,7 +191,13 @@ abstract class TestBasic(protected val ctx: Context,
     abstract fun show(trial: TrialBasic, isRepeat:Boolean=false)
 
     abstract fun initSummary()              // init summary content (mSummary),
-    fun closeSummary():String = mSummary?.close(subjectparcel.composeSummaryFileName(ctx)) ?: ""
+//    fun closeSummary(blk:Int = -1):String = mSummary?.close(subject.composeSummaryFileName(ctx, blk)) ?: "" // writes summary and return filename or empty string
+
+    // writes summary and return absolute filepath or empty string
+    fun closeSummary(filename:String = ""):String{
+        return  if(filename.isEmpty())  mSummary?.close(subject.composeSummaryFileName(ctx)) ?: ""
+                else                    mSummary?.close(filename) ?: ""
+    }
 
     // ===============================================================================================================
     fun start():Boolean{
@@ -202,7 +207,7 @@ abstract class TestBasic(protected val ctx: Context,
                         return false
                     }
 
-                    if(subjectparcel.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
+                    if(subject.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
 
                     show(mTrial)
                     true
@@ -249,7 +254,7 @@ abstract class TestBasic(protected val ctx: Context,
         return  try {
                     mTrial = getNewTrial()  // it also updates currTrial
 
-                    if(subjectparcel.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
+                    if(subject.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
 
                     show(mTrial)
                     currTrial
@@ -280,24 +285,26 @@ abstract class TestBasic(protected val ctx: Context,
 
         if(deleteOrShow){
                 deleteFile(mResultFile)
-                deleteFile(subjectparcel.subjectFileName)
+                deleteFile(subject.subjectFileName)
         }
         else    notifyFile(mResultFile, ctx, dir)
     }
 
-    fun stopTestAfterBlock(dir:String= Environment.DIRECTORY_DOWNLOADS):String{
+    fun stopTestAfterBlock(dir:String= Environment.DIRECTORY_DOWNLOADS):Triple<String,String,String>{
 
         mStimuliHandler.removeCallbacksAndMessages(null)
 
-        val newresname = subjectparcel.composeResultFileName(ctx, mCurrBlock)
+        val newresname = subject.composeResultFileName(ctx, mCurrBlock)
         renameFile(mResultFile, newresname)
 
-        val newsubjname = subjectparcel.composeSubjectFileName(ctx, mCurrBlock)
-        renameFile(subjectparcel.subjectFileName, newsubjname)
+        val newsubjname = subject.composeSubjectFileName(ctx, mCurrBlock)
+        renameFile(subject.subjectFileName, newsubjname)
+
+        val newsummaryname = subject.composeSummaryFileName(ctx, mCurrBlock)
 
         notifyFile(newresname, ctx, dir)
 
-        return newresname
+        return Triple(newresname, newsubjname, newsummaryname)
     }
 
     fun getTrialCorrectAnswer():String{
@@ -313,20 +320,18 @@ abstract class TestBasic(protected val ctx: Context,
     // ACCESSORY
     // ===============================================================================================================
 
-    fun adjustBlocks(blk:Int){      // blk is 0-based
+    fun adjustBlocks(blk:Int){
 
         if((nBlocks == 1 && blk > 0) || (blk >= nBlocks)){
             // incongruent condition
             showAlert(activity, ctx.resources.getString(R.string.error), "")
             return
         }
-
-        if(nBlocks == 1 || blk == -1){
+        if(blk == -1){
             currTrial   = 0
             mCurrBlock  = 0
         }
-        else  {
-            // nBlocks > 1 :blocks subdivision is available
+        else {  // if it found lab_type_blk2.txt => blk=3)
             mCurrBlock = blk
 
             // following trial of the previous block
@@ -335,8 +340,9 @@ abstract class TestBasic(protected val ctx: Context,
         mTrial      = mTrials[currTrial]
     }
 
+    // is always created without block information, which is added when interruputing after a block
     protected fun createResultFile(subj:SubjectBasicParcel, header:String){
-        mResultFile = subj.composeResultFileName(ctx, subj.block)
+        mResultFile = subj.composeResultFileName(ctx)
         saveText(ctx, mResultFile, header)
     }
 
@@ -348,8 +354,4 @@ abstract class TestBasic(protected val ctx: Context,
     private fun getDebugInfo():String = mTrial.debugInfo()
 
     protected fun getTestTitle():String = "${ctx.resources.getString(R.string.app_name)} - ${ctx.resources.getString(R.string.lab_test_res)}: $mTestLabel"
-
-    fun getResultFile(): String =   if(existFile(mResultFile).first)    mResultFile
-    else                                ""
-
 }

@@ -192,7 +192,9 @@ open class SubjectBasicDialogFragment: DialogFragment(), AdapterView.OnItemSelec
 
     override fun onNothingSelected(p0: AdapterView<*>?) {}
 
-    //  ---- UI presses ----------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // UI presses
+    //------------------------------------------------------------------------------------
     protected open fun confirmData(){
 
         val errors = checkData()
@@ -204,12 +206,8 @@ open class SubjectBasicDialogFragment: DialogFragment(), AdapterView.OnItemSelec
             // data are valid => create subject object
             val subj = updateSubject()
 
-            // in case the subject's "label_type_Date" file exists, ask user whether continue or change name
-            if(manageSubjectFileExistence(subj)){
-                // file is unique
-                subject = subj
-                sendResult(subject)
-            }
+            // verify whether is unique. in case the subject's "label_type_Date" file exists, ask user whether continue or change name
+            sendSubjectOrChangeData(subj)
         }
     }
 
@@ -233,7 +231,7 @@ open class SubjectBasicDialogFragment: DialogFragment(), AdapterView.OnItemSelec
     }
 
     //------------------------------------------------------------------------------------
-    // ACCESSORY
+    // SUBJECT VALIDATION
     //------------------------------------------------------------------------------------
     // validate subject info
     protected open fun checkData():List<String>{
@@ -281,6 +279,43 @@ open class SubjectBasicDialogFragment: DialogFragment(), AdapterView.OnItemSelec
         return subject
     }
 
+    // subj.block is by default always -1
+    // check whether subject's "label_type_Date" file exists, ask user whether continue or change name
+    // -1 no file exist, 0 just one file without block, > 0  id of the next block (if it found _blk1 => returns 2)
+    private fun sendSubjectOrChangeData(subj: SubjectBasicParcel){
+        val nextblock = subj.existSubjectFile(requireContext())
+        when(nextblock){
+            -1 -> { // file is unique
+                        subject = subj
+                        sendResult(subject)
+            }
+            0  -> { // exist only one same subjects file. overwrite it and continue with presently filled subject or don't do anything
+                show2ChoisesDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_present), resources.getString(R.string.yes), resources.getString(R.string.no),
+                    {   // ok press, update subject, then continue
+                        subject = subj
+                        sendResult(subject)
+                    },
+                    {   // cancel press. stop. let user change data
+                        txtName.requestFocus()
+                    })
+            }
+            else -> {  // exist at least n-block files.
+                        // 1-based last block file  (if it finds lab_type_blk2.txt => return 3)
+                show2ChoisesDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_block_present), resources.getString(R.string.continue_txt), resources.getString(R.string.restart),
+                    { // ok press, continue next block
+                        subject         = subj
+                        subject.block   = nextblock     // this is the only case where block is != -1
+                        sendResult(subject)
+                    },
+                    { // cancel press. DELETE all previous files !!! and continue with presently filled subject
+                        deleteFilesStartingWith(subject.getFilesPrefix(requireContext()))
+                        subject = subj
+                        sendResult(subject)
+                    })
+            }
+        }
+    }
+
     private fun sendResult(subj: SubjectBasicParcel?) {
         if (targetFragment == null) {
             return
@@ -291,41 +326,9 @@ open class SubjectBasicDialogFragment: DialogFragment(), AdapterView.OnItemSelec
         dismiss()
     }
 
-    // check whether subject's "label_type_Date" file exists, ask user whether continue or change name
-    // -1 no file exist, 0 just one file without block, > 0  id of the next block (if it found _blk1 => returns 2)
-    private fun manageSubjectFileExistence(subj: SubjectBasicParcel):Boolean{
-        val nextblock = subj.existSubjectFile(requireContext())
-        return when(nextblock){
-
-            -1 -> true  // does not exist a same subject file
-            0  -> {     // exist only one same subjects file
-                show2ChoisesDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_present), resources.getString(R.string.yes), resources.getString(R.string.no),
-                    { // ok press, update subject, then continue
-                        subject = subj
-                        sendResult(subject)
-                    },
-                    { // cancel press. stop. let user change data
-                    txtName.requestFocus()
-                })
-                false
-            }
-            else  -> {  // exist at least n-block files
-                show2ChoisesDialog(requireActivity(), resources.getString(R.string.warning), resources.getString(R.string.subject_block_present), resources.getString(R.string.continue_txt), resources.getString(R.string.restart),
-                    { // ok press, continue next block
-                        subject = subj
-                        subject.block = nextblock
-                        sendResult(subject)
-                    },
-                    { // cancel press. all previous files
-                    deleteFilesStartingWith(subject.getFilesPrefix(requireContext()))
-                    subject = subj
-                    sendResult(subject)
-                })
-                false
-            }
-        }
-    }
-
+    //------------------------------------------------------------------------------------
+    // ACCESSORY
+    //------------------------------------------------------------------------------------
     private fun showInteractive(show: Boolean) {
         if (show) {
             swInteractive?.visibility   = View.VISIBLE

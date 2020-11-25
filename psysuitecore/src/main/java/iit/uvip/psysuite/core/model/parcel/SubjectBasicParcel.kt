@@ -63,9 +63,9 @@ open class SubjectBasicParcel(
     }
 
     open fun loadSubject(): SubjectBasicParcel {
-        val subj = existFile(CURR_SUBJ_FILE + TestBasic.FILE_EXTENSION)
+        val subj = existFile(CURR_SUBJ_FILE + TestBasic.SUBJFILE_EXTENSION)
         if (subj.first) {
-            val jsontext = readText(CURR_SUBJ_FILE + TestBasic.FILE_EXTENSION)
+            val jsontext = readText(CURR_SUBJ_FILE + TestBasic.SUBJFILE_EXTENSION)
             return try {
                 loadJsonText(jsontext)
             } catch (e: Exception) {
@@ -93,6 +93,7 @@ open class SubjectBasicParcel(
                         -1
     }
 
+    // returns 0 if no old blocks exist, otherwise last block+1
     private fun getLastValidBlock(prefix: String, allowedext: List<String> = listOf()):Int{
         val list = getFileList(allowedext = allowedext, contains = prefix)
         var blk = -1
@@ -103,6 +104,11 @@ open class SubjectBasicParcel(
         return (blk+1)
     }
 
+    // =============================================================================================================
+    // RETURNS FILES NAME
+    // =============================================================================================================
+    // used by the following three methods to compose subject files
+    // RETURNS: "${label}_${type_label}_$population_label"
     open fun getFilesPrefix(ctx: Context):String {
 
         val ci                  = getCompanionObjectMethod(classes[0], "getConditionsInfo")
@@ -114,7 +120,7 @@ open class SubjectBasicParcel(
         return "${label}_${type_label}_$population_label"
     }
 
-    // label_type_population(_blk)_datetime.txt
+    // RETURNS: label_type_population(_blk)_datetime.txt
     open fun composeResultFileName(ctx: Context, blk: Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
@@ -122,7 +128,7 @@ open class SubjectBasicParcel(
         return "${getFilesPrefix(ctx)}_${getFullDateString()}${blkstr}${TestBasic.RES_EXTENSION}"
     }
 
-    // label_type_population(_blk)_datetime.txt
+    // RETURNS: label_type_population(_blk)_datetime.txt
     open fun composeSummaryFileName(ctx: Context, blk: Int = -1):String{
 
         val blkstr =    if(blk > -1)    "_blk$blk"
@@ -130,19 +136,17 @@ open class SubjectBasicParcel(
         return "${getFilesPrefix(ctx)}_${getFullDateString()}_summary${blkstr}${TestBasic.RES_EXTENSION}"
     }
 
-    // label_type_population(_blk)_date.json
+    // RETURNS: label_type_population(_blk)_date.json
     open fun composeSubjectFileName(ctx: Context, blk: Int = -1):String{
         if(label.isBlank() || type == -1)   return ""
 
         val blkstr =    if(blk > -1)    "_blk$blk"
                         else           ""
-        return "${getFilesPrefix(ctx)}_${getDateString()}${blkstr}${TestBasic.FILE_EXTENSION}"
+        return "${getFilesPrefix(ctx)}_${getDateString()}${blkstr}${TestBasic.SUBJFILE_EXTENSION}"
     }
 
-    // return filename or "" if file does not exist
-    fun getAbsoluteSubjectFilePath(): String{
-        return getAbsoluteFilePath(subjectFileName).second
-    }
+    // RETURNS: filename or "" if file does not exist
+    fun getAbsoluteSubjectFilePath():String = getAbsoluteFilePath(subjectFileName).second   // is "" if file was not present
 
     // =============================================================================================================
     // WRITE
@@ -153,10 +157,9 @@ open class SubjectBasicParcel(
         val jsonAdapter = moshi.adapter(this.javaClass)
 
         return try {
-                    subjectFileName = composeSubjectFileName(context, block)
-                    if(subjectFileName.isEmpty()){
-                        ERROR_SUBJECT_INCOMPLETE
-                    }
+                    // want to create subject file always without block info, I want to add block info only renaming it after a block stop
+                    subjectFileName = composeSubjectFileName(context)
+                    if(subjectFileName.isEmpty())   ERROR_SUBJECT_INCOMPLETE
                     else {
                         saveText(context, subjectFileName, jsonAdapter.toJson(this))        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
                         0

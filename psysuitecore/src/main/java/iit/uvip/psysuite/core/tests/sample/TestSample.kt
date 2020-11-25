@@ -30,8 +30,8 @@ unimodal precision: (Audio-Vibration-Visual)
 
 */
 
-class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data: SubjectSampleParcel, vibrator: VibrationManager?, mImageView: ImageView?, speechManager: SpeechManager?)
-    : TestBasic(ctx, activity, hostfragment, data, vibrator, mImageView, speechManager)
+class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subject: SubjectSampleParcel, vibrator: VibrationManager?, mImageView: ImageView?, speechManager: SpeechManager?)
+    : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager)
 {
     private var curStimDuration: Long = 0L
     override var LOG_TAG:String = TestSample::class.java.simpleName
@@ -73,14 +73,14 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
         currTrial               = 0
         validAnswers            = mutableListOf()
 
-        ITI                     = (subjectparcel as SubjectSampleParcel).iti
+        ITI                     = (subject as SubjectSampleParcel).iti
         mTestLabel              = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subjectparcel, LOG_HEADER)
+        createResultFile(subject, LOG_HEADER)
         createTrials()
         nTrials                 = mTrials.size
         setStimuliManager()
@@ -89,20 +89,20 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
     private fun setStimuliManager(){
 
         val audioManager = when {
-            (subjectparcel as SubjectSampleParcel).stim_sources and StimuliManager.STIM_TYPE_A1 > 0 ->
+            (subject as SubjectSampleParcel).stim_sources and StimuliManager.STIM_TYPE_A1 > 0 ->
                 AudioManager(StimuliManager.STIM_TYPE_A1, -1,
-                    amplitude  = subjectparcel.audioVolume.toInt(),
-                    duration   = subjectparcel.audioDuration,
+                    amplitude  = subject.audioVolume.toInt(),
+                    duration   = subject.audioDuration,
                     handler    = mStimuliHandler,
                     ctx        = ctx)
 
-            subjectparcel.stim_sources and StimuliManager.STIM_TYPE_A2 > 0 ->
+            subject.stim_sources and StimuliManager.STIM_TYPE_A2 > 0 ->
                 try{
-                    if(subjectparcel.audioResource.isEmpty())    subjectparcel.audioResource = currAudioResourceName
+                    if(subject.audioResource.isEmpty())    subject.audioResource = currAudioResourceName
                     AudioManager(StimuliManager.STIM_TYPE_A2,
-                        subjectparcel.audioResource,
-                        subjectparcel.audioVolume.toInt(),
-                        duration = subjectparcel.audioDuration,
+                        subject.audioResource,
+                        subject.audioVolume.toInt(),
+                        duration = subject.audioDuration,
                         handler = mStimuliHandler,
                         ctx = ctx)
 
@@ -112,14 +112,14 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
                     throw AudioResourceException("AUDIO_RESOURCE_ERROR: resource name = $e")
                 }
 
-            subjectparcel.stim_sources and StimuliManager.STIM_TYPE_A3 > 0 ->
+            subject.stim_sources and StimuliManager.STIM_TYPE_A3 > 0 ->
                 try{
 //                    if(subjectparcel.audioResource.isEmpty())                        subjectparcel.audioResource = currAudioResourceName
-                    subjectparcel.audioResource = "t200hz_1s.wav"
+                    subject.audioResource = "t200hz_1s.wav"
                     AudioManager(StimuliManager.STIM_TYPE_A3,
-                        listOf(subjectparcel.audioResource),
-                        subjectparcel.audioVolume.toInt(),
-                        duration = subjectparcel.audioDuration,
+                        listOf(subject.audioResource),
+                        subject.audioVolume.toInt(),
+                        duration = subject.audioDuration,
                         handler = mStimuliHandler,
                         ctx = ctx)
 
@@ -132,12 +132,12 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
             else -> null
         }
 
-        val tactileManager =    if(subjectparcel.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
-            TactileManager(vibrator!!, subjectparcel.tactileAmplitude, duration = subjectparcel.tactileSequence.toLong(), handler = mStimuliHandler)
+        val tactileManager =    if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
+            TactileManager(vibrator!!, subject.tactileAmplitude, duration = subject.tactileSequence.toLong(), handler = mStimuliHandler)
 
-        else if(subjectparcel.stim_sources and StimuliManager.STIM_TYPE_T2 > 0){
-            val timings = TactileManager.validatePattern(subjectparcel.tactileSequence)
-            if(timings != null) TactileManager(vibrator!!, subjectparcel.tactileAmplitude, timings!!, handler = mStimuliHandler)
+        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0){
+            val timings = TactileManager.validatePattern(subject.tactileSequence)
+            if(timings != null) TactileManager(vibrator!!, subject.tactileAmplitude, timings!!, handler = mStimuliHandler)
             else {
                 // TODO: ALERT
                 null
@@ -146,16 +146,16 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
         else null
 
         val visualManager = when {
-            subjectparcel.stim_sources and StimuliManager.STIM_TYPE_V1 > 0 -> {
-                val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size
-                else                                                                        subjectparcel.visualDrawableOn
-                VisualManager(StimuliManager.STIM_TYPE_V1, mImageView!!, mDrawablesResource[on], duration = subjectparcel.visualDuration, handler = mStimuliHandler)
+            subject.stim_sources and StimuliManager.STIM_TYPE_V1 > 0 -> {
+                val on =    if(subject.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size
+                else                                                                        subject.visualDrawableOn
+                VisualManager(StimuliManager.STIM_TYPE_V1, mImageView!!, mDrawablesResource[on], duration = subject.visualDuration, handler = mStimuliHandler)
             }
-            subjectparcel.stim_sources and StimuliManager.STIM_TYPE_V2 > 0 -> {
+            subject.stim_sources and StimuliManager.STIM_TYPE_V2 > 0 -> {
                 if(mImageView == null)  return
-                val on =    if(subjectparcel.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size-1
-                else                                                                        subjectparcel.visualDrawableOn
-                VisualManager(StimuliManager.STIM_TYPE_V2, mImageView, mDrawablesResource[on], mDrawablesResource[subjectparcel.visualDrawableOff], subjectparcel.visualDuration, handler = mStimuliHandler)
+                val on =    if(subject.visualDrawableOn >= mDrawablesResource.size)   mDrawablesResource.size-1
+                else                                                                        subject.visualDrawableOn
+                VisualManager(StimuliManager.STIM_TYPE_V2, mImageView, mDrawablesResource[on], mDrawablesResource[subject.visualDrawableOff], subject.visualDuration, handler = mStimuliHandler)
             }
             else -> null
         }
@@ -167,15 +167,15 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
     // =============================================================================================================================
     private fun createTrials(){
 
-        val extraTrial:Any? = when(subjectparcel.type){
-            TEST_SAMPLE_SHIFTED     -> (subjectparcel as SubjectSampleParcel).shiftedParams
-            TEST_SAMPLE_PAIR        -> (subjectparcel as SubjectSampleParcel).pairDistance
+        val extraTrial:Any? = when(subject.type){
+            TEST_SAMPLE_SHIFTED     -> (subject as SubjectSampleParcel).shiftedParams
+            TEST_SAMPLE_PAIR        -> (subject as SubjectSampleParcel).pairDistance
             else                    -> null
         }
 
         var cnt = -1
-        for(t in 0 until (subjectparcel as SubjectSampleParcel).repetitions){
-            mTrials.add(TrialSample(++cnt, subjectparcel.type, "", subjectparcel.stim_sources, extraTrial))
+        for(t in 0 until (subject as SubjectSampleParcel).repetitions){
+            mTrials.add(TrialSample(++cnt, subject.type, "", subject.stim_sources, extraTrial))
         }
     }
 
@@ -207,7 +207,7 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, data:
             TEST_SAMPLE_ALIGNED ->  mStimuliManager.deliverAlignedStimulus((trial as TrialSample).source){onTrialEnd()}
 
             TEST_SAMPLE_SHIFTED ->  {
-                val corr_delays = delaysAligner.arrangeDelays((subjectparcel as SubjectSampleParcel).stim_sources,
+                val corr_delays = delaysAligner.arrangeDelays((subject as SubjectSampleParcel).stim_sources,
                                                 ((trial as TrialSample).extraTrial as List<Long>)[0],
                                                 (trial.extraTrial as List<Long>)[1],
                                                 trial.extraTrial[2])

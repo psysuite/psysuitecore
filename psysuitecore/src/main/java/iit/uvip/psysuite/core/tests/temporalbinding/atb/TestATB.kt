@@ -27,10 +27,10 @@ import kotlin.math.roundToInt
 class TestATB(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              subjectparcel: SubjectBasicParcel,
+              subject: SubjectBasicParcel,
               vibrator: VibrationManager?,
               speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, speechManager=speechManager)
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, speechManager=speechManager)
 {
     override var LOG_TAG:String = TestATB::class.java.simpleName
 
@@ -145,7 +145,7 @@ class TestATB(ctx: Context,
 
         if(vibrator == null)    throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
 
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
@@ -153,7 +153,7 @@ class TestATB(ctx: Context,
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
 
         // set stim duration (presently the same in the two subtasks
-        when (subjectparcel.type) {
+        when (subject.type) {
             TEST_ATB_TIME_SINGLESTIM ->{
                 mQuestion               = allQuestions[0]
                 curISI                  = ISI           // 1000L
@@ -180,47 +180,47 @@ class TestATB(ctx: Context,
             }
         }
 
-        if(!subjectparcel.isDebug) {
+        if(!subject.isDebug) {
             // create trials/summary
-            when (subjectparcel.type) {
+            when (subject.type) {
                 TEST_ATB_TIME_DOUBLESTIM_TOD,
                 TEST_ATB_TIME_DOUBLESTIM ->{
                     createTrialsTimeDouble()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
 
                 }
                 TEST_ATB_TIME_SINGLESTIM_TOD,
                 TEST_ATB_TIME_SINGLESTIM       -> {
                     createTrialsTimeSingle()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
                 }
                 TEST_ATB_TIME_INF   -> {
                     initTimeArrays()
                     createTrialsTimeInfants()
-                    createResultFile(subjectparcel, TrialBindingsInfants.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
                 }
             }
         }
         else{
             createTrialsDebug()
-            createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
         }
 
         nTrials     = mTrials.size
         currTrial   = 0
 
-        mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-//        mListBlocks = mutableListOf(1,2)
+        mListBlocks = mutableListOf((nTrials / 5F).roundToInt(), (2*nTrials / 5F).roundToInt(), (3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+        mListBlocks = mutableListOf(1,2,5,7)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(
                 AudioManager(UNIMODAL_AUDIO_CODE, -1, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
@@ -372,7 +372,7 @@ class TestATB(ctx: Context,
 
     override fun initSummary(){
 
-        mSummary = when (subjectparcel.type) {
+        mSummary = when (subject.type) {
             TEST_ATB_TIME_DOUBLESTIM,
             TEST_ATB_TIME_SINGLESTIM,
             TEST_ATB_TIME_DOUBLESTIM_TOD,
@@ -390,7 +390,7 @@ class TestATB(ctx: Context,
 
         mNoise?.start()
 
-        when(subjectparcel.type) {
+        when(subject.type) {
 
             TEST_ATB_TIME_INF -> {
                 mStimuliHandler.postDelayed({

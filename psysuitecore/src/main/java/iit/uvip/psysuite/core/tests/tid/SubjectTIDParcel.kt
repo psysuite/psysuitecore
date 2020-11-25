@@ -50,7 +50,7 @@ class SubjectTIDParcel(
         val blkstr =    if(blk > -1)    "_blk$blk"
                         else           ""
 
-        return "${getFilesPrefix(ctx)}_${getDateString()}${blkstr}${TestBasic.FILE_EXTENSION}"
+        return "${getFilesPrefix(ctx)}_${getDateString()}${blkstr}${TestBasic.SUBJFILE_EXTENSION}"
     }
 }
 

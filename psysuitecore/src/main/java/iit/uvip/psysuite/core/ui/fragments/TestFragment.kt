@@ -88,11 +88,9 @@ class TestFragment : BaseFragment(
 
     private lateinit var onsetDate: Date
 
-    private val isDebug:Boolean                     = false
     private var currDebugInfo:String                = ""
 
     var showResult:Boolean                          = false
-    var correctAnswer:String                        = ""
 
     private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
     // ==========================================================================================================================
@@ -116,7 +114,9 @@ class TestFragment : BaseFragment(
     }
 
     // main access point. it does:
-    // (try) instanciate the correct TestClass
+    // - (try) instanciate the correct TestClass
+    // - call mTest.initTest() and wait for EVENT_TEST_SETUP_COMPLETED
+    // - onTestSetupComplete() -> mTest.adjustBlocks, mTest.start()
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         super.onActivityCreated(savedInstanceState)
@@ -129,7 +129,7 @@ class TestFragment : BaseFragment(
         vibrator                    = VibrationManager(requireContext()).init()
         speechRecognitionManager    = SpeechRecognitionManager(requireContext())
         mSubjectParcel              = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
-        speechManager               = SpeechManager(resources, requireContext()){
+        speechManager               = SpeechManager(requireContext()){
             try{
                 when(mSubjectParcel!!.type){
 
@@ -229,6 +229,7 @@ class TestFragment : BaseFragment(
     // triggered by testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
     private fun onTestSetupComplete(){
 
+        // block is always -1 but when is continuing a previous session (in that case if it found ..._blk2.txt => block=3 ...thus is always > 0)
         mTest.adjustBlocks(mSubjectParcel!!.block)     // set currTrial, mCurrBlock, mTrial
 
         if(isBlindUser)     showAnswerDialog(TRG_REQ_CODE_INSTRUCTIONS)
@@ -394,7 +395,9 @@ class TestFragment : BaseFragment(
         if(isBlindUser) speechManager.speak(msg)
         else            showToast(msg, requireContext())
 
-        navigateBack(TestBasic.TEST_COMPLETED, listOf(mTest.getAbsoluteResultFilePath(),mTest.closeSummary()))
+        navigateBack(TestBasic.TEST_COMPLETED, listOf(  mTest.getAbsoluteResultFilePath(),
+                                                        mSubjectParcel!!.getAbsoluteSubjectFilePath(),
+                                                        mTest.closeSummary()))
     }
 
     // user wanted to interrupt test during a block (ask whether deleting results file and it)
@@ -412,7 +415,9 @@ class TestFragment : BaseFragment(
             requireContext().resources.getString(R.string.delete),       // cancel
             { /* okClb */
                 mTest.abortTest(false)
-                navigateBack(TestBasic.TEST_ABORT, listOf(mTest.getAbsoluteResultFilePath(),mTest.closeSummary()))
+                navigateBack(TestBasic.TEST_ABORT, listOf(  mTest.getAbsoluteResultFilePath(),
+                                                            mSubjectParcel!!.getAbsoluteSubjectFilePath(),
+                                                            mTest.closeSummary()))
             },
             { /* cancelClb*/
                 mTest.abortTest(true)
@@ -420,7 +425,19 @@ class TestFragment : BaseFragment(
             })
     }
 
-    // user ended a planned block. can continue or stop (result file is renamed "*_blkX")
+    private fun onTestError(msg: String){
+        mHandler.removeCallbacksAndMessages(null)
+
+        if(isBlindUser)
+            speechManager.speak(resources.getString(R.string.critical_error))
+
+        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
+        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, listOf( mTest.getAbsoluteResultFilePath(),
+                                                                mSubjectParcel!!.getAbsoluteSubjectFilePath(),
+                                                                mTest.closeSummary()))
+    }
+
+    // called when user ended a planned block. can continue or stop (result file is renamed "*_blkX")
     private fun onBlockEnded(){
 
         if(isBlindUser) {
@@ -437,39 +454,31 @@ class TestFragment : BaseFragment(
             { /* cancelClb*/    onStoppedAfterBlock() })
     }
 
-    private fun onTestError(msg: String){
-        mHandler.removeCallbacksAndMessages(null)
-
-        if(isBlindUser)
-            speechManager.speak(resources.getString(R.string.critical_error))
-
-        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
-        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, listOf(mTest.getAbsoluteResultFilePath(), mTest.closeSummary()))
-    }
-    // user wanted to interrupt test after an end block (send data). rename current res file
+    // user wanted to interrupt test after an end block (send data). rename current res & subject files
     private fun onStoppedAfterBlock(){
-        val newresfilename = mTest.stopTestAfterBlock()
+        val newfilenames = mTest.stopTestAfterBlock()
         mHandler.removeCallbacksAndMessages(null)
-        navigateBack(TestBasic.BLOCK_COMPLETED, listOf(getAbsoluteFilePath(newresfilename).second, mTest.closeSummary()))
+        navigateBack(TestBasic.BLOCK_COMPLETED, listOf( getAbsoluteFilePath(newfilenames.first).second,
+                                                        getAbsoluteFilePath(newfilenames.second).second,
+                                                        mTest.closeSummary(newfilenames.third))) // closeSummary return absolute path or ""
     }
 
-    // results_file can be empty. it can have only the first (result) file not empty or having both results and summary
+    /* called by:
+     - onTestEnded
+     - onAbortTest -> OK/cancel
+     - onTestError
+     - onStoppedAfterBlock
+    results_file can be empty. it can have only the first (result) file not empty or having both results and summary
+     */
     private fun navigateBack(result_code: Int, results_file: List<String>){
 
-        val files_list:ArrayList<String> = when(results_file.isEmpty()){
-            true -> arrayListOf()
-            false -> when (results_file[0].isEmpty()) {
-                true -> arrayListOf()
-                false -> {
-                    val l = arrayListOf(results_file[0])
-                    if (results_file[1].isNotEmpty()) l.add(results_file[1])
-                    l
-                }
-            }
+        val files_list:ArrayList<String> = arrayListOf()
+        results_file.map{
+            if(it.isNotEmpty()) files_list.add(it)
         }
-
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name),
+                            TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
     }
 

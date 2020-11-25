@@ -19,6 +19,7 @@ abstract class Summary(private val ctx: Context){
         conditions[0].add(trial)
     }
 
+    // writes and return absolute filepath or empty
     open fun close(filename:String, dir:String = Environment.DIRECTORY_DOWNLOADS):String{
 
         if(conditions.size == 1) {
@@ -35,6 +36,7 @@ abstract class Summary(private val ctx: Context){
         return writeFile(summary, filename, dir)
     }
 
+    // return filename or empty
     private fun writeFile(summary:String, filename:String, dir:String = Environment.DIRECTORY_DOWNLOADS):String{
         return when(saveText(ctx, filename, summary, dir, true, notifyDm=true)){
             true    -> getAbsoluteFilePath(filename, dir).second

@@ -25,11 +25,11 @@ class TestATVB(
     ctx: Context,
     activity: Activity,
     hostfragment: Fragment,
-    subjectparcel: SubjectBasicParcel,
+    subject: SubjectBasicParcel,
     vibrator: VibrationManager?,
     mImageView: ImageView?,
     speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, mImageView) {
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView) {
 
     override var LOG_TAG: String = TestATVB::class.java.simpleName
 
@@ -222,21 +222,21 @@ class TestATVB(
             mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
             vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
         }
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
         allQuestions        = mutableListOf(ctx.resources.getString(R.string.atvb_question_synchro), ctx.resources.getString(R.string.atvb_question_equal))
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
 
-        createResultFile(subjectparcel, TrialBindings3latencies.LOG_HEADER)
+        createResultFile(subject, TrialBindings3latencies.LOG_HEADER)
         initSummary()
 
         curISI                  = ISI           // 1000L
         currStimulusDuration    = STIM_DURATION // 50L
 
-        if(!subjectparcel.isDebug) {
-            when (subjectparcel.type) {
+        if(!subject.isDebug) {
+            when (subject.type) {
                 TEST_ATVB_TIME_S_UNBAL,
                 TEST_ATVB_TIME_D_UNBAL -> createTrialsTimeUnbalanced()
 
@@ -246,7 +246,7 @@ class TestATVB(
         }
         else    createTrialsDebug()
 
-        when (subjectparcel.type) {
+        when (subject.type) {
             TEST_ATVB_TIME_S_UNBAL,
             TEST_ATVB_TIME_S_BAL   -> {
                 mQuestion       = allQuestions[0]
@@ -258,18 +258,20 @@ class TestATVB(
         }
 
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         // mTrials list
         nTrials         = mTrials.size
         currTrial       = 0
 
-        mListBlocks     = mutableListOf((nTrials / 2F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+//        mListBlocks     = mutableListOf((nTrials / 2F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+        mListBlocks     = mutableListOf((nTrials / 5F).roundToInt(), (2*nTrials / 5F).roundToInt(), (3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+
 //        mListBlocks     = mutableListOf(0,2)    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
         mTestLabel      = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
@@ -374,7 +376,7 @@ class TestATVB(
 
     override fun initSummary(){
 
-        mSummary = when (subjectparcel.type) {
+        mSummary = when (subject.type) {
             TEST_ATVB_TIME_S_UNBAL,
             TEST_ATVB_TIME_D_UNBAL  ->  ATVBUnBalancedSummary(ctx)
             else                    ->  null
@@ -391,7 +393,7 @@ class TestATVB(
 
         mNoise?.start()
 
-        when(subjectparcel.type) {
+        when(subject.type) {
 
             TEST_ATVB_TIME_S_UNBAL -> {
                 mStimuliHandler.postDelayed({
@@ -426,7 +428,7 @@ class TestATVB(
 //            }
 
 //            TEST_ATVB_TIME_D_BAL -> {
-//                val corr_delays = arrangeDelays(0,0,0, subjectparcel.stimuliDelay)
+//                val corr_delays = arrangeDelays(0,0,0, subject.stimuliDelay)
 //                mStimuliHandler.postDelayed({
 //                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
 //                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
