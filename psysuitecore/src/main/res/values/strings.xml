@@ -258,7 +258,7 @@
 
     <!-- TFI TEST -->
     <string name="tfi_label">TRIPLE FLASH ILLUSION (TFI)</string>
-    <string name="tfi_question">Indica il numero di stimoli che hai visto per ciascuna delle 3 modalità</string>
+    <string name="tfi_question">Indica il numero di stimoli che hai percepito per ciascuna delle 3 modalità</string>
 
     <string name="tfi_warning_null_answer">seleziona almeno uno stimolo maggiore di zero</string>
 

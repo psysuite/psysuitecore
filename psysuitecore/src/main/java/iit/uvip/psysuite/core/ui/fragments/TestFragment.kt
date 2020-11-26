@@ -415,13 +415,13 @@ class TestFragment : BaseFragment(
             requireContext().resources.getString(R.string.delete),       // cancel
             { /* okClb */
                 mTest.abortTest(false)
-                navigateBack(TestBasic.TEST_ABORT, listOf(  mTest.getAbsoluteResultFilePath(),
+                navigateBack(TestBasic.TEST_ABORTED, listOf(  mTest.getAbsoluteResultFilePath(),
                                                             mSubjectParcel!!.getAbsoluteSubjectFilePath(),
                                                             mTest.closeSummary()))
             },
             { /* cancelClb*/
                 mTest.abortTest(true)
-                navigateBack(TestBasic.TEST_ABORT, listOf())
+                navigateBack(TestBasic.TEST_ABORTED, listOf())
             })
     }
 
@@ -464,10 +464,10 @@ class TestFragment : BaseFragment(
     }
 
     /* called by:
-     - onTestEnded
-     - onAbortTest -> OK/cancel
-     - onTestError
-     - onStoppedAfterBlock
+     - onTestEnded                  TEST_COMPLETED
+     - onAbortTest -> OK/cancel     TEST_ABORTED
+     - onTestError                  TEST_ABORTED_WITH_ERROR
+     - onStoppedAfterBlock          BLOCK_COMPLETED
     results_file can be empty. it can have only the first (result) file not empty or having both results and summary
      */
     private fun navigateBack(result_code: Int, results_file: List<String>){

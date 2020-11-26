@@ -60,7 +60,7 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_WNOISE_DISABLED             = 0         //  disabled, cannot enable it
         @JvmStatic val TEST_WNOISE_CHOOSE_OFF           = 1         //  can choose, disabled by default
         @JvmStatic val TEST_WNOISE_CHOOSE_ON            = 2         //  can choose, enabled by default
-//        @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
+        @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
 
         //-----------------------------------------------------------------------------------------
         //
@@ -129,7 +129,7 @@ abstract class TestBasic(protected val ctx: Context,
 
 
         //-----------------------------------------------------------------------------------------
-        @JvmStatic val TEST_ABORT                       = 230
+        @JvmStatic val TEST_ABORTED                     = 230
         @JvmStatic val TEST_COMPLETED                   = 231
         @JvmStatic val BLOCK_COMPLETED                  = 232
         @JvmStatic val TEST_ABORTED_WITH_ERROR          = 233

@@ -5,7 +5,7 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectLongitParcel
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.utility.IdLabelData
+import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.getLabelLog
 import kotlinx.android.parcel.Parcelize
 import org.albaspazio.core.accessory.Device
@@ -39,7 +39,7 @@ class SubjectTIDParcel(
     override fun getFilesPrefix(ctx:Context):String{
 
         val ci          = getCompanionObjectMethod(classes[0], "getConditionsInfo")
-        val type_label  = (ci.first?.call(ci.second, ctx) as List<IdLabelData>).getLabelLog(type)
+        val type_label  = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(type)
 
         return "${label}_${population}_${group}_s${session}_$type_label"
     }

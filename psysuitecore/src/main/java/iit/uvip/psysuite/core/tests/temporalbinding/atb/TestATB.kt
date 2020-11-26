@@ -212,7 +212,7 @@ class TestATB(ctx: Context,
         currTrial   = 0
 
         mListBlocks = mutableListOf((nTrials / 5F).roundToInt(), (2*nTrials / 5F).roundToInt(), (3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-        mListBlocks = mutableListOf(1,2,5,7)
+//        mListBlocks = mutableListOf(1,2,5,7)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
