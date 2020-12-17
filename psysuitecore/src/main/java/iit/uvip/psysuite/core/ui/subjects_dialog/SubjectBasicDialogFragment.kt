@@ -16,8 +16,8 @@ import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.IdLabelData
 import kotlinx.android.synthetic.main.fragment_subject_info_basic.*
-import org.albaspazio.core.accessory.deleteFilesStartingWith
 import org.albaspazio.core.accessory.getCompanionObjectMethod
+import org.albaspazio.core.filesystem.deleteFilesStartingWith
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 

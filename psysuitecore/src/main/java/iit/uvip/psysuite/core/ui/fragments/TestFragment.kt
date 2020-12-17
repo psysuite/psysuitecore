@@ -32,6 +32,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_test.*
 import org.albaspazio.core.accessory.*
+import org.albaspazio.core.filesystem.getAbsoluteFilePath
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
 import org.albaspazio.core.speech.SpeechManager

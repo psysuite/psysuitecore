@@ -88,10 +88,10 @@ class TestTID(ctx: Context,
             val stl_sh  = ctx.resources.getString(R.string.tid_rb_long_text_short)
 
             return mutableListOf(
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"    , TEST_TID_SHORT_AUDIO, "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"  , TEST_TID_SHORT_TACTILE, "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"    , TEST_TID_LONG_AUDIO, "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"  , TEST_TID_LONG_TACTILE, "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl_sh", Populations.all_populations)
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"    , TEST_TID_SHORT_AUDIO, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"  , TEST_TID_SHORT_TACTILE, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$sts_sh", Populations.all_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"    , TEST_TID_LONG_AUDIO, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"  , TEST_TID_LONG_TACTILE, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$stl_sh", Populations.all_populations)
             )
         }
 

@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
@@ -12,7 +11,11 @@ import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.getLabelLog
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
-import org.albaspazio.core.accessory.*
+import org.albaspazio.core.accessory.Device
+import org.albaspazio.core.accessory.getCompanionObjectMethod
+import org.albaspazio.core.accessory.getDateString
+import org.albaspazio.core.accessory.getFullDateString
+import org.albaspazio.core.filesystem.*
 
 /*
 This class manage simple subjects that participate in tests with only one condition.

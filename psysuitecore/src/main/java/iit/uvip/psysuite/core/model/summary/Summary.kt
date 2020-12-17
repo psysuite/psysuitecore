@@ -1,10 +1,11 @@
 package iit.uvip.psysuite.core.model.summary
 
 import android.content.Context
+import android.net.Uri
 import android.os.Environment
 import iit.uvip.psysuite.core.tests.TrialBasic
-import org.albaspazio.core.accessory.getAbsoluteFilePath
-import org.albaspazio.core.accessory.saveText
+import org.albaspazio.core.filesystem.getAbsoluteFilePath
+import org.albaspazio.core.filesystem.saveText
 
 
 abstract class Summary(private val ctx: Context){
@@ -38,9 +39,13 @@ abstract class Summary(private val ctx: Context){
 
     // return filename or empty
     private fun writeFile(summary:String, filename:String, dir:String = Environment.DIRECTORY_DOWNLOADS):String{
-        return when(saveText(ctx, filename, summary, dir, true, notifyDm=true)){
-            true    -> getAbsoluteFilePath(filename, dir).second
-            false   -> ""
+
+        val res:Any? = saveText(ctx, filename, summary, dir, true, notifyDm=true)
+
+        return when(res){
+            null, false -> ""
+            is Uri, true -> getAbsoluteFilePath(filename, dir).second
+            else   -> ""
         }
     }
 

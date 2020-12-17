@@ -3,6 +3,8 @@ package iit.uvip.psysuite.core.tests
 import android.app.Activity
 import android.content.Context
 import android.media.MediaPlayer
+import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.widget.ImageView
@@ -13,7 +15,9 @@ import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.stimuli.StimuliManager
-import org.albaspazio.core.accessory.*
+import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.logLastTwo
+import org.albaspazio.core.filesystem.*
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showAlert
 
@@ -175,8 +179,10 @@ abstract class TestBasic(protected val ctx: Context,
     protected open var mDrawablesResource:MutableList<Int>  = mutableListOf()   // list of drawables' resources id to be edited in subclasses
     protected var mStimuliHandler: Handler                  = Handler()
 
-    protected var mSummary: Summary?                         = null
+    protected var mSummary: Summary?                        = null
     private var mResultFile: String                         = ""
+    private var mResultUri: Uri?                            = null
+
     private var mCurrBlock: Int                             = 0
 
     protected var currStimulusDuration:Long     = 100L          // default value to be used when stimulus duration in not given
@@ -235,20 +241,27 @@ abstract class TestBasic(protected val ctx: Context,
         // if !last trial && !block end => doNextTrial
         return when {
             currTrial == (nTrials - 1) -> {
-                saveText(ctx, mResultFile, mTrial.Log(), overwrite = false, notifyDm = true)
+                saveText(mTrial.Log(), notifyDm = true)
                 EVENT_TEST_END            // END !
             }
             mListBlocks.contains(currTrial) -> {
-                saveText(ctx, mResultFile, mTrial.Log(), overwrite = false, notifyDm = false)
+                saveText(mTrial.Log(), notifyDm = false)
                 EVENT_BLOCK_END
             }
             else -> {
-                saveText(ctx, mResultFile, mTrial.Log(), overwrite = false, notifyDm = false)
+                saveText(mTrial.Log(), notifyDm = false)
                 doNextTrial()
             }
         }
     }
 
+    private fun saveText(text: String, overwrite: Boolean = false, notifyDm: Boolean = false){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            saveTextQ(ctx, mResultUri!!, text, overwrite = overwrite, notifyDm = notifyDm)
+        else
+            saveText(ctx, mResultFile, text, overwrite = overwrite, notifyDm = notifyDm)
+    }
     // called by above nextTrial & by TestFragment after user decided to continue after block end
     private fun doNextTrial():Int{
         return  try {
@@ -340,10 +353,14 @@ abstract class TestBasic(protected val ctx: Context,
         mTrial      = mTrials[currTrial]
     }
 
-    // is always created without block information, which is added when interruputing after a block
+    // is always created without block information, which is added when interrupting after a block
     protected fun createResultFile(subj:SubjectBasicParcel, header:String){
         mResultFile = subj.composeResultFileName(ctx)
-        saveText(ctx, mResultFile, header)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            mResultUri = saveTextQ(ctx, mResultFile, header)
+        else
+            saveText(ctx, mResultFile, header)
     }
 
     fun getAbsoluteResultFilePath(): String = getAbsoluteFilePath(mResultFile).second      // is "" if file was not present

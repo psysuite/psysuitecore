@@ -60,7 +60,7 @@ class TestTFI(ctx: Context,
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
             ConditionData(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
-            ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "TFITOD", Populations.sighted_hearing_populations)
+            ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations)
         )
 
         fun getNextTrialModes():List<List<Int>> = listOf(listOf(TEST_NEXTTRIAL_ANSWER))

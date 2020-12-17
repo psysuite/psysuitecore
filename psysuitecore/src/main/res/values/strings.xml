@@ -113,14 +113,14 @@
     <string name="start_atb">AT Binding (AT-B)</string>
 
     <string name="atb_subtask_time_single">Singolo Stimolo</string>
-    <string name="atb_subtask_time_single_tag">SSU</string>
+    <string name="atb_subtask_time_single_tag">SS</string>
     <string name="atb_subtask_time_double">Doppio Stimolo</string>
-    <string name="atb_subtask_time_double_tag">DSU</string>
+    <string name="atb_subtask_time_double_tag">DS</string>
 
     <string name="atb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="atb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="atb_subtask_time_single_tod_tag">SST</string>
     <string name="atb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="atb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="atb_subtask_time_double_tod_tag">DST</string>
 
     <string name="atb_subtask_time_infants">tempo infanti</string>
     <string name="atb_subtask_time_infants_tag">INF</string>
@@ -150,14 +150,14 @@
     <string name="start_tvb">TV Binding (TV-B)</string>
 
     <string name="tvb_subtask_time_single">Singolo Stimolo</string>
-    <string name="tvb_subtask_time_single_tag">SSU</string>
+    <string name="tvb_subtask_time_single_tag">SS</string>
     <string name="tvb_subtask_time_double">Doppio Stimolo</string>
-    <string name="tvb_subtask_time_double_tag">DSU</string>
+    <string name="tvb_subtask_time_double_tag">DS</string>
 
     <string name="tvb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="tvb_subtask_time_single_tod_tag">SST</string>
     <string name="tvb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="tvb_subtask_time_double_tod_tag">DST</string>
 
     <string name="tvb_rb1_text">uguali</string>
     <string name="tvb_rb3_text">diversi</string>
@@ -167,14 +167,14 @@
     <string name="start_avb">AV Binding (AV-B)</string>
 
     <string name="avb_subtask_time_single">Singolo Stimolo</string>
-    <string name="avb_subtask_time_single_tag">SSU</string>
+    <string name="avb_subtask_time_single_tag">SS</string>
     <string name="avb_subtask_time_double">Doppio Stimolo</string>
-    <string name="avb_subtask_time_double_tag">DSU</string>
+    <string name="avb_subtask_time_double_tag">DS</string>
 
     <string name="avb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="avb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="avb_subtask_time_single_tod_tag">SST</string>
     <string name="avb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="avb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="avb_subtask_time_double_tod_tag">DST</string>
 
     <string name="avb_rb1_text">uguali</string>
     <string name="avb_rb3_text">diversi</string>
@@ -196,7 +196,7 @@
     <string name="tid_rb_short_text">CORTO</string>
     <string name="tid_rb_long_text">LUNGO</string>
 
-    <string name="tid_rb_short_text_short">C</string>
+    <string name="tid_rb_short_text_short">S</string>
     <string name="tid_rb_long_text_short">L</string>
 
     <string name="tid_rb_audio_text">audio</string>

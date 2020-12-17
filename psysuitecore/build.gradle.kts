@@ -2,6 +2,7 @@ plugins {
     id(Plugins.androidLibrary)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
+    id("kotlin-android")
 
     id("name.remal.check-dependency-updates") version "1.0.211"
 }
@@ -44,6 +45,9 @@ dependencies {
     implementation(Dependencies.Moshi.moshiKt)
 
     implementation(project(":core"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
 
     testImplementation("junit:junit:4.13")
     androidTestImplementation("androidx.test:runner:1.3.0")
