@@ -1,4 +1,4 @@
-package iit.uvip.psysuite.core.ui.fragments
+package iit.uvip.psysuite.core.ui.fragments.answers
 
 import android.app.Activity
 import android.os.Bundle
@@ -10,7 +10,8 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.tests.TestBasic
-import kotlinx.android.synthetic.main.fragment_answer.*
+import iit.uvip.psysuite.core.ui.fragments.TestFragment
+import kotlinx.android.synthetic.main.fragment_2afc_answer.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -18,9 +19,9 @@ import java.lang.Math.random
 import java.util.*
 
 
-open class AnswerDialogFragment: DialogFragment()
+open class TwoAFCAnswerDialogFragment: DialogFragment()
 {
-    open val LOG_TAG = AnswerDialogFragment::class.java.simpleName
+    open val LOG_TAG = TwoAFCAnswerDialogFragment::class.java.simpleName
 
     protected var isDebug:Boolean           = false
     protected var isInstructions:Boolean    = false
@@ -36,8 +37,8 @@ open class AnswerDialogFragment: DialogFragment()
     protected var tts: SpeechManager?                     = null
 
     companion object {
-        fun newInstance(title: String, speechManager: SpeechManager): AnswerDialogFragment {
-            val frag = AnswerDialogFragment()
+        fun newInstance(title: String, speechManager: SpeechManager): TwoAFCAnswerDialogFragment {
+            val frag = TwoAFCAnswerDialogFragment()
             val args = Bundle()
             args.putString("title", title)
             frag.setArguments(args)
@@ -49,7 +50,7 @@ open class AnswerDialogFragment: DialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_answer, container)
+        return inflater.inflate(R.layout.fragment_2afc_answer, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

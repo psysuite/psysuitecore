@@ -172,6 +172,7 @@ class TestFragment : BaseFragment(
 
                     TestBasic.TEST_ATVB_TIME_S_UNBAL,
                     TestBasic.TEST_ATVB_TIME_S_BAL,
+                    TestBasic.TEST_ATVB_TIME_S_BAL2,
                     TestBasic.TEST_ATVB_TIME_D_UNBAL,
                     TestBasic.TEST_ATVB_TIME_D_BAL -> mTest = TestATVB(
                         requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
@@ -205,11 +206,11 @@ class TestFragment : BaseFragment(
                 // get a reference to the AnswerDialogFragment
                 val answerDialogClass = if(isBlindUser)
                                             // population is visually impaired. use AnswerGestureDF
-                                            "iit.uvip.psysuite.core.ui.fragments.AnswerGestureDialogFragment"
+                                            "iit.uvip.psysuite.core.ui.fragments.answers.AnswerGestureDialogFragment"
                                         else {
                                             if (mSubjectParcel!!.classes.size > 1 && mSubjectParcel!!.classes[1].isNotEmpty())
                                                 mSubjectParcel!!.classes[1]
-                                            else "iit.uvip.psysuite.core.ui.fragments.AnswerDialogFragment"
+                                            else "iit.uvip.psysuite.core.ui.fragments.answers.TwoAFCAnswerDialogFragment"
                                         }
                 answerDialogRef       = getCompanionObjectMethod(answerDialogClass, "newInstance")
 

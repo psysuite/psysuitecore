@@ -119,7 +119,7 @@ class TestTID(ctx: Context,
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
         mQuestion           = ctx.resources.getString(R.string.tid_question_text)
-        validAnswers        = mutableListOf(ctx.resources.getString(R.string.tid_rb1_text), ctx.resources.getString(R.string.tid_rb3_text))
+        validAnswers        = mutableListOf(ctx.resources.getString(R.string.tid_rb1_text), ctx.resources.getString(R.string.tid_rb2_text))
         
         currStimulusDuration = STIMULUS_DURATION_AUDIO
         when(subject.type){

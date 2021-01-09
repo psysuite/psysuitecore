@@ -13,7 +13,7 @@ import java.util.Collections.max
 // input params correspond to reciprocal 
 @Suppress("CanBeParameter")
 @Parcelize
-class DelaysAligner(val a1:Long=0L, val a2:Long=0L, val a3:Long=0L, val t1:Long=0L, val t2:Long=0L, val v1:Long=0L, val v2:Long=0L) : Parcelable {
+class DelaysAligner(var a1:Long=0L, var a2:Long=0L, var a3:Long=0L, var t1:Long=0L, var t2:Long=0L, var v1:Long=0L, var v2:Long=0L) : Parcelable {
 
     @IgnoredOnParcel
     private val delays:HashMap<Int, StimuliDelay> = hashMapOf(

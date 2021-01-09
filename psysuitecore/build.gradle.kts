@@ -28,6 +28,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 androidExtensions {
@@ -43,6 +47,8 @@ dependencies {
 
     implementation(Dependencies.Moshi.moshi)
     implementation(Dependencies.Moshi.moshiKt)
+
+    api("androidx.preference:preference-ktx:1.1.1")
 
     implementation(project(":core"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")

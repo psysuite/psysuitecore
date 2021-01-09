@@ -17,7 +17,7 @@ import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
-import iit.uvip.psysuite.core.utility.StimulusBindingsUnbalanced
+import iit.uvip.psysuite.core.utility.StimulusDelay
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 import kotlin.math.roundToInt
@@ -38,46 +38,46 @@ class TestAVB(ctx: Context,
     // stimuli combinations
     private val STIM_A              = StimuliManager.STIM_TYPE_A1
     private val STIM_V              = StimuliManager.STIM_TYPE_V1
-    private val BIMODAL_CODE            = STIM_A or STIM_V
+    private val BIMODAL_CODE        = STIM_A or STIM_V
 
     private var allQuestions:MutableList<String> = mutableListOf()
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
 
     // 26 different elements
-    private val lStimuliUnBalanced: List<StimulusBindingsUnbalanced> = listOf(
+    private val lStimuliUnBalanced: List<StimulusDelay> = listOf(
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 50),
-        StimulusBindingsUnbalanced( TYPE_V_A, 50),
-        StimulusBindingsUnbalanced( TYPE_A_V, 50),
-        StimulusBindingsUnbalanced( TYPE_V_A, 50),
+        StimulusDelay( TYPE_A_V, 50),
+        StimulusDelay( TYPE_V_A, 50),
+        StimulusDelay( TYPE_A_V, 50),
+        StimulusDelay( TYPE_V_A, 50),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 100),
-        StimulusBindingsUnbalanced( TYPE_V_A, 100),
-        StimulusBindingsUnbalanced( TYPE_A_V, 100),
-        StimulusBindingsUnbalanced( TYPE_V_A, 100),
+        StimulusDelay( TYPE_A_V, 100),
+        StimulusDelay( TYPE_V_A, 100),
+        StimulusDelay( TYPE_A_V, 100),
+        StimulusDelay( TYPE_V_A, 100),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 200),
-        StimulusBindingsUnbalanced( TYPE_V_A, 200),
-        StimulusBindingsUnbalanced( TYPE_A_V, 200),
-        StimulusBindingsUnbalanced( TYPE_V_A, 200),
+        StimulusDelay( TYPE_A_V, 200),
+        StimulusDelay( TYPE_V_A, 200),
+        StimulusDelay( TYPE_A_V, 200),
+        StimulusDelay( TYPE_V_A, 200),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 300),
-        StimulusBindingsUnbalanced( TYPE_V_A, 300),
-        StimulusBindingsUnbalanced( TYPE_A_V, 300),
-        StimulusBindingsUnbalanced( TYPE_V_A, 300),
+        StimulusDelay( TYPE_A_V, 300),
+        StimulusDelay( TYPE_V_A, 300),
+        StimulusDelay( TYPE_A_V, 300),
+        StimulusDelay( TYPE_V_A, 300),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 400),
-        StimulusBindingsUnbalanced( TYPE_V_A, 400),
-        StimulusBindingsUnbalanced( TYPE_A_V, 400),
-        StimulusBindingsUnbalanced( TYPE_V_A, 400),
+        StimulusDelay( TYPE_A_V, 400),
+        StimulusDelay( TYPE_V_A, 400),
+        StimulusDelay( TYPE_A_V, 400),
+        StimulusDelay( TYPE_V_A, 400),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 800),
-        StimulusBindingsUnbalanced( TYPE_V_A, 800),
-        StimulusBindingsUnbalanced( TYPE_A_V, 800),
-        StimulusBindingsUnbalanced( TYPE_V_A, 800),
+        StimulusDelay( TYPE_A_V, 800),
+        StimulusDelay( TYPE_V_A, 800),
+        StimulusDelay( TYPE_A_V, 800),
+        StimulusDelay( TYPE_V_A, 800),
 
-        StimulusBindingsUnbalanced( TYPE_A_V, 1200),
-        StimulusBindingsUnbalanced( TYPE_V_A, 1200)
+        StimulusDelay( TYPE_A_V, 1200),
+        StimulusDelay( TYPE_V_A, 1200)
     )
 
     private val WN_FIRSTSTIM_INTERVAL   = 1000L

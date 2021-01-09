@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.AnswerDialogFragment">
+        tools:context=".ui.fragments.answers.TwoAFCAnswerDialogFragment">
 
 
     <ImageButton
@@ -43,7 +43,7 @@
 
     <RadioGroup
         android:id="@+id/radioGroupAudio"
-        android:layout_width="296dp"
+        android:layout_width="320dp"
         android:layout_height="61dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -54,13 +54,19 @@
 
         <RadioButton
             android:id="@+id/rb_a_0"
-            android:layout_width="167dp"
+            android:layout_width="105dp"
             android:layout_height="55dp"
             android:text="@string/tid_rb1_text" />
 
         <RadioButton
             android:id="@+id/rb_a_1"
-            android:layout_width="167dp"
+            android:layout_width="105dp"
+            android:layout_height="55dp"
+            android:text="@string/tid_rb2_text" />
+
+        <RadioButton
+            android:id="@+id/rb_a_2"
+            android:layout_width="105dp"
             android:layout_height="55dp"
             android:text="@string/tid_rb3_text" />
     </RadioGroup>

@@ -9,7 +9,7 @@ object Configs {
 
 object Versions {
 
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.21"
     const val ktx = "1.4.0-alpha01"
     const val gradlePlugin = "4.0.0"
 

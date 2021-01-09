@@ -92,6 +92,7 @@
     <string name="whitenoise">aggiungi rumore bianco</string>
 
     <string name="session">sessione</string>
+    <string name="main_email">psysuite.uvip@gmail.com</string>
 
     <string name="empty_subject_parcel">SOGGETTO E\' VUOTO</string>
     <string name="critical_error">ERRORE IRRECUPERABILE</string>
@@ -105,6 +106,15 @@
     <string name="error_tactilemanager">gestore dell\'tattile non valido</string>
     <string name="error_visualmanager">gestore dell\'visuale non valido</string>
     <string name="internal_error">Il codice ha generato il seguente errore\n%1$s</string>
+
+
+    <string name="pref_delay_a1">10</string>
+    <string name="pref_delay_a2">29</string>
+    <string name="pref_delay_a3">18</string>
+    <string name="pref_delay_t1">0</string>
+    <string name="pref_delay_t2">0</string>
+    <string name="pref_delay_v1">29</string>
+    <string name="pref_delay_v2">29</string>
 
 
     <string name="start_bindings">Temporal Bindings</string>
@@ -134,8 +144,10 @@
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
     <string name="atvb_subtask_time_single_tag">SSU</string>
-    <string name="atvb_subtask_time_single2">Singolo Stimolo bilanciato</string>
-    <string name="atvb_subtask_time_single2_tag">SSB</string>
+    <string name="atvb_subtask_time_single_b">Singolo Stimolo bilanciato</string>
+    <string name="atvb_subtask_time_single_b_tag">SSB</string>
+    <string name="atvb_subtask_time_single_b2">Singolo Stimolo bilanciato 2</string>
+    <string name="atvb_subtask_time_single_b2_tag">SSB</string>
     <string name="atvb_subtask_time_double">Doppio Stimolo</string>
     <string name="atvb_subtask_time_double_tag">DSU</string>
     <string name="atvb_subtask_time_double2">Doppio Stimolo bilanciato</string>
@@ -145,6 +157,7 @@
     <string name="atvb_rb3_text">no</string>
     <string name="atvb_question_equal">Sono uguali?</string>
     <string name="atvb_question_synchro">Sono simultanei?</string>
+    <string name="atvb_question_whichsecond">Che tipo di stimolo è il secondo?</string>
 
     <!-- TVB -->
     <string name="start_tvb">TV Binding (TV-B)</string>
@@ -188,7 +201,8 @@
     <string name="tid_question_text">Quale intervallo in ciascuna coppia era maggiore?\nnella prima o nella seconda coppia?</string>
 
     <string name="tid_rb1_text">primo</string>
-    <string name="tid_rb3_text">secondo</string>
+    <string name="tid_rb2_text">secondo</string>
+    <string name="tid_rb3_text">terzo</string>
 
     <string name="tid_rb_male_text">M</string>
     <string name="tid_rb_female_text">F</string>

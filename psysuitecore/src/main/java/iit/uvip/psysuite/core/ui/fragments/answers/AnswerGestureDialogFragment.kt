@@ -1,4 +1,4 @@
-package iit.uvip.psysuite.core.ui.fragments
+package iit.uvip.psysuite.core.ui.fragments.answers
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.core.view.GestureDetectorCompat
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.tests.TestBasic
-import kotlinx.android.synthetic.main.fragment_answer.*
+import kotlinx.android.synthetic.main.fragment_2afc_answer.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.gestures.MyGestureDetector
 import org.albaspazio.core.speech.SpeechManager
 
 
-class AnswerGestureDialogFragment: AnswerDialogFragment()
+class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
 {
     override val LOG_TAG = AnswerGestureDialogFragment::class.java.simpleName
 
@@ -34,7 +34,7 @@ class AnswerGestureDialogFragment: AnswerDialogFragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        layoutView = inflater.inflate(R.layout.fragment_answer, container)
+        layoutView = inflater.inflate(R.layout.fragment_2afc_answer, container)
         return layoutView
     }
 

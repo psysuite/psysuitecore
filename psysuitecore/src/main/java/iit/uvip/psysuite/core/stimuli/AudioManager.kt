@@ -1,6 +1,8 @@
 package iit.uvip.psysuite.core.stimuli
 
+import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -8,6 +10,7 @@ import android.media.SoundPool
 import android.media.ToneGenerator
 import android.os.Handler
 import android.util.Log
+import iit.uvip.psysuite.core.R
 import java.io.IOException
 
 
@@ -77,6 +80,29 @@ class AudioManager(type: Int, var resource: Any, override var amplitude: Int = -
                 throw AudioResourceException(resname)
             }
         }
+
+        fun getDeviceAudioParameters(activity: Activity, res: Resources):Pair<Int,Int> {
+
+
+//        val hasLowLatencyFeature: Boolean = packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_LOW_LATENCY)
+//        val hasProFeature: Boolean = packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO)
+
+
+            val am = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val sampleRateStr: String? = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
+            val sampleRate: Int = sampleRateStr?.let { str ->
+                Integer.parseInt(str).takeUnless { it == 0 }
+            }
+                ?: res.getInteger(R.integer.sampleRate) // Use a default value if property not found
+
+            val framesPerBuffer: String? = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
+            var framesPerBufferInt: Int = framesPerBuffer?.let { str ->
+                Integer.parseInt(str).takeUnless { it == 0 }
+            } ?: res.getInteger(R.integer.bufferSize) // Use default
+
+            return Pair(sampleRate, framesPerBufferInt)
+        }
+
     }
 
     init{

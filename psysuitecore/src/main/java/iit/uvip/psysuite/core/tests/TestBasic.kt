@@ -111,6 +111,7 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_ATVB_TIME_D_UNBAL       = 141
         @JvmStatic val TEST_ATVB_TIME_D_BAL         = 142
         @JvmStatic val TEST_ATVB_TIME_S_BAL         = 143
+        @JvmStatic val TEST_ATVB_TIME_S_BAL2        = 144
 
         @JvmStatic val TEST_SAMPLE_ALIGNED          = 150
         @JvmStatic val TEST_SAMPLE_SHIFTED          = 151
@@ -368,7 +369,7 @@ abstract class TestBasic(protected val ctx: Context,
     // set trial id according to its order in the list
     protected fun setTrialsID(){  mTrials.mapIndexed { index, trialBasic -> trialBasic.id = index } }
 
-    private fun getDebugInfo():String = mTrial.debugInfo()
+    protected fun getDebugInfo():String = mTrial.debugInfo()
 
     protected fun getTestTitle():String = "${ctx.resources.getString(R.string.app_name)} - ${ctx.resources.getString(R.string.lab_test_res)}: $mTestLabel"
 }
