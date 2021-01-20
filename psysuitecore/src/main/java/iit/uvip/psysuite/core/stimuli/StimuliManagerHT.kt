@@ -12,8 +12,8 @@ some tests can deliver a combination of stimuli (uni-bi-trimodal).
 I set the way I deliver each of them and then expose method allowing to select my modality
 */
 
-class StimuliManager(
-    val mAudioManager: AudioManager? = null,
+class StimuliManagerHT(
+    val mAudioManager: AudioHandlerThread? = null,
     val mTactileManager: TactileManager? = null,
     val mVisualManager: VisualManager? = null,
     private val delaysAligner: DelaysAligner,
@@ -91,6 +91,8 @@ class StimuliManager(
     }
 
     init{
+        mAudioManager?.start()
+//        mAudioManager?.init()
         checkResourcesLoading()
     }
     // to be used when one single modalities-combination is used
@@ -153,7 +155,7 @@ class StimuliManager(
         mHandler.post(runTask)  // Start the initial runnable task by posting through the handler
     }
 
-    fun getValidAudioManager(manager: AudioManager?):AudioManager?{
+    fun getValidAudioManager(manager: AudioHandlerThread?):AudioHandlerThread?{
 
         val mam_dur =  mAudioManager?.isValid ?: false
         val am_dur  =  manager?.isValid ?: false
@@ -210,7 +212,6 @@ class StimuliManager(
         return Triple(Collections.max(durs) as Long, Collections.min(durs) as Long, mean)
     }
 
-
     // =============================================================================================================================
     // STIMULUS DELIVERY
     // =============================================================================================================================
@@ -234,15 +235,6 @@ class StimuliManager(
         }, isi)
     }
     // ---------------------------------------------------------------------------------------------
-    // ALIGNED STIMULUS (correct delays and call deliverShiftedStimulus)
-    // ---------------------------------------------------------------------------------------------
-    fun deliverAlignedStimulus(type:Int, onEnd:()-> Unit = {}){
-
-        val corr_delays = delaysAligner.arrangeDelays(type)
-        deliverShiftedStimulus(type, corr_delays.a, corr_delays.t, corr_delays.v){onEnd()}
-    }
-
-    // ---------------------------------------------------------------------------------------------
     // SHIFTED STIMULUS (call 1-to-3 deliverUnimodalStimulus at different latencies, receive already corrected shifting)
     // THIS IS THE ONLY METHOD THAT CALLS UNIMODAL STIMULI !!!!!!!
     // ---------------------------------------------------------------------------------------------
@@ -264,12 +256,15 @@ class StimuliManager(
                 if(mAudioManager.type != atype)    throw Exception(ctx.resources.getString(R.string.error_audiomanager))
 
                 durlist.add(mAudioManager.duration + a)
-                mHandler.postDelayed({
-                    val elapsedms1 = getTimeDifference(onsetDate)
-                    deliverUnimodalStimulus(atype)
-                    val elapsedms2 = getTimeDifference(onsetDate)
-                    Log.d("TestBasic", "audio issued: type=${mAudioManager.type}, onset=$a, elapsedPre=$elapsedms1, elapsedPost=$elapsedms2")
-                }, a)
+
+                mAudioManager.deliverStimulus(a)
+
+//                mHandler.postDelayed({
+//                    val elapsedms1 = getTimeDifference(onsetDate)
+//                    deliverUnimodalStimulus(atype)
+//                    val elapsedms2 = getTimeDifference(onsetDate)
+//                    Log.d("TestBasic", "audio issued: type=${mAudioManager.type}, onset=$a, elapsedPre=$elapsedms1, elapsedPost=$elapsedms2")
+//                }, a)
             }
 
             if(t > -1 && ttype > -1) {
@@ -299,11 +294,20 @@ class StimuliManager(
             }
 
             val end:Long = Collections.max(durlist)
-            mHandler.postDelayed({  onEnd() }, end)
+            mHandler.postDelayed({ onEnd() }, end)
         }
         catch (e:Exception){
             throw Exception(e.message)
         }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // ALIGNED STIMULUS (correct delays and call deliverShiftedStimulus)
+    // ---------------------------------------------------------------------------------------------
+    fun deliverAlignedStimulus(type:Int, onEnd:()-> Unit = {}){
+
+        val corr_delays = delaysAligner.arrangeDelays(type)
+        deliverShiftedStimulus(type, corr_delays.a, corr_delays.t, corr_delays.v){onEnd()}
     }
 
     // --------------------------------------------------------------------------------------------------------------
@@ -312,19 +316,18 @@ class StimuliManager(
     // --------------------------------------------------------------------------------------------------------------
     fun deliverUnimodalStimulus(type:Int, onEnd:() -> Unit = {}){
         when(type){
-            STIM_TYPE_A1, STIM_TYPE_A2, STIM_TYPE_A3    -> deliverAStimulus(onEnd)
-            STIM_TYPE_T1, STIM_TYPE_T2                  -> deliverTStimulus(onEnd)
-            STIM_TYPE_V1, STIM_TYPE_V2                  -> deliverVStimulus(onEnd)
+            STIM_TYPE_A1, STIM_TYPE_A2, STIM_TYPE_A3 -> deliverAStimulus(onEnd)
+            STIM_TYPE_T1, STIM_TYPE_T2 -> deliverTStimulus(onEnd)
+            STIM_TYPE_V1, STIM_TYPE_V2 -> deliverVStimulus(onEnd)
         }
     }
 
     fun deliverAStimulus(onEnd:() -> Unit = {}){
-
         try {
-            if(mAudioManager == null)               throw Exception("deliverAStimulus: mAudioManager is null")
-            if(!mAudioManager.isValid)              throw Exception("deliverAStimulus: mAudioManager is not valid")
+            if (mAudioManager == null) throw Exception("deliverAStimulus: mAudioManager is null")
+            if (!mAudioManager.isValid) throw Exception("deliverAStimulus: mAudioManager is not valid")
 
-            mAudioManager.deliver()
+            mAudioManager.deliverStimulus(0, mAudioManager.duration)
             mHandler.postDelayed({ onEnd() }, mAudioManager.duration)
         }
         catch (e:Exception){

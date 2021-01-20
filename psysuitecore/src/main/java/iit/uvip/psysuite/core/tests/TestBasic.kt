@@ -209,10 +209,10 @@ abstract class TestBasic(protected val ctx: Context,
     // ===============================================================================================================
     fun start():Boolean{
         return  try {
-                    if(!mStimuliManager.isValid || !this::mTrial.isInitialized){
-                        onCriticalError(ctx.resources.getString(R.string.test_failure), true)
-                        return false
-                    }
+//                    if(!mStimuliManager.isValid || !this::mTrial.isInitialized){
+//                        onCriticalError(ctx.resources.getString(R.string.test_failure), true)
+//                        return false
+//                    }
 
                     if(subject.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
 

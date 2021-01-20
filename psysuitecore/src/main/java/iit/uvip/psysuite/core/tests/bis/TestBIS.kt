@@ -269,7 +269,7 @@ class TestBIS(
     private fun deliverStimulus(trial: TrialBIS, stage:Int=0){
 
         when(trial.type) {
-            TEST_BISECTION_AUDIO            ->  mStimuliManager.deliverA1Stimulus()
+            TEST_BISECTION_AUDIO            ->  mStimuliManager.deliverAStimulus()
             TEST_BISECTION_TACTILE          ->  mStimuliManager.deliverTStimulus()
             TEST_BISECTION_AUDIO_TACTILE    ->  mStimuliManager.deliverAlignedStimulus(StimuliManager.STIM_TYPE_A1T1)
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)

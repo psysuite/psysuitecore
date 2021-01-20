@@ -187,6 +187,7 @@ class TestFragment : BaseFragment(
                         requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 
                     else    -> {
+                        Log.e("TestFragment", "Test non riconosciuto")
                         showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
                         Navigation.findNavController(requireView()).popBackStack()
                         return@SpeechManager

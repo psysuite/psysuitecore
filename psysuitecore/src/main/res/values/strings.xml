@@ -299,20 +299,22 @@
         <item>sequence</item>
     </string-array>
 
-    <string-array name="sample_audioresources_array">
-        <item>t1000hz_10ms</item>
-        <item>t1000hz_20ms</item>
-        <item>t1000hz_30ms</item>
-        <item>t1000hz_50ms</item>
-        <item>t200hz_1s</item>
-        <item>t200hz_2s</item>
-        <item>wnoise_20s</item>
-    </string-array>
+<!--    <string-array name="sample_audioresources_array">-->
+<!--        <item>t1000hz_10ms</item>-->
+<!--        <item>t1000hz_30ms</item>-->
+<!--        <item>t200hz_1s</item>-->
+<!--        <item>wnoise_20s</item>-->
+<!--    </string-array>-->
 
     <string-array name="sample_audioassets_array">
         <item>t1000hz_10ms.wav</item>
+        <item>t1000hz_20ms.wav</item>
         <item>t1000hz_30ms.wav</item>
-        <item>t200hz_1s.wav</item>
+        <item>t1000hz_35ms.wav</item>
+        <item>t1000hz_50ms.wav</item>
+        <item>t1000hz_100ms.wav</item>
+        <item>t1000hz_1000ms.wav</item>
+        <item>t200hz_1000ms.wav</item>
     </string-array>
 
 </resources>

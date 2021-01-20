@@ -62,11 +62,17 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
             TestBasic.TEST_ATVB_TIME_D_UNBAL,
             TestBasic.TEST_ATVB_TIME_D_BAL,
             TestBasic.TEST_ATVB_TIME_S_UNBAL,
-            TestBasic.TEST_ATVB_TIME_S_BAL ->  if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
-                                               else                        TestBasic.TEST_NEXTTRIAL_ANSWER
+            TestBasic.TEST_ATVB_TIME_S_BAL,
+            TestBasic.TEST_ATVB_TIME_S_BAL2 ->  if(subject.canRecordAudio)  TestBasic.TEST_NEXTTRIAL_ANSWER //TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
+                                                else                        TestBasic.TEST_NEXTTRIAL_ANSWER
 
             else                                ->   subject.nextTrailModality
         }
+
+
+        if(subject.type == TestBasic.TEST_ATVB_TIME_S_BAL || subject.type == TestBasic.TEST_ATVB_TIME_S_BAL2)
+            subject.classes         = listOf("iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB",
+                                            "iit.uvip.psysuite.core.ui.fragments.answers.ThreeAFCAnswerDialogFragment")
 
         return subject
     }

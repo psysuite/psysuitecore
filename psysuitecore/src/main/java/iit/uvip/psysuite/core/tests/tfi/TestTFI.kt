@@ -47,8 +47,8 @@ class TestTFI(ctx: Context,
         @JvmStatic val soa_1:Long = 55L
         @JvmStatic val soa_2:Long = 85L
 
-        @JvmStatic val STIM_A     = StimuliManager.STIM_TYPE_A1
-        @JvmStatic val STIM_V     = StimuliManager.STIM_TYPE_V2
+        @JvmStatic val STIM_A     = StimuliManager.STIM_TYPE_A2
+        @JvmStatic val STIM_V     = StimuliManager.STIM_TYPE_V1
         @JvmStatic val STIM_T     = StimuliManager.STIM_TYPE_T1
         @JvmStatic val STIM_ATV   = STIM_A or STIM_T or STIM_V
 
@@ -92,6 +92,7 @@ class TestTFI(ctx: Context,
 
         if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
+        subject.isDebug = true
         if(!subject.isDebug)  createTrials()
         else                  createTrialsDebug()
         // mTrials list
@@ -113,7 +114,8 @@ class TestTFI(ctx: Context,
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
         mStimuliManager = StimuliManager(
-            AudioManager(STIM_A, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+            AudioManager(STIM_A, "t1000hz_35ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+//            AudioManager(STIM_A, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
 //                                            AudioManager(UNIMODAL_AUDIO_CODE, listOf("t1000hz_30ms.wav"), 100, duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
 //                                            AudioManager(UNIMODAL_AUDIO_CODE, "t1000hz_30ms",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
             TactileManager(vibrator!!, duration = currStimulusDuration, handler = mStimuliHandler),
@@ -214,10 +216,10 @@ class TestTFI(ctx: Context,
             val block_trials:MutableList<TrialTFI> = mutableListOf()
 
             for(rb in 0 until rip_x_cond_block){
-                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,2", soa_1))
-                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "0,2,2", soa_1))
-                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,2", soa_1))
-                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,0", soa_1))
+                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,1", soa_1))
+                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "0,2,1", soa_1))
+//                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,2", soa_1))
+//                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,0", soa_1))
 //                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "0,2,2", soa_1))
 //                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,0", soa_1))
 //                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,2", soa_1))
