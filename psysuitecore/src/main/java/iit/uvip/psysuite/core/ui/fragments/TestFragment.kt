@@ -183,6 +183,7 @@ class TestFragment : BaseFragment(
                         requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, circleView, speechManager)
 
                     TestBasic.TEST_TFI,
+                    TestBasic.TEST_TFI_BIMODAL,
                     TestBasic.TEST_TFI_TODDLERS -> mTest = TestTFI(
                         requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 

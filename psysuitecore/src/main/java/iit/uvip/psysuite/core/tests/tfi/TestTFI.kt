@@ -54,13 +54,15 @@ class TestTFI(ctx: Context,
 
         @JvmStatic val TEST_BASIC_LABEL                 = "TFI"
         @JvmStatic val TEST_BASIC_TODDLERS_LABEL        = "TFI toddlers"
+        @JvmStatic val TEST_BASIC_BIMODAL_LABEL         = "TFI BIMODAL"
         @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com",
                                                                     "psysuite.uvip@gmail.com",
                                                                     "alessia.tonelli@iit.it")
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
             ConditionData(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
-            ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations)
+            ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations),
+            ConditionData(TEST_BASIC_BIMODAL_LABEL, TEST_TFI_BIMODAL, "${TEST_BASIC_LABEL}BI", Populations.sighted_hearing_populations)
         )
 
         fun getNextTrialModes():List<List<Int>> = listOf(listOf(TEST_NEXTTRIAL_ANSWER))

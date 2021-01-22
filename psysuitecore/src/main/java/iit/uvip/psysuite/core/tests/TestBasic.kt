@@ -119,6 +119,7 @@ abstract class TestBasic(protected val ctx: Context,
 
         @JvmStatic val TEST_TFI                     = 160
         @JvmStatic val TEST_TFI_TODDLERS            = 161
+        @JvmStatic val TEST_TFI_BIMODAL             = 162
 
         @JvmStatic val TEST_TVB_TIME_SINGLESTIM     = 170
         @JvmStatic val TEST_TVB_TIME_DOUBLESTIM     = 171

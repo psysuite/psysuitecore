@@ -9,6 +9,8 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 import java.util.Collections.max
 
+// TODO: make this class a singleton, to be inited by mainactivity with device info,
+//  then accessed by each test. not passed as Subjects parcel
 
 // input params correspond to reciprocal 
 @Suppress("CanBeParameter")
