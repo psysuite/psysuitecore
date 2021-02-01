@@ -286,6 +286,7 @@
         <item>Tone</item>
         <item>MediaPlayer</item>
         <item>AudioTrack</item>
+        <item>Nativo</item>
     </string-array>
 
     <string-array name="sample_visual_types">
@@ -299,7 +300,9 @@
     </string-array>
 
     <string-array name="sample_audioassets_array">
+        <item>t1000hz_7ms.wav</item>
         <item>t1000hz_10ms.wav</item>
+        <item>t1000hz_17ms.wav</item>
         <item>t1000hz_20ms.wav</item>
         <item>t1000hz_30ms.wav</item>
         <item>t1000hz_35ms.wav</item>

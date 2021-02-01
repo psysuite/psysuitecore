@@ -268,7 +268,8 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
             src = when (spAudio.selectedItemPosition) {
                 0       ->  src or StimuliManager.STIM_TYPE_A1
                 1       ->  src or StimuliManager.STIM_TYPE_A2
-                else    ->  src or StimuliManager.STIM_TYPE_A3
+                2       ->  src or StimuliManager.STIM_TYPE_A3
+                else    ->  src or StimuliManager.STIM_TYPE_A4
             }
             (subject as SubjectSampleParcel).audioDuration   = etDurationAudio.text.toString().toLong()
             (subject as SubjectSampleParcel).audioResource   = spAudioResource.selectedItem as String
@@ -324,7 +325,9 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
             1 -> (subject as SubjectSampleParcel).shiftedParams = listOf(   etShiftedAudio.text.toString().toLong(),
                                                                             etShiftedVisual.text.toString().toLong(),
                                                                             etShiftedTactile.text.toString().toLong())
-            2 -> (subject as SubjectSampleParcel).pairDistance = etPairStimDistance.text.toString().toLong()
+
+            2 -> (subject as SubjectSampleParcel).pairDistance = if(etPairStimDistance.text.toString().isEmpty()) 0L
+                                                                 else    etPairStimDistance.text.toString().toLong()
         }
 
         (subject as SubjectSampleParcel).repetitions = etRepetitionNum.text.toString().toInt()

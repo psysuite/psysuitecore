@@ -15,13 +15,14 @@ import java.util.Collections.max
 // input params correspond to reciprocal 
 @Suppress("CanBeParameter")
 @Parcelize
-class DelaysAligner(var a1:Long=0L, var a2:Long=0L, var a3:Long=0L, var t1:Long=0L, var t2:Long=0L, var v1:Long=0L, var v2:Long=0L) : Parcelable {
+class DelaysAligner(var a1:Long=0L, var a2:Long=0L, var a3:Long=0L, var a4:Long=0L, var t1:Long=0L, var t2:Long=0L, var v1:Long=0L, var v2:Long=0L) : Parcelable {
 
     @IgnoredOnParcel
     private val delays:HashMap<Int, StimuliDelay> = hashMapOf(
     StimuliManager.STIM_TYPE_A1 to StimuliDelay(a1, -1, -1),
     StimuliManager.STIM_TYPE_A2 to StimuliDelay(a2, -1, -1),
     StimuliManager.STIM_TYPE_A3 to StimuliDelay(a3, -1, -1),
+    StimuliManager.STIM_TYPE_A4 to StimuliDelay(a4, -1, -1),
     StimuliManager.STIM_TYPE_T1 to StimuliDelay(-1, t1, -1),
     StimuliManager.STIM_TYPE_T2 to StimuliDelay(-1, t2, -1),
     StimuliManager.STIM_TYPE_V1 to StimuliDelay(-1, -1, v1),
@@ -39,6 +40,10 @@ class DelaysAligner(var a1:Long=0L, var a2:Long=0L, var a3:Long=0L, var t1:Long=
     StimuliManager.STIM_TYPE_A3T2 to StimuliDelay(a3, t2, -1),
     StimuliManager.STIM_TYPE_A3V1 to StimuliDelay(a3, -1, v1),
     StimuliManager.STIM_TYPE_A3V2 to StimuliDelay(a3, -1, v2),
+    StimuliManager.STIM_TYPE_A4T1 to StimuliDelay(a4, t1, -1),
+    StimuliManager.STIM_TYPE_A4T2 to StimuliDelay(a4, t2, -1),
+    StimuliManager.STIM_TYPE_A4V1 to StimuliDelay(a4, -1, v1),
+    StimuliManager.STIM_TYPE_A4V2 to StimuliDelay(a4, -1, v2),
     StimuliManager.STIM_TYPE_T1V1 to StimuliDelay(-1, t1, v1),
     StimuliManager.STIM_TYPE_T2V1 to StimuliDelay(-1, t2, v1),
     StimuliManager.STIM_TYPE_T1V2 to StimuliDelay(-1, t1, v2),
@@ -55,7 +60,11 @@ class DelaysAligner(var a1:Long=0L, var a2:Long=0L, var a3:Long=0L, var t1:Long=
     StimuliManager.STIM_TYPE_A3T1V1 to StimuliDelay(a3, t1, v1),
     StimuliManager.STIM_TYPE_A3T2V1 to StimuliDelay(a3, t2, v1),
     StimuliManager.STIM_TYPE_A3T1V2 to StimuliDelay(a3, t1, v2),
-    StimuliManager.STIM_TYPE_A3T2V2 to StimuliDelay(a3, t2, v2)
+    StimuliManager.STIM_TYPE_A3T2V2 to StimuliDelay(a3, t2, v2),
+    StimuliManager.STIM_TYPE_A4T1V1 to StimuliDelay(a4, t1, v1),
+    StimuliManager.STIM_TYPE_A4T2V1 to StimuliDelay(a4, t2, v1),
+    StimuliManager.STIM_TYPE_A4T1V2 to StimuliDelay(a4, t1, v2),
+    StimuliManager.STIM_TYPE_A4T2V2 to StimuliDelay(a4, t2, v2)
     )
 
     fun getStimuliDelay(stim_type:Int)= delays[stim_type] ?: StimuliDelay()

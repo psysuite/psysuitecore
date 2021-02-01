@@ -124,6 +124,20 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
                 } catch(e: AudioResourceException){
                     throw AudioResourceException("AUDIO_RESOURCE_ERROR: resource name = $e")
                 }
+            subject.stim_sources and StimuliManager.STIM_TYPE_A4 > 0 ->
+                try{
+                    if(subject.audioResource.isEmpty())                        subject.audioResource = currAudioResourceName
+                    AudioManager(StimuliManager.STIM_TYPE_A4,
+                        subject.audioResource,
+                        (subject.audioVolume*1.0F)/100,
+                        duration = subject.audioDuration,
+                        ctx = ctx, handler = mStimuliHandler)
+
+                } catch(e:Exception){
+                    throw Exception("GENERIC ERROR: $e")
+                } catch(e: AudioResourceException){
+                    throw AudioResourceException("AUDIO_RESOURCE_ERROR: resource name = $e")
+                }
 
             else -> null
         }

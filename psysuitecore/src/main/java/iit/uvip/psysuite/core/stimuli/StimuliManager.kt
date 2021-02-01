@@ -25,43 +25,52 @@ class StimuliManager(
         // STIMULUS TYPES UNIQUE CODES
         //-----------------------------------------------------------------------------------------
         // A1: tone, A2:resource, V1: view made visible/invisible, V2: imageview with different color frame (one as background), T1: single, T2:sequence
-        @JvmStatic val STIM_TYPE_A1                 = 1     //  000 000 001
-        @JvmStatic val STIM_TYPE_A2                 = 2     //  000 000 010
-        @JvmStatic val STIM_TYPE_A3                 = 4     //  000 000 100
-        @JvmStatic val STIM_TYPE_T1                 = 8     //  000 001 000
-        @JvmStatic val STIM_TYPE_T2                 = 16    //  000 010 000
-        @JvmStatic val STIM_TYPE_V1                 = 64    //  001 000 000
+        @JvmStatic val STIM_TYPE_A1                 = 1     //  000 00 0001
+        @JvmStatic val STIM_TYPE_A2                 = 2     //  000 00 0010
+        @JvmStatic val STIM_TYPE_A3                 = 4     //  000 00 0100
+        @JvmStatic val STIM_TYPE_A4                 = 8     //  000 00 1000
+        @JvmStatic val STIM_TYPE_T1                 = 16    //  000 01 0000
+        @JvmStatic val STIM_TYPE_T2                 = 32    //  000 10 0000
+        @JvmStatic val STIM_TYPE_V1                 = 64    //  001 00 0000
         @JvmStatic val STIM_TYPE_V2                 = 128   //  010 000 000
 
-        @JvmStatic val STIM_TYPE_A1T1               = 9     //  000 001 001
-        @JvmStatic val STIM_TYPE_A1T2               = 17    //  000 010 001
-        @JvmStatic val STIM_TYPE_A1V1               = 65    //  001 000 001
-        @JvmStatic val STIM_TYPE_A1V2               = 129   //  010 000 001
-        @JvmStatic val STIM_TYPE_A2T1               = 10    //  000 001 010
-        @JvmStatic val STIM_TYPE_A2T2               = 18    //  000 010 010
-        @JvmStatic val STIM_TYPE_A2V1               = 66    //  001 000 010
-        @JvmStatic val STIM_TYPE_A2V2               = 131   //  010 000 011
-        @JvmStatic val STIM_TYPE_A3T1               = 12    //  000 001 100
-        @JvmStatic val STIM_TYPE_A3T2               = 20    //  000 010 100
-        @JvmStatic val STIM_TYPE_A3V1               = 68    //  001 000 100
-        @JvmStatic val STIM_TYPE_A3V2               = 131   //  010 000 100
-        @JvmStatic val STIM_TYPE_T1V1               = 72    //  001 001 000
-        @JvmStatic val STIM_TYPE_T2V1               = 80    //  001 010 000
-        @JvmStatic val STIM_TYPE_T1V2               = 136   //  010 001 000
-        @JvmStatic val STIM_TYPE_T2V2               = 144   //  010 010 000
+        @JvmStatic val STIM_TYPE_A1T1               = 17    //  000 01 0001
+        @JvmStatic val STIM_TYPE_A1T2               = 33    //  000 10 0001
+        @JvmStatic val STIM_TYPE_A1V1               = 65    //  001 00 0001
+        @JvmStatic val STIM_TYPE_A1V2               = 129   //  010 00 0001
+        @JvmStatic val STIM_TYPE_A2T1               = 18    //  000 01 0010
+        @JvmStatic val STIM_TYPE_A2T2               = 34    //  000 10 0010
+        @JvmStatic val STIM_TYPE_A2V1               = 66    //  001 00 0010
+        @JvmStatic val STIM_TYPE_A2V2               = 130   //  010 00 0010
+        @JvmStatic val STIM_TYPE_A3T1               = 20    //  000 01 0100
+        @JvmStatic val STIM_TYPE_A3T2               = 36    //  000 10 0100
+        @JvmStatic val STIM_TYPE_A3V1               = 68    //  001 00 0100
+        @JvmStatic val STIM_TYPE_A3V2               = 132   //  010 00 0100
+        @JvmStatic val STIM_TYPE_A4T1               = 24    //  000 01 1000
+        @JvmStatic val STIM_TYPE_A4T2               = 40    //  000 10 1000
+        @JvmStatic val STIM_TYPE_A4V1               = 72    //  001 00 1000
+        @JvmStatic val STIM_TYPE_A4V2               = 136   //  010 00 1000
+        @JvmStatic val STIM_TYPE_T1V1               = 80    //  001 01 0000
+        @JvmStatic val STIM_TYPE_T2V1               = 96    //  001 10 0000
+        @JvmStatic val STIM_TYPE_T1V2               = 144   //  010 01 0000
+        @JvmStatic val STIM_TYPE_T2V2               = 160   //  010 10 0000
 
-        @JvmStatic val STIM_TYPE_A1T1V1             = 73    //  001 001 001
-        @JvmStatic val STIM_TYPE_A1T2V1             = 81    //  001 010 001
-        @JvmStatic val STIM_TYPE_A1T1V2             = 137   //  010 001 001
-        @JvmStatic val STIM_TYPE_A1T2V2             = 145   //  010 010 001
-        @JvmStatic val STIM_TYPE_A2T1V1             = 74    //  001 001 010
-        @JvmStatic val STIM_TYPE_A2T2V1             = 82    //  001 010 010
-        @JvmStatic val STIM_TYPE_A2T1V2             = 138   //  010 001 010
-        @JvmStatic val STIM_TYPE_A2T2V2             = 146   //  010 010 010
-        @JvmStatic val STIM_TYPE_A3T1V1             = 76    //  001 001 100
-        @JvmStatic val STIM_TYPE_A3T2V1             = 84    //  001 010 100
-        @JvmStatic val STIM_TYPE_A3T1V2             = 140   //  010 001 100
-        @JvmStatic val STIM_TYPE_A3T2V2             = 148   //  010 010 100
+        @JvmStatic val STIM_TYPE_A1T1V1             = 81    //  001 01 0001
+        @JvmStatic val STIM_TYPE_A1T2V1             = 97    //  001 10 0001
+        @JvmStatic val STIM_TYPE_A1T1V2             = 145   //  010 01 0001
+        @JvmStatic val STIM_TYPE_A1T2V2             = 161   //  010 10 0001
+        @JvmStatic val STIM_TYPE_A2T1V1             = 82    //  001 01 0010
+        @JvmStatic val STIM_TYPE_A2T2V1             = 98    //  001 10 0010
+        @JvmStatic val STIM_TYPE_A2T1V2             = 146   //  010 01 0010
+        @JvmStatic val STIM_TYPE_A2T2V2             = 162   //  010 10 0010
+        @JvmStatic val STIM_TYPE_A3T1V1             = 84    //  001 01 0100
+        @JvmStatic val STIM_TYPE_A3T2V1             = 100   //  001 10 0100
+        @JvmStatic val STIM_TYPE_A3T1V2             = 148   //  010 01 0100
+        @JvmStatic val STIM_TYPE_A3T2V2             = 164   //  010 10 0100
+        @JvmStatic val STIM_TYPE_A4T1V1             = 88    //  001 01 1000
+        @JvmStatic val STIM_TYPE_A4T2V1             = 104   //  001 10 1000
+        @JvmStatic val STIM_TYPE_A4T1V2             = 152   //  010 01 1000
+        @JvmStatic val STIM_TYPE_A4T2V2             = 168   //  010 10 1000
 
         fun maintype2unimodaltypes(source:Int):List<Int>{
 
@@ -69,6 +78,7 @@ class StimuliManager(
                 source and STIM_TYPE_A1 > 0 -> STIM_TYPE_A1
                 source and STIM_TYPE_A2 > 0 -> STIM_TYPE_A2
                 source and STIM_TYPE_A3 > 0 -> STIM_TYPE_A3
+                source and STIM_TYPE_A4 > 0 -> STIM_TYPE_A4
                 else -> -1
             }
 
@@ -251,7 +261,7 @@ class StimuliManager(
         val durlist         = mutableListOf<Long>()
 
         val onsetDate           = Date()
-        Log.d(TAG, "${getOnsetDate()}: NEW STIMULUS, reciprocal delays A=$a, T=$t, V=$v")
+        Log.d(TAG, "${getOnsetDate()}: NEW STIMULUS, type:$type, reciprocal delays A=$a, T=$t, V=$v")
 
         try{
             if(a > -1 && atype > -1) {
@@ -318,7 +328,7 @@ class StimuliManager(
     // --------------------------------------------------------------------------------------------------------------
     fun deliverUnimodalStimulus(type:Int, onEnd:() -> Unit = {}){
         when(type){
-            STIM_TYPE_A1, STIM_TYPE_A2, STIM_TYPE_A3 -> deliverAStimulus(onEnd)
+            STIM_TYPE_A1, STIM_TYPE_A2, STIM_TYPE_A3, STIM_TYPE_A4 -> deliverAStimulus(onEnd)
             STIM_TYPE_T1, STIM_TYPE_T2 -> deliverTStimulus(onEnd)
             STIM_TYPE_V1, STIM_TYPE_V2 -> deliverVStimulus(onEnd)
         }

@@ -16,6 +16,7 @@ object ProjectPreferences: SharedPreferenceWrapper() {
         "pref_delay_a1" to R.integer.pref_delay_a1,
         "pref_delay_a2" to R.integer.pref_delay_a2,
         "pref_delay_a3" to R.integer.pref_delay_a3,
+        "pref_delay_a4" to R.integer.pref_delay_a4,
         "pref_delay_t1" to R.integer.pref_delay_t1,
         "pref_delay_t2" to R.integer.pref_delay_t1,
         "pref_delay_v1" to R.integer.pref_delay_v1,
@@ -52,6 +53,7 @@ object ProjectPreferences: SharedPreferenceWrapper() {
             (read("pref_delay_a1","") as String).toLong(),
             (read("pref_delay_a2","") as String).toLong(),
             (read("pref_delay_a3","") as String).toLong(),
+            (read("pref_delay_a4","") as String).toLong(),
             (read("pref_delay_t1","") as String).toLong(),
             (read("pref_delay_t2","") as String).toLong(),
             (read("pref_delay_v1","") as String).toLong(),
@@ -61,11 +63,12 @@ object ProjectPreferences: SharedPreferenceWrapper() {
     private fun setDefault(){
 
         keysHashMap.map {
-            if (!prefs.contains(it.key)) {
+//            if (!prefs.contains(it.key)) {
                 val value = when (it.key) {
                     "pref_delay_a1" -> defaultDelays.a1.toString()
                     "pref_delay_a2" -> defaultDelays.a2.toString()
                     "pref_delay_a3" -> defaultDelays.a3.toString()
+                    "pref_delay_a4" -> defaultDelays.a4.toString()
                     "pref_delay_t1" -> defaultDelays.t1.toString()
                     "pref_delay_t2" -> defaultDelays.t2.toString()
                     "pref_delay_v1" -> defaultDelays.v1.toString()
@@ -73,7 +76,7 @@ object ProjectPreferences: SharedPreferenceWrapper() {
                     else            -> resources.getString(R.string.main_email)
                 }
                 write(it.key, value)
-            }
+//            }
         }
     }
     // write preferences only if still unset
@@ -82,7 +85,7 @@ object ProjectPreferences: SharedPreferenceWrapper() {
 
             if(!prefs.contains(it.key))
                 when(it.key){
-                    "pref_delay_a1", "pref_delay_a2", "pref_delay_a3",
+                    "pref_delay_a1", "pref_delay_a2", "pref_delay_a3", "pref_delay_a4",
                     "pref_delay_t1", "pref_delay_t2",
                     "pref_delay_v1", "pref_delay_v2" ->
                         write(it.key, resources.getInteger(it.value).toString())

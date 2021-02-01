@@ -12,18 +12,17 @@ import android.os.Build
 import android.os.Handler
 import androidx.annotation.RequiresApi
 import iit.uvip.psysuite.core.R
+import org.albaspazio.nativeaudio.PlaybackEngine
 import java.io.IOException
 import java.io.InputStream
 
 
 // resource is:
-// - A1 : Int     ToneGenerator.TONE_xxxxx
-// - A2 : String  resource name
-// - A3 : List<String> names of assets files
+// - A1 : Int       ToneGenerator.TONE_xxxxx
+// - A2 : String    resource name
+// - A3 : String    names of assets "audio.wav"
+// - A4 : String    names of assets "audio.wav"
 //
-// in A3 assets are loaded asynchronously at object creation. Thus, we start the loading process and when all are loaded the clb(AUDIO_SUCCESS) is called.
-// I also set a timeout > (TIMEOUT * #assets) to free the app and raise an exception.
-// at its end a clb(failure) is called
 
 
 class AudioManager(
@@ -48,9 +47,9 @@ class AudioManager(
     val hasProFeature: Boolean
         get() = ctx.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO)
 
-    private var mToneGen: ToneGenerator?    = null
-    private var currMPAudio: MediaPlayer?   = null
-    private var currAudioTrack: AudioTrack? = null
+    private var mTG: ToneGenerator? = null
+    private var mMP: MediaPlayer?   = null
+    private var mAT: AudioTrack?    = null
 
     private var isResourcesLoaded:Boolean   = false
     private var loadedResource:String       = ""
@@ -119,7 +118,6 @@ class AudioManager(
             }
         }
 
-        @RequiresApi(Build.VERSION_CODES.O)
         @Throws(AudioResourceException::class)
         fun loadAudioTrackFromAsset(
             ctx: Context,
@@ -134,25 +132,44 @@ class AudioManager(
             istr.read(fileBytes)
             istr.close()
 
-            // create AudioTrack object
-            val at = AudioTrack.Builder()
-                .setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                )
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                        .setSampleRate(sampleRate)
-                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                        .build()
-                )
-                .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
-                .setBufferSizeInBytes(fileBytes.size)
-                .setTransferMode(AudioTrack.MODE_STATIC)
-                .build()
+            // create AudioTrack object (setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY) is available only with android 0)
+            val at = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(sampleRate)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
+                    .setBufferSizeInBytes(fileBytes.size)
+                    .setTransferMode(AudioTrack.MODE_STATIC)
+                    .build()
+            } else {
+                AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(sampleRate)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(fileBytes.size)
+                    .setTransferMode(AudioTrack.MODE_STATIC)
+                    .build()            }
 
             // fill its buffer
             at.write(fileBytes, 0, fileBytes.size)
@@ -188,7 +205,7 @@ class AudioManager(
                 val ampl: Int = if (amplitude == 1F) ToneGenerator.MAX_VOLUME
                 else (amplitude * 100).toInt()
 
-                mToneGen = ToneGenerator(AudioManager.STREAM_SYSTEM, ampl)
+                mTG = ToneGenerator(AudioManager.STREAM_SYSTEM, ampl)
                 isResourcesLoaded = true
             }
             StimuliManager.STIM_TYPE_A2 -> {
@@ -197,13 +214,20 @@ class AudioManager(
                         resource as String,
                         amplitude
                     )   // also set isResourcesLoaded/loadedResource...otherwise throw AudioResourceException
-                    if (isValid) currMPAudio?.dummyUse(amplitude)
+                    if (isValid) mMP?.dummyUse(amplitude)
                 } else isResourcesLoaded = true
             }
             StimuliManager.STIM_TYPE_A3 -> {
                 if ((resource as String).isNotEmpty()) {
                     loadATResource(resource as String,amplitude)   // also set isResourcesLoaded/loadedResource...otherwise throw AudioResourceException
-                    if (isValid) currAudioTrack?.dummyUse(amplitude)
+                    if (isValid) mAT?.dummyUse(amplitude)
+                }
+            }
+            StimuliManager.STIM_TYPE_A4 -> {
+                PlaybackEngine.setupAudioStream(ctx)
+                if ((resource as String).isNotEmpty()) {
+                    PlaybackEngine.loadWavAsset(ctx.resources.assets, resource as String, 0)
+                    isResourcesLoaded = true
                 }
             }
         }
@@ -216,10 +240,10 @@ class AudioManager(
                 }
 
         when(type) {
-            StimuliManager.STIM_TYPE_A1 -> mToneGen!!.startTone(resource as Int, (d as Long).toInt())
+            StimuliManager.STIM_TYPE_A1 -> mTG!!.startTone(resource as Int, (d as Long).toInt())
             StimuliManager.STIM_TYPE_A2 -> {
-                currMPAudio?.start()
-                currMPAudio?.setOnCompletionListener {
+                mMP?.start()
+                mMP?.setOnCompletionListener {
                     it.stop()
                     it.prepare()
                 }
@@ -227,7 +251,7 @@ class AudioManager(
             StimuliManager.STIM_TYPE_A3 -> {
 //                Log.d(TAG,"${getOnsetDate()}: STARTED in thread, id=$id")   //, pos $a, state=$state, playstate=$playstate, dur=$dur")
 
-                currAudioTrack?.setPlaybackPositionUpdateListener(object :
+                mAT?.setPlaybackPositionUpdateListener(object :
                     AudioTrack.OnPlaybackPositionUpdateListener {
                     override fun onPeriodicNotification(track: AudioTrack?) {}
 
@@ -237,52 +261,60 @@ class AudioManager(
                         track?.reloadStaticData()
                     }
                 })
-                currAudioTrack?.play()
+                mAT?.play()
+            }
+            StimuliManager.STIM_TYPE_A4 -> {
+//                Log.d(TAG,"${getOnsetDate()}: STARTED in thread, id=$id")
+                PlaybackEngine.deliver(0)
             }
         }
     }
 
     override fun getHandler():Any? {
         return  when(type){
-            StimuliManager.STIM_TYPE_A1 -> mToneGen
-            StimuliManager.STIM_TYPE_A2 -> currMPAudio
-            else                        -> currAudioTrack
+            StimuliManager.STIM_TYPE_A1 -> mTG
+            StimuliManager.STIM_TYPE_A2 -> mMP
+            else                        -> mAT
         }
     }
 
     override fun stop(id: Int){
 
-        when(type){
-            StimuliManager.STIM_TYPE_A1 -> mToneGen!!.stopTone()
+        when(type) {
+            StimuliManager.STIM_TYPE_A1 -> mTG!!.stopTone()
             StimuliManager.STIM_TYPE_A2 -> {
-                if (currMPAudio!!.isPlaying) {
-                    currMPAudio!!.stop()
-                    currMPAudio!!.prepare()
+                if (mMP!!.isPlaying) {
+                    mMP!!.stop()
+                    mMP!!.prepare()
                 }
             }
             StimuliManager.STIM_TYPE_A3 -> {
 //                Log.d(TAG, "${getOnsetDate()}: STOPPED in thread, id=$id")
-                currAudioTrack?.stop()
-                currAudioTrack?.reloadStaticData()
+                mAT?.stop()
+                mAT?.reloadStaticData()
+            }
+            StimuliManager.STIM_TYPE_A4 -> {
+                PlaybackEngine.stop(0)
             }
         }
     }
 
     override fun clear() {
         when(type){
-            StimuliManager.STIM_TYPE_A1 -> mToneGen?.release()
-            StimuliManager.STIM_TYPE_A2 -> currMPAudio?.release()
-            StimuliManager.STIM_TYPE_A3 -> currAudioTrack?.release()
+            StimuliManager.STIM_TYPE_A1 -> mTG?.release()
+            StimuliManager.STIM_TYPE_A2 -> mMP?.release()
+            StimuliManager.STIM_TYPE_A3 -> mAT?.release()
+            StimuliManager.STIM_TYPE_A4 -> PlaybackEngine.release()
         }
     }
 
     @Throws(AudioResourceException::class, Exception::class)
     fun loadMPResource(resname: String, volume: Float = 1F):MediaPlayer{
         try{
-            currMPAudio         = loadMediaPlayerFromAsset(ctx, resname, volume)
+            mMP         = loadMediaPlayerFromAsset(ctx, resname, volume)
             loadedResource      = resname
             isResourcesLoaded   = true
-            return currMPAudio as MediaPlayer
+            return mMP as MediaPlayer
         }
         catch (e: Exception){
             loadedResource      = ""
@@ -291,14 +323,13 @@ class AudioManager(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @Throws(AudioResourceException::class, Exception::class)
     fun loadATResource(resname: String, volume: Float = 1F):AudioTrack{
         try{
-            currAudioTrack      = loadAudioTrackFromAsset(ctx, resname, outputSampleRate, volume)
+            mAT      = loadAudioTrackFromAsset(ctx, resname, outputSampleRate, volume)
             loadedResource      = resname
             isResourcesLoaded   = true
-            return currAudioTrack as AudioTrack
+            return mAT as AudioTrack
         }
         catch (e: Exception){
             loadedResource      = ""

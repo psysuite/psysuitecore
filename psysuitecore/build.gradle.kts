@@ -2,7 +2,6 @@ plugins {
     id(Plugins.androidLibrary)
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
-    id("kotlin-android")
 
     id("name.remal.check-dependency-updates") version "1.0.211"
 }
@@ -51,6 +50,8 @@ dependencies {
     api("androidx.preference:preference-ktx:1.1.1")
 
     implementation(project(":core"))
+    implementation(project(":nativeaudio"))
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.1.0")

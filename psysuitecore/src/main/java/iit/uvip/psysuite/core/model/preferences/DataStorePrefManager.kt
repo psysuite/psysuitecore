@@ -6,20 +6,20 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.*
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
+// import androidx.datastore.preferences.core.preferencesKey
 
 object DataStorePrefManager {
 
     private const val SETTINGS_PREF = "psysuitecore_preferences"
 
-    private val DELAY_A1    = preferencesKey<Long>("pref_delay_a1")
-    private val DELAY_A2    = preferencesKey<Long>("pref_delay_a2")
-    private val DELAY_A3    = preferencesKey<Long>("pref_delay_a3")
-    private val DELAY_T1    = preferencesKey<Long>("pref_delay_t1")
-    private val DELAY_T2    = preferencesKey<Long>("pref_delay_t2")
-    private val DELAY_V1    = preferencesKey<Long>("pref_delay_v1")
-    private val DELAY_V2    = preferencesKey<Long>("pref_delay_v2")
-    private val MAIN_EMAIL  = preferencesKey<String>("pref_main_email")
+    // private val DELAY_A1    = preferencesKey<Long>("pref_delay_a1")
+    // private val DELAY_A2    = preferencesKey<Long>("pref_delay_a2")
+    // private val DELAY_A3    = preferencesKey<Long>("pref_delay_a3")
+    // private val DELAY_T1    = preferencesKey<Long>("pref_delay_t1")
+    // private val DELAY_T2    = preferencesKey<Long>("pref_delay_t2")
+    // private val DELAY_V1    = preferencesKey<Long>("pref_delay_v1")
+    // private val DELAY_V2    = preferencesKey<Long>("pref_delay_v2")
+    // private val MAIN_EMAIL  = preferencesKey<String>("pref_main_email")
 
     private lateinit var dataStore:DataStore<Preferences>
     private lateinit var resources:Resources
@@ -29,14 +29,14 @@ object DataStorePrefManager {
         resources = context.resources
     }
 
-    private val keyMap:HashMap<String, Preferences.Key<Long>> = hashMapOf(
-        "DELAY_A1" to DELAY_A1,
-        "DELAY_A2" to DELAY_A2,
-        "DELAY_A3" to DELAY_A3,
-        "DELAY_T1" to DELAY_T1,
-        "DELAY_T2" to DELAY_T2,
-        "DELAY_V1" to DELAY_V1,
-        "DELAY_V2" to DELAY_V2)
+    // private val keyMap:HashMap<String, Preferences.Key<Long>> = hashMapOf(
+    //     "DELAY_A1" to DELAY_A1,
+    //     "DELAY_A2" to DELAY_A2,
+    //     "DELAY_A3" to DELAY_A3,
+    //     "DELAY_T1" to DELAY_T1,
+    //     "DELAY_T2" to DELAY_T2,
+    //     "DELAY_V1" to DELAY_V1,
+    //     "DELAY_V2" to DELAY_V2)
 
 //    val userPreferencesFlow: Flow<PsySuiteCorePreferences> = dataStore.data
 //        .catch { exception ->
@@ -58,9 +58,9 @@ object DataStorePrefManager {
 //        }
 
     suspend fun updateInt(key:String, value: Long) {
-        dataStore.edit { preferences ->
-            preferences[keyMap.get(key) ?: return@edit] = value
-        }
+        // dataStore.edit { preferences ->
+        //     preferences[keyMap.get(key) ?: return@edit] = value
+        // }
     }
 }
 

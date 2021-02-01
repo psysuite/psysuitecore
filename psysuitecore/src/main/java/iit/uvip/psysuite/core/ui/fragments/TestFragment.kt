@@ -176,6 +176,7 @@ class TestFragment : BaseFragment(
 
                     TestBasic.TEST_TFI,
                     TestBasic.TEST_TFI_BIMODAL,
+                    TestBasic.TEST_TFI_AV,
                     TestBasic.TEST_TFI_TODDLERS -> mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 
                     else    -> {

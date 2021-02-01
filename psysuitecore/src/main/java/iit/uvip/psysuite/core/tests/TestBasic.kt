@@ -43,6 +43,18 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val SUBJFILE_EXTENSION: String       = ".json"
         @JvmStatic val RES_EXTENSION: String            = ".txt"
         @JvmStatic val TEST_BUNDLE_RESULT_LABEL: String = "result"
+
+        @JvmStatic val audioResources:HashMap<Long, String> = hashMapOf(
+            7L to "t1000hz_7ms.wav",
+            10L to "t1000hz_10ms.wav",
+            17L to "t1000hz_17ms.wav",
+            20L to "t1000hz_20ms.wav",
+            30L to "t1000hz_30ms.wav",
+            35L to "t1000hz_35ms.wav",
+            50L to "t1000hz_50ms.wav",
+            100L to "t1000hz_100ms.wav",
+            1000L to "t1000hz_1000ms.wav",
+        )
         // --------------------------------------------------------------------------------------------
         // trial-by-trial management
         //-----------------------------------------------------------------------------------------
@@ -120,6 +132,7 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_TFI                     = 160
         @JvmStatic val TEST_TFI_TODDLERS            = 161
         @JvmStatic val TEST_TFI_BIMODAL             = 162
+        @JvmStatic val TEST_TFI_AV                  = 163
 
         @JvmStatic val TEST_TVB_TIME_SINGLESTIM     = 170
         @JvmStatic val TEST_TVB_TIME_DOUBLESTIM     = 171

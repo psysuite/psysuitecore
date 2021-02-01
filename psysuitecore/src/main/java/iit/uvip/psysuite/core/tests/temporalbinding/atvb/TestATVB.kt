@@ -34,7 +34,7 @@ class TestATVB(
 
     override var LOG_TAG: String = TestATVB::class.java.simpleName
 
-    private val STIM_A      = StimuliManager.STIM_TYPE_A3
+    private val STIM_A      = StimuliManager.STIM_TYPE_A4
     private val STIM_V      = StimuliManager.STIM_TYPE_V1
     private val STIM_T      = StimuliManager.STIM_TYPE_T1
     private val STIM_ATV    = (STIM_A or STIM_T or STIM_V)
@@ -113,23 +113,23 @@ class TestATVB(
 //        StimulusDelay( TYPE_T_V_A,200)
 //    )
 
-    // 18 different elements: 6 x 3 delays (150, 225, 300)
+    // 18 different elements: 6 x 3 delays (200, 250, 300)
     // a-t-v, a-v-t, t-a-v, t-v-a, v-a-t, v-t-a
     private val lStimuliBalancedShort: List<StimulusDelay> = listOf(
 
-        StimulusDelay( TYPE_V_A_T,150),
-        StimulusDelay( TYPE_T_A_V,150),
-        StimulusDelay( TYPE_A_T_V,150),
-        StimulusDelay( TYPE_V_T_A,150),
-        StimulusDelay( TYPE_A_V_T,150),
-        StimulusDelay( TYPE_T_V_A,150),
+        StimulusDelay( TYPE_V_A_T,200),
+        StimulusDelay( TYPE_T_A_V,200),
+        StimulusDelay( TYPE_A_T_V,200),
+        StimulusDelay( TYPE_V_T_A,200),
+        StimulusDelay( TYPE_A_V_T,200),
+        StimulusDelay( TYPE_T_V_A,200),
 
-        StimulusDelay( TYPE_V_A_T,225),
-        StimulusDelay( TYPE_T_A_V,225),
-        StimulusDelay( TYPE_A_T_V,225),
-        StimulusDelay( TYPE_V_T_A,225),
-        StimulusDelay( TYPE_A_V_T,225),
-        StimulusDelay( TYPE_T_V_A,225),
+        StimulusDelay( TYPE_V_A_T,250),
+        StimulusDelay( TYPE_T_A_V,250),
+        StimulusDelay( TYPE_A_T_V,250),
+        StimulusDelay( TYPE_V_T_A,250),
+        StimulusDelay( TYPE_A_V_T,250),
+        StimulusDelay( TYPE_T_V_A,250),
 
         StimulusDelay( TYPE_V_A_T,300),
         StimulusDelay( TYPE_T_A_V,300),
