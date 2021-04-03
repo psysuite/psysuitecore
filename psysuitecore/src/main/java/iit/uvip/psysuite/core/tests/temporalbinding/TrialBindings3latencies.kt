@@ -9,7 +9,7 @@ open class TrialBindings3latencies(id:Int=-1, type:Int=0, var a:Long=0L, var t:L
 
     companion object {
         @JvmStatic
-        val LOG_HEADER = "id\taudio\ttactile\tvideo\tanswer\tsuccess\telapsed\n"
+        val LOG_HEADER = "id\ttype\taudio\ttactile\tvideo\tanswer\tsuccess\telapsed\n"
     }
 
     // all class exported as string

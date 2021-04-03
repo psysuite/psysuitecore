@@ -12,7 +12,7 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_an
 
     companion object {
         @JvmStatic
-        val LOG_HEADER = "id\ttype\tlabel\tdelay\tanswer\tsuccess\telapsed\n"
+        val LOG_HEADER = "id\ttype\tdelay\tanswer\tsuccess\telapsed\n"
     }
 
     init {
@@ -64,7 +64,7 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_an
 
     // data exported to log file
     override fun Log(): String {
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + delay.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() +"\n"
+        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() +"\n"
     }
 
     override fun debugInfo():String{

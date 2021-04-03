@@ -111,16 +111,16 @@ open class SubjectBasicParcel(
     // RETURNS FILES NAME
     // =============================================================================================================
     // used by the following three methods to compose subject files
-    // RETURNS: "${label}_${type_label}_$population_label"
+    // RETURNS: "${label}_${age}_${gender}_${type_label}_$population_label"
     open fun getFilesPrefix(ctx: Context):String {
 
         val ci                  = getCompanionObjectMethod(classes[0], "getConditionsInfo")
-        val type_label          = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(
-            type
-        )
+        val type_label          = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(type)
         val population_label    = Populations.all_populations.getLabelLog(population)
 
-        return "${label}_${type_label}_$population_label"
+        val gender_str          =   if(gender == 0) "m"
+                                    else            "f"
+        return "${label}_${age}_${gender_str}_${type_label}_$population_label"
     }
 
     // RETURNS: label_type_population(_blk)_datetime.txt

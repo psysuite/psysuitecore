@@ -47,8 +47,8 @@ class ATVBBalancedSummary(ctx:Context) : Summary(ctx){
 
         override var rows:List<SummaryRow> = listOf(
                 ATVBsummaryRow(type, cond_label, "0"),
-                ATVBsummaryRow(type, cond_label, "150"),
-                ATVBsummaryRow(type, cond_label, "225"),
+                ATVBsummaryRow(type, cond_label, "200"),
+                ATVBsummaryRow(type, cond_label, "250"),
                 ATVBsummaryRow(type, cond_label, "300"))
 
         override fun add(trial: TrialBasic){
