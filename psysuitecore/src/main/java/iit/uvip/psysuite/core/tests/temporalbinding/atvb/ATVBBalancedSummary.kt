@@ -5,21 +5,21 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.model.summary.SummaryCondition
 import iit.uvip.psysuite.core.model.summary.SummaryRow
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.balshSD
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindings3latencies
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsBalanced
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_ATV
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_A_T_V
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_A_V_T
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_T_A_V
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_T_V_A
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_V_A_T
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_V_T_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_ATV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A_T_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A_V_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_A_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_A_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T_A
 
 
 class ATVBBalancedSummary(ctx:Context) : Summary(ctx){
-
 
     override val cond_labels:List<String> = listOf("T_A_V", "V_A_T", "A_T_V", "V_T_A", "A_V_T", "T_V_A")
 
@@ -47,16 +47,16 @@ class ATVBBalancedSummary(ctx:Context) : Summary(ctx){
 
         override var rows:List<SummaryRow> = listOf(
                 ATVBsummaryRow(type, cond_label, "0"),
-                ATVBsummaryRow(type, cond_label, "200"),
-                ATVBsummaryRow(type, cond_label, "250"),
-                ATVBsummaryRow(type, cond_label, "300"))
+                ATVBsummaryRow(type, cond_label, balshSD[0].second),
+                ATVBsummaryRow(type, cond_label, balshSD[1].second),
+                ATVBsummaryRow(type, cond_label, balshSD[2].second))
 
         override fun add(trial: TrialBasic){
                 when((trial as TrialBindingsBalanced).delay){
-                    300L    -> rows[3].add(trial)
-                    225L    -> rows[2].add(trial)
-                    150L    -> rows[1].add(trial)
-                    0L      -> rows[0].add(trial)
+                    balshSD[2].first    -> rows[3].add(trial)
+                    balshSD[1].first    -> rows[2].add(trial)
+                    balshSD[0].first    -> rows[1].add(trial)
+                    0L                  -> rows[0].add(trial)
                 }
             }
     }

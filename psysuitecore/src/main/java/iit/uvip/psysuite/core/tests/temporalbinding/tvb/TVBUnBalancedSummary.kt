@@ -5,14 +5,16 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.model.summary.SummaryCondition
 import iit.uvip.psysuite.core.model.summary.SummaryRow
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_T
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_TV
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_T_V
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_V
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB.Companion.TYPE_V_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T
 
 
 class TVBUnBalancedSummary(ctx:Context) : Summary(ctx){
@@ -24,20 +26,21 @@ class TVBUnBalancedSummary(ctx:Context) : Summary(ctx){
 
         override var rows:List<SummaryRow> = listOf(
             TVBsummaryRow(TYPE_T,  "T","0"),
-            TVBsummaryRow(TYPE_T_V,"T_V", "1200"),
-            TVBsummaryRow(TYPE_T_V,"T_V", "800"),
-            TVBsummaryRow(TYPE_T_V,"T_V","400"),
-            TVBsummaryRow(TYPE_T_V,"T_V","300"),
-            TVBsummaryRow(TYPE_T_V,"T_V","200"),
-            TVBsummaryRow(TYPE_T_V,"T_V","100"),
-            TVBsummaryRow(TYPE_TV, "TV","0"),
-            TVBsummaryRow(TYPE_V_T,"V_T","50"),
-            TVBsummaryRow(TYPE_V_T,"V_T","100"),
-            TVBsummaryRow(TYPE_V_T,"V_T","200"),
-            TVBsummaryRow(TYPE_V_T,"V_T","300"),
-            TVBsummaryRow(TYPE_V_T,"V_T","400"),
-            TVBsummaryRow(TYPE_V_T,"V_T","800"),
-            TVBsummaryRow(TYPE_V_T,"V_T","1200"),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[6].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[5].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[4].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[3].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[2].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[1].second),
+            TVBsummaryRow(TYPE_T_V,"T_V",unbalSD[0].second),
+            TVBsummaryRow(TYPE_TV, "TV", "0"),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[0].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[1].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[2].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[3].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[4].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[5].second),
+            TVBsummaryRow(TYPE_V_T,"V_T",unbalSD[6].second),
             TVBsummaryRow(TYPE_V,  "V","0")
         )
 
@@ -47,25 +50,25 @@ class TVBUnBalancedSummary(ctx:Context) : Summary(ctx){
                 TYPE_T          ->   rows[0].add(trial)
                 TYPE_T_V        -> {
                     when((trial as TrialBindingsUnBalanced).delay){
-                        1200L   -> rows[1].add(trial)
-                        800L    -> rows[2].add(trial)
-                        400L    -> rows[3].add(trial)
-                        300L    -> rows[4].add(trial)
-                        200L    -> rows[5].add(trial)
-                        100L    -> rows[6].add(trial)
-                        50L     -> rows[7].add(trial)
+                        unbalSD[6].first    -> rows[1].add(trial)
+                        unbalSD[5].first    -> rows[2].add(trial)
+                        unbalSD[4].first    -> rows[3].add(trial)
+                        unbalSD[3].first    -> rows[4].add(trial)
+                        unbalSD[2].first    -> rows[5].add(trial)
+                        unbalSD[1].first    -> rows[6].add(trial)
+                        unbalSD[0].first    -> rows[7].add(trial)
                     }
                 }
                 TYPE_TV         -> rows[8].add(trial)
                 TYPE_V_T        -> {
                     when((trial as TrialBindingsUnBalanced).delay){
-                        50L     -> rows[9].add(trial)
-                        100L    -> rows[10].add(trial)
-                        200L    -> rows[11].add(trial)
-                        300L    -> rows[12].add(trial)
-                        400L    -> rows[13].add(trial)
-                        800L    -> rows[14].add(trial)
-                        1200L   -> rows[15].add(trial)
+                        unbalSD[0].first    -> rows[9].add(trial)
+                        unbalSD[1].first    -> rows[10].add(trial)
+                        unbalSD[2].first    -> rows[11].add(trial)
+                        unbalSD[3].first    -> rows[12].add(trial)
+                        unbalSD[4].first    -> rows[13].add(trial)
+                        unbalSD[5].first    -> rows[14].add(trial)
+                        unbalSD[6].first    -> rows[15].add(trial)
                     }
                 }
                 TYPE_V          ->  rows[16].add(trial)

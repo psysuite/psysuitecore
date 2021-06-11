@@ -10,6 +10,20 @@ import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.*
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_TOD
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T_V800
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T800_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.WN_FIRSTSTIM_INTERVAL
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -33,71 +47,85 @@ class TestTVB(ctx: Context,
 {
     override var LOG_TAG:String = TestTVB::class.java.simpleName
 
-    private var curISI: Long = 0L
+    companion object {
 
-    // stimuli combinations
-    private val STIM_TYPE_TIME_T800_V   = 100
-    private val STIM_TYPE_TIME_T_V800   = 101
+        @JvmStatic val TEST_BASIC_LABEL         = "TVB"
+        @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
+        @JvmStatic val NUM_REPETITIONS          = 5
+
+        @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
+
+        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_TVB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_TVB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_TVB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_TVB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}", Populations.sighted_populations))
+
+        fun getNextTrialModes():List<List<Int>> = listOf(
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
+
+        fun getEmailRecipients():Array<String> = recipients
+    }
+
+    private var curISI: Long = 0L
 
     private val STIM_T              = StimuliManager.STIM_TYPE_T1
     private val STIM_V              = StimuliManager.STIM_TYPE_V1
     private val BIMODAL_CODE        = STIM_T or STIM_V
 
-    private var allQuestions:MutableList<String> = mutableListOf()
-    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
+    private var allQuestions:MutableList<String>        = mutableListOf()
+    override var mDrawablesResource: MutableList<Int>   = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
 
     // 5   different trials
     private val lStimuli: List<StimulusATBInfants> = listOf(
-        StimulusATBInfants(BIMODAL_CODE,0),
+        StimulusATBInfants(BIMODAL_CODE, 0),
         StimulusATBInfants(STIM_T, 1),
         StimulusATBInfants(STIM_V, 2),
-        StimulusATBInfants(STIM_TYPE_TIME_T_V800,  3),
-        StimulusATBInfants(STIM_TYPE_TIME_T800_V,  4)
+        StimulusATBInfants(STIM_TYPE_TIME_T_V800, 3),
+        StimulusATBInfants(STIM_TYPE_TIME_T800_V, 4)
     )
 
     // 26 different elements
     private val lStimuliUnBalanced: List<StimulusDelay> = listOf(
 
-        StimulusDelay( TYPE_T_V, 50),
-        StimulusDelay( TYPE_V_T, 50),
-        StimulusDelay( TYPE_T_V, 50),
-        StimulusDelay( TYPE_V_T, 50),
+        StimulusDelay( TYPE_T_V, unbalSD[0].first),
+        StimulusDelay( TYPE_V_T, unbalSD[0].first),
+        StimulusDelay( TYPE_T_V, unbalSD[0].first),
+        StimulusDelay( TYPE_V_T, unbalSD[0].first),
 
-        StimulusDelay( TYPE_T_V, 100),
-        StimulusDelay( TYPE_V_T, 100),
-        StimulusDelay( TYPE_T_V, 100),
-        StimulusDelay( TYPE_V_T, 100),
+        StimulusDelay( TYPE_T_V, unbalSD[1].first),
+        StimulusDelay( TYPE_V_T, unbalSD[1].first),
+        StimulusDelay( TYPE_T_V, unbalSD[1].first),
+        StimulusDelay( TYPE_V_T, unbalSD[1].first),
 
-        StimulusDelay( TYPE_T_V, 200),
-        StimulusDelay( TYPE_V_T, 200),
-        StimulusDelay( TYPE_T_V, 200),
-        StimulusDelay( TYPE_V_T, 200),
+        StimulusDelay( TYPE_T_V, unbalSD[2].first),
+        StimulusDelay( TYPE_V_T, unbalSD[2].first),
+        StimulusDelay( TYPE_T_V, unbalSD[2].first),
+        StimulusDelay( TYPE_V_T, unbalSD[2].first),
 
-        StimulusDelay( TYPE_T_V, 300),
-        StimulusDelay( TYPE_V_T, 300),
-        StimulusDelay( TYPE_T_V, 300),
-        StimulusDelay( TYPE_V_T, 300),
+        StimulusDelay( TYPE_T_V, unbalSD[3].first),
+        StimulusDelay( TYPE_V_T, unbalSD[3].first),
+        StimulusDelay( TYPE_T_V, unbalSD[3].first),
+        StimulusDelay( TYPE_V_T, unbalSD[3].first),
 
-        StimulusDelay( TYPE_T_V, 400),
-        StimulusDelay( TYPE_V_T, 400),
-        StimulusDelay( TYPE_T_V, 400),
-        StimulusDelay( TYPE_V_T, 400),
+        StimulusDelay( TYPE_T_V, unbalSD[4].first),
+        StimulusDelay( TYPE_V_T, unbalSD[4].first),
+        StimulusDelay( TYPE_T_V, unbalSD[4].first),
+        StimulusDelay( TYPE_V_T, unbalSD[4].first),
 
-        StimulusDelay( TYPE_T_V, 800),
-        StimulusDelay( TYPE_V_T, 800),
-        StimulusDelay( TYPE_T_V, 800),
-        StimulusDelay( TYPE_V_T, 800),
+        StimulusDelay( TYPE_T_V, unbalSD[5].first),
+        StimulusDelay( TYPE_V_T, unbalSD[5].first),
+        StimulusDelay( TYPE_T_V, unbalSD[5].first),
+        StimulusDelay( TYPE_V_T, unbalSD[5].first),
 
-        StimulusDelay( TYPE_T_V, 1200),
-        StimulusDelay( TYPE_V_T, 1200)
+        StimulusDelay( TYPE_T_V, unbalSD[6].first),
+        StimulusDelay( TYPE_V_T, unbalSD[6].first)
     )
-
-    private val WN_FIRSTSTIM_INTERVAL   = 1000L
-    private val STIM_DURATION_INF       = 1000L
-    private val STIM_DURATION_TOD       = 200L
-    private val STIM_DURATION           = 50L
-    private val ISI                     = 1000L
-    private val ISI_INF                 = 2000L // distance between stimuli onsets
 
     private val EVENT_SECOND_TRAIN      = 1201
 
@@ -105,37 +133,6 @@ class TestTVB(ctx: Context,
 
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
     private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
-
-    companion object {
-
-        @JvmStatic val TEST_BASIC_LABEL         = "TVB"
-        @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
-        @JvmStatic val NUM_REPETITIONS          = 5
-
-        @JvmStatic val TYPE_TV     = 0
-        @JvmStatic val TYPE_T      = 1
-        @JvmStatic val TYPE_V      = 2
-        @JvmStatic val TYPE_T_V    = 3
-        @JvmStatic val TYPE_V_T    = 4
-
-         @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
-
-        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_TVB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}", Populations.sighted_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_TVB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}", Populations.sighted_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_TVB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}", Populations.sighted_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_TVB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}", Populations.sighted_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}", Populations.sighted_populations))
-
-        fun getNextTrialModes():List<List<Int>> = listOf(
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
-
-        fun getEmailRecipients():Array<String> = recipients
-    }
 
     // =============================================================================================================================
     // INIT
@@ -420,7 +417,6 @@ class TestTVB(ctx: Context,
                 mStimuliHandler.postDelayed({
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
                 }, shift + curISI)     // to preserve the desired ISI between 1st and 2nd stimuli,
-                                                                                                    // I also add the shift that could be eventually imposed to the fastest modality
             }
         }
     }

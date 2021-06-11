@@ -5,16 +5,17 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.model.summary.SummaryCondition
 import iit.uvip.psysuite.core.model.summary.SummaryRow
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_ATV
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_AT_V
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_AV_T
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_A_TV
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_TV_A
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_T_AV
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB.Companion.TYPE_V_AT
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_ATV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_AT_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_AV_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_TV_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_AV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_AT
 
 
 class ATVBUnBalancedSummary(ctx:Context) : Summary(ctx){
@@ -46,53 +47,53 @@ class ATVBUnBalancedSummary(ctx:Context) : Summary(ctx){
 
         override var rows:List<SummaryRow> = when(inner_type) {
             A_TV -> listOf(
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "1200"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "800"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "400"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "300"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "200"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "100"),
-                ATVBsummaryRow(TYPE_A_TV, "A_TV", "50"),
-                ATVBsummaryRow(TYPE_A_TV, "TV_A", "50"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "100"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "200"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "300"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "400"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "800"),
-                ATVBsummaryRow(TYPE_TV_A, "TV_A", "1200")
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[6].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_A_TV, "A_TV", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_A_TV, "TV_A", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_TV_A, "TV_A", unbalSD[6].second)
             )
             T_AV -> listOf(
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "1200"),
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "800"),
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "400"),
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "300"),
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "200"),
-                ATVBsummaryRow(TYPE_T_AV, "T_AV", "100"),
-                ATVBsummaryRow(TYPE_A_TV, "T_AV", "50"),
-                ATVBsummaryRow(TYPE_A_TV, "AV_T", "50"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "100"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "200"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "300"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "400"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "800"),
-                ATVBsummaryRow(TYPE_AV_T, "AV_T", "1200")
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[6].second),
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_T_AV, "T_AV", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_A_TV, "T_AV", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_A_TV, "AV_T", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_AV_T, "AV_T", unbalSD[6].second)
             )
             // V_AT
             V_AT -> listOf(
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "1200"),
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "800"),
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "400"),
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "300"),
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "200"),
-                ATVBsummaryRow(TYPE_V_AT, "V_AT", "100"),
-                ATVBsummaryRow(TYPE_A_TV, "V_AT", "50"),
-                ATVBsummaryRow(TYPE_A_TV, "AT_V", "50"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "100"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "200"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "300"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "400"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "800"),
-                ATVBsummaryRow(TYPE_AT_V, "AT_V", "1200")
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[6].second),
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_V_AT, "V_AT", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_A_TV, "V_AT", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_A_TV, "AT_V", unbalSD[0].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[1].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[2].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[3].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[4].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[5].second),
+                ATVBsummaryRow(TYPE_AT_V, "AT_V", unbalSD[6].second)
             )
             else -> listOf(ATVBsummaryRow(TYPE_ATV, "ATV", "0"))
         }
@@ -101,24 +102,24 @@ class ATVBUnBalancedSummary(ctx:Context) : Summary(ctx){
             when(trial.type){
                 TYPE_A_TV, TYPE_T_AV, TYPE_V_AT ->{
                     when((trial as TrialBindingsUnBalanced).delay){
-                        1200L   -> rows[0].add(trial)
-                        800L    -> rows[1].add(trial)
-                        400L    -> rows[2].add(trial)
-                        300L    -> rows[3].add(trial)
-                        200L    -> rows[4].add(trial)
-                        100L    -> rows[5].add(trial)
-                        50L     -> rows[6].add(trial)
+                        unbalSD[6].first    -> rows[0].add(trial)
+                        unbalSD[5].first    -> rows[1].add(trial)
+                        unbalSD[4].first    -> rows[2].add(trial)
+                        unbalSD[3].first    -> rows[3].add(trial)
+                        unbalSD[2].first    -> rows[4].add(trial)
+                        unbalSD[1].first    -> rows[5].add(trial)
+                        unbalSD[0].first    -> rows[6].add(trial)
                     }
                 }
                 TYPE_TV_A, TYPE_AV_T, TYPE_AT_V ->{
                     when((trial as TrialBindingsUnBalanced).delay){
-                        50L     -> rows[7].add(trial)
-                        100L    -> rows[8].add(trial)
-                        200L    -> rows[9].add(trial)
-                        300L    -> rows[10].add(trial)
-                        400L    -> rows[11].add(trial)
-                        800L    -> rows[12].add(trial)
-                        1200L   -> rows[13].add(trial)
+                        unbalSD[0].first    -> rows[7].add(trial)
+                        unbalSD[1].first    -> rows[8].add(trial)
+                        unbalSD[2].first    -> rows[9].add(trial)
+                        unbalSD[3].first    -> rows[10].add(trial)
+                        unbalSD[4].first    -> rows[11].add(trial)
+                        unbalSD[5].first    -> rows[12].add(trial)
+                        unbalSD[6].first    -> rows[13].add(trial)
                     }
                 }
                 TYPE_ATV ->{

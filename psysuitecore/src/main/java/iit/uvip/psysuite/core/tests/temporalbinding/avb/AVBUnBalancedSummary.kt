@@ -5,14 +5,16 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.model.summary.SummaryCondition
 import iit.uvip.psysuite.core.model.summary.SummaryRow
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB.Companion.TYPE_A
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB.Companion.TYPE_AV
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB.Companion.TYPE_A_V
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB.Companion.TYPE_V
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB.Companion.TYPE_V_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_AV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_A
 
 
 class AVBUnBalancedSummary(ctx:Context) : Summary(ctx){
@@ -24,21 +26,21 @@ class AVBUnBalancedSummary(ctx:Context) : Summary(ctx){
 
         override var rows:List<SummaryRow> = listOf(
             AVBsummaryRow(TYPE_A,  "A","0"),
-            AVBsummaryRow(TYPE_A_V,"A_V", "1200"),
-            AVBsummaryRow(TYPE_A_V,"A_V", "800"),
-            AVBsummaryRow(TYPE_A_V,"A_V","400"),
-            AVBsummaryRow(TYPE_A_V,"A_V","300"),
-            AVBsummaryRow(TYPE_A_V,"A_V","200"),
-            AVBsummaryRow(TYPE_A_V,"A_V","100"),
-            AVBsummaryRow(TYPE_A_V,"A_V","50"),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[6].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[5].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[4].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[3].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[2].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[1].second),
+            AVBsummaryRow(TYPE_A_V,"A_V",unbalSD[0].second),
             AVBsummaryRow(TYPE_AV, "AV","0"),
-            AVBsummaryRow(TYPE_V_A,"V_A","50"),
-            AVBsummaryRow(TYPE_V_A,"V_A","100"),
-            AVBsummaryRow(TYPE_V_A,"V_A","200"),
-            AVBsummaryRow(TYPE_V_A,"V_A","300"),
-            AVBsummaryRow(TYPE_V_A,"V_A","400"),
-            AVBsummaryRow(TYPE_V_A,"V_A","800"),
-            AVBsummaryRow(TYPE_V_A,"V_A","1200"),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[0].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[1].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[2].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[3].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[4].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[5].second),
+            AVBsummaryRow(TYPE_V_A,"V_A",unbalSD[6].second),
             AVBsummaryRow(TYPE_V,  "V","0"))
 
         override fun add(trial: TrialBasic){
@@ -46,25 +48,25 @@ class AVBUnBalancedSummary(ctx:Context) : Summary(ctx){
                 TYPE_A          ->   rows[0].add(trial)
                 TYPE_A_V        -> {
                     when((trial as TrialBindingsUnBalanced).delay){
-                        1200L   -> rows[1].add(trial)
-                        800L    -> rows[2].add(trial)
-                        400L    -> rows[3].add(trial)
-                        300L    -> rows[4].add(trial)
-                        200L    -> rows[5].add(trial)
-                        100L    -> rows[6].add(trial)
-                        50L     -> rows[7].add(trial)
+                        unbalSD[6].first    -> rows[1].add(trial)
+                        unbalSD[5].first    -> rows[2].add(trial)
+                        unbalSD[4].first    -> rows[3].add(trial)
+                        unbalSD[3].first    -> rows[4].add(trial)
+                        unbalSD[2].first    -> rows[5].add(trial)
+                        unbalSD[1].first    -> rows[6].add(trial)
+                        unbalSD[0].first    -> rows[7].add(trial)
                     }
                 }
                 TYPE_AV         -> rows[8].add(trial)
                 TYPE_V_A        -> {
                     when((trial as TrialBindingsUnBalanced).delay){
-                        50L     -> rows[9].add(trial)
-                        100L    -> rows[10].add(trial)
-                        200L    -> rows[11].add(trial)
-                        300L    -> rows[12].add(trial)
-                        400L    -> rows[13].add(trial)
-                        800L    -> rows[14].add(trial)
-                        1200L   -> rows[15].add(trial)
+                        unbalSD[0].first    -> rows[9].add(trial)
+                        unbalSD[1].first    -> rows[10].add(trial)
+                        unbalSD[2].first    -> rows[11].add(trial)
+                        unbalSD[3].first    -> rows[12].add(trial)
+                        unbalSD[4].first    -> rows[13].add(trial)
+                        unbalSD[5].first    -> rows[14].add(trial)
+                        unbalSD[6].first    -> rows[15].add(trial)
                     }
                 }
                 TYPE_V          ->  rows[16].add(trial)

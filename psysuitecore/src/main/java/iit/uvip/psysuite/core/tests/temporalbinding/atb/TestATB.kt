@@ -12,6 +12,19 @@ import iit.uvip.psysuite.core.stimuli.TactileManager
 import iit.uvip.psysuite.core.stimuli.VibratorNotDefinedException
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_TOD
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_AT
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_A_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_A
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.WN_FIRSTSTIM_INTERVAL
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -33,6 +46,31 @@ class TestATB(ctx: Context,
 ) : TestBasic(ctx, activity, hostfragment, subject, vibrator, speechManager=speechManager)
 {
     override var LOG_TAG:String = TestATB::class.java.simpleName
+
+    companion object {
+
+        @JvmStatic val TEST_BASIC_LABEL         = "ATB"
+        @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
+        @JvmStatic val NUM_REPETITIONS          = 5
+
+        @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
+
+        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_ATB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}", Populations.hearing_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_ATB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}", Populations.hearing_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_ATB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}", Populations.hearing_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_ATB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}", Populations.hearing_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}", Populations.hearing_populations))
+
+        fun getNextTrialModes():List<List<Int>> = listOf(
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
+
+        fun getEmailRecipients():Array<String> = recipients
+    }
 
     private var tone2sec:String     = "t200hz_2s"
 
@@ -59,84 +97,45 @@ class TestATB(ctx: Context,
     // 26 different elements
     private val lStimuliUnBalanced: List<StimulusDelay> = listOf(
 
-        StimulusDelay( TYPE_A_T, 50),
-        StimulusDelay( TYPE_T_A, 50),
-        StimulusDelay( TYPE_A_T, 50),
-        StimulusDelay( TYPE_T_A, 50),
+        StimulusDelay( TYPE_A_T, unbalSD[0].first),
+        StimulusDelay( TYPE_T_A, unbalSD[0].first),
+        StimulusDelay( TYPE_A_T, unbalSD[0].first),
+        StimulusDelay( TYPE_T_A, unbalSD[0].first),
 
-        StimulusDelay( TYPE_A_T, 100),
-        StimulusDelay( TYPE_T_A, 100),
-        StimulusDelay( TYPE_A_T, 100),
-        StimulusDelay( TYPE_T_A, 100),
+        StimulusDelay( TYPE_A_T, unbalSD[1].first),
+        StimulusDelay( TYPE_T_A, unbalSD[1].first),
+        StimulusDelay( TYPE_A_T, unbalSD[1].first),
+        StimulusDelay( TYPE_T_A, unbalSD[1].first),
 
-        StimulusDelay( TYPE_A_T, 200),
-        StimulusDelay( TYPE_T_A, 200),
-        StimulusDelay( TYPE_A_T, 200),
-        StimulusDelay( TYPE_T_A, 200),
+        StimulusDelay( TYPE_A_T, unbalSD[2].first),
+        StimulusDelay( TYPE_T_A, unbalSD[2].first),
+        StimulusDelay( TYPE_A_T, unbalSD[2].first),
+        StimulusDelay( TYPE_T_A, unbalSD[2].first),
 
-        StimulusDelay( TYPE_A_T, 300),
-        StimulusDelay( TYPE_T_A, 300),
-        StimulusDelay( TYPE_A_T, 300),
-        StimulusDelay( TYPE_T_A, 300),
+        StimulusDelay( TYPE_A_T, unbalSD[3].first),
+        StimulusDelay( TYPE_T_A, unbalSD[3].first),
+        StimulusDelay( TYPE_A_T, unbalSD[3].first),
+        StimulusDelay( TYPE_T_A, unbalSD[3].first),
 
-        StimulusDelay( TYPE_A_T, 400),
-        StimulusDelay( TYPE_T_A, 400),
-        StimulusDelay( TYPE_A_T, 400),
-        StimulusDelay( TYPE_T_A, 400),
+        StimulusDelay( TYPE_A_T, unbalSD[4].first),
+        StimulusDelay( TYPE_T_A, unbalSD[4].first),
+        StimulusDelay( TYPE_A_T, unbalSD[4].first),
+        StimulusDelay( TYPE_T_A, unbalSD[4].first),
 
-        StimulusDelay( TYPE_A_T, 800),
-        StimulusDelay( TYPE_T_A, 800),
-        StimulusDelay( TYPE_A_T, 800),
-        StimulusDelay( TYPE_T_A, 800),
+        StimulusDelay( TYPE_A_T, unbalSD[5].first),
+        StimulusDelay( TYPE_T_A, unbalSD[5].first),
+        StimulusDelay( TYPE_A_T, unbalSD[5].first),
+        StimulusDelay( TYPE_T_A, unbalSD[5].first),
 
-        StimulusDelay( TYPE_A_T, 1200),
-        StimulusDelay( TYPE_T_A, 1200)
+        StimulusDelay( TYPE_A_T, unbalSD[6].first),
+        StimulusDelay( TYPE_T_A, unbalSD[6].first)
     )
-
-    private val WN_FIRSTSTIM_INTERVAL   = 1000L
-    private val STIM_DURATION_INF       = 1000L
-    private val STIM_DURATION_TOD       = 200L
-    private val STIM_DURATION           = 50L
-    private val ISI                     = 1000L
-    private val ISI_INF                 = 2000L // distance between stimuli onsets
-
     private val EVENT_SECOND_TRAIN      = 1201
 
     private val amplitude = 100
 
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
     private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
-
-    companion object {
-
-        @JvmStatic val TEST_BASIC_LABEL         = "ATB"
-        @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
-        @JvmStatic val NUM_REPETITIONS          = 5
-
-        @JvmStatic val TYPE_AT     = 0
-        @JvmStatic val TYPE_A      = 1
-        @JvmStatic val TYPE_T      = 2
-        @JvmStatic val TYPE_A_T    = 3
-        @JvmStatic val TYPE_T_A    = 4
-
-         @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
-
-        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_ATB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}", Populations.hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_ATB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}", Populations.hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_ATB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}", Populations.hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_ATB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}", Populations.hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}", Populations.hearing_populations))
-
-        fun getNextTrialModes():List<List<Int>> = listOf(
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
-
-        fun getEmailRecipients():Array<String> = recipients
-    }
 
     // =============================================================================================================================
     // INIT

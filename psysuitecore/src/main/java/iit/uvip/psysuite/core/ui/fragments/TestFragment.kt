@@ -143,8 +143,10 @@ class TestFragment : BaseFragment(
 
                     TestBasic.TEST_TID_SHORT_AUDIO,
                     TestBasic.TEST_TID_SHORT_TACTILE,
+                    TestBasic.TEST_TID_SHORT_VISUAL,
                     TestBasic.TEST_TID_LONG_AUDIO,
-                    TestBasic.TEST_TID_LONG_TACTILE -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, speechManager)
+                    TestBasic.TEST_TID_LONG_TACTILE,
+                    TestBasic.TEST_TID_LONG_VISUAL -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, circleView, speechManager)
 
                     TestBasic.TEST_ATB_TIME_SINGLESTIM,
                     TestBasic.TEST_ATB_TIME_DOUBLESTIM,
