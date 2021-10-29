@@ -137,40 +137,43 @@ class TestFragment : BaseFragment(
                     TestBasic.TEST_BISECTION_AUDIO,
                     TestBasic.TEST_BISECTION_TACTILE,
                     TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-                    TestBasic.TEST_BISECTION_AUDIO_VIDEO -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
+                    TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 
-                    TestBasic.TEST_MUSICAL_METERS -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel!!, speechManager)
+                    TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel!!, speechManager)
 
                     TestBasic.TEST_TID_SHORT_AUDIO,
                     TestBasic.TEST_TID_SHORT_TACTILE,
                     TestBasic.TEST_TID_SHORT_VISUAL,
                     TestBasic.TEST_TID_LONG_AUDIO,
                     TestBasic.TEST_TID_LONG_TACTILE,
-                    TestBasic.TEST_TID_LONG_VISUAL -> mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, circleView, speechManager)
+                    TestBasic.TEST_TID_LONG_VISUAL,
+                    TestBasic.TEST_TID_SHORT_AUDIO_TRAIN,
+                    TestBasic.TEST_TID_SHORT_TACTILE_TRAIN,
+                    TestBasic.TEST_TID_SHORT_VISUAL_TRAIN   ->  mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, circleView, speechManager)
 
                     TestBasic.TEST_ATB_TIME_SINGLESTIM,
                     TestBasic.TEST_ATB_TIME_DOUBLESTIM,
                     TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_ATB_TIME_INF -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, speechManager)
+                    TestBasic.TEST_ATB_TIME_INF             -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, speechManager)
 
                     TestBasic.TEST_AVB_TIME_SINGLESTIM,
                     TestBasic.TEST_AVB_TIME_DOUBLESTIM,
                     TestBasic.TEST_AVB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_AVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_AVB_TIME_INF -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel!!, circleView, speechManager)
+                    TestBasic.TEST_AVB_TIME_INF             -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel!!, circleView, speechManager)
 
                     TestBasic.TEST_TVB_TIME_SINGLESTIM,
                     TestBasic.TEST_TVB_TIME_DOUBLESTIM,
                     TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_TVB_TIME_INF -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
+                    TestBasic.TEST_TVB_TIME_INF             -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 
                     TestBasic.TEST_ATVB_TIME_S_UNBAL,
                     TestBasic.TEST_ATVB_TIME_S_BAL,
                     TestBasic.TEST_ATVB_TIME_S_BAL2,
                     TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                    TestBasic.TEST_ATVB_TIME_D_BAL -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
+                    TestBasic.TEST_ATVB_TIME_D_BAL          -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, circleView, speechManager)
 
                     TestBasic.TEST_SAMPLE_ALIGNED,
                     TestBasic.TEST_SAMPLE_SHIFTED,

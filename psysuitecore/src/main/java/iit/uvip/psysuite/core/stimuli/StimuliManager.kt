@@ -111,6 +111,7 @@ class StimuliManager(
         }
 
     //region variables getters
+
     // get type separated by modalities-combinations
     val typeA:Int
         get() = mAudioManager?.type ?: -1
@@ -133,6 +134,13 @@ class StimuliManager(
     val typeTV:Int
         get(){
             var t = 0
+            t = t or (mTactileManager?.type ?: t)
+            return t or (mVisualManager?.type ?: t)
+        }
+    val typeATV:Int
+        get() {
+            var t = 0
+            t = t or (mAudioManager?.type ?: t)
             t = t or (mTactileManager?.type ?: t)
             return t or (mVisualManager?.type ?: t)
         }

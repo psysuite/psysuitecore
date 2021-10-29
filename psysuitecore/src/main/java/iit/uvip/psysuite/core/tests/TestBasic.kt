@@ -114,6 +114,9 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_TID_LONG_TACTILE        = 123
         @JvmStatic val TEST_TID_SHORT_VISUAL        = 124
         @JvmStatic val TEST_TID_LONG_VISUAL         = 125
+        @JvmStatic val TEST_TID_SHORT_AUDIO_TRAIN   = 126
+        @JvmStatic val TEST_TID_SHORT_TACTILE_TRAIN = 127
+        @JvmStatic val TEST_TID_SHORT_VISUAL_TRAIN  = 128
 
         @JvmStatic val TEST_ATB_TIME_SINGLESTIM     = 130
         @JvmStatic val TEST_ATB_TIME_DOUBLESTIM     = 131

@@ -74,7 +74,7 @@ class TestAVB(ctx: Context,
     private var curISI: Long = 0L
 
     // stimuli combinations
-    private val STIM_A              = StimuliManager.STIM_TYPE_A1
+    private val STIM_A              = StimuliManager.STIM_TYPE_A4
     private val STIM_V              = StimuliManager.STIM_TYPE_V1
     private val BIMODAL_CODE        = STIM_A or STIM_V
 
@@ -206,7 +206,7 @@ class TestAVB(ctx: Context,
         if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(
-            AudioManager(STIM_A, -1, duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
+            AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav", duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
             null,
             VisualManager(STIM_V, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)

@@ -80,8 +80,8 @@ class TestATB(ctx: Context,
     private val STIM_TYPE_TIME_A800_T   = 100
     private val STIM_TYPE_TIME_A_T800   = 101
 
-    private val UNIMODAL_AUDIO_CODE     = StimuliManager.STIM_TYPE_A1
-    private val BIMODAL_CODE            = StimuliManager.STIM_TYPE_A1T1
+    private val UNIMODAL_AUDIO_CODE     = StimuliManager.STIM_TYPE_A4
+    private val BIMODAL_CODE            = StimuliManager.STIM_TYPE_A4T1
 
     private var allQuestions:MutableList<String> = mutableListOf()
 
@@ -221,7 +221,7 @@ class TestATB(ctx: Context,
         if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(
-                AudioManager(UNIMODAL_AUDIO_CODE, -1, duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
+                AudioManager(UNIMODAL_AUDIO_CODE, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav", duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
                 TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler),
                 null,
                 delaysAligner, ctx, mStimuliHandler)
@@ -415,12 +415,7 @@ class TestATB(ctx: Context,
 
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    mStimuliManager.deliverShiftedStimulus(
-                        BIMODAL_CODE,
-                        corr_delays.a,
-                        corr_delays.t,
-                        corr_delays.v
-                    ) // simult
+                    mStimuliManager.deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
                 }, shift)
                 mStimuliHandler.postDelayed({
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)

@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.stimuli.*
-import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_A1
+import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_A4
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_T1
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_V1
 import iit.uvip.psysuite.core.tests.TestBasic
@@ -50,8 +50,10 @@ class TestTID(ctx: Context,
     companion object {
 
         @JvmStatic val TEST_BASIC_LABEL                 = "TID"
+        @JvmStatic val TRAIN_LABEL                      = "TRAIN"
 
         @JvmStatic var NUM_BLOCKS                       = 2
+        @JvmStatic var NUM_TRAIN_TRIALS                 = 100
 
         @JvmStatic val REF_STIM_DUR_SHORT:Long          = 200
         @JvmStatic val ISI_SHORT:Long                   = 1000L  // interval between pair#1 and pair#2
@@ -85,6 +87,8 @@ class TestTID(ctx: Context,
         @JvmStatic val STIMULUS_TYPE_TACTILE        = "T"
         @JvmStatic val STIMULUS_TYPE_VISUAL         = "V"
 
+        @JvmStatic val AUDIO_TYPE                   = STIM_TYPE_A4
+
         fun getConditionsInfo(ctx: Context): List<ConditionData> {
 
             val sts     = ctx.resources.getString(R.string.tid_rb_short_text)
@@ -94,16 +98,24 @@ class TestTID(ctx: Context,
             val stl_sh  = ctx.resources.getString(R.string.tid_rb_long_text_short)
 
             return mutableListOf(
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"    , TEST_TID_SHORT_AUDIO, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"  , TEST_TID_SHORT_TACTILE, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$sts_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$sts"  , TEST_TID_SHORT_VISUAL, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$sts_sh", Populations.sighted_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"    , TEST_TID_LONG_AUDIO, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"  , TEST_TID_LONG_TACTILE, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$stl_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$stl"  , TEST_TID_LONG_VISUAL, "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$stl_sh", Populations.sighted_populations)
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"                 , TEST_TID_SHORT_AUDIO          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"               , TEST_TID_SHORT_TACTILE        , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$sts_sh", Populations.all_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$sts"                , TEST_TID_SHORT_VISUAL         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$sts_sh", Populations.sighted_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}_$sts"  , TEST_TID_SHORT_AUDIO_TRAIN    , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}$sts_sh", Populations.hearing_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}_$sts", TEST_TID_SHORT_TACTILE_TRAIN  , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}$sts_sh", Populations.all_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}_$sts" , TEST_TID_SHORT_VISUAL_TRAIN   , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}$sts_sh", Populations.sighted_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"                 , TEST_TID_LONG_AUDIO           , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"               , TEST_TID_LONG_TACTILE         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$stl_sh", Populations.all_populations),
+                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$stl"                , TEST_TID_LONG_VISUAL          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$stl_sh", Populations.sighted_populations)
             )
         }
 
         fun getNextTrialModes():List<List<Int>> = listOf(  listOf(TEST_NEXTTRIAL_ANSWER),
+                            listOf(TEST_NEXTTRIAL_ANSWER),
+                            listOf(TEST_NEXTTRIAL_ANSWER),
+                            listOf(TEST_NEXTTRIAL_ANSWER),
+                            listOf(TEST_NEXTTRIAL_ANSWER),
+                            listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER),
                             listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
@@ -112,8 +124,9 @@ class TestTID(ctx: Context,
         fun getEmailRecipients():Array<String> = recipients
     }
 
-    private val shortLatencies:List<Long>   = listOf(100, 128, 157, 185, 214, 242, 271, 300)
-    private val longLatencies:List<Long>    = listOf(1000, 1280, 1570, 1850, 2140, 2420, 2710, 3000)
+    private val shortLatencies:List<Long>       = listOf(100, 128, 157, 185, 214, 242, 271, 300)
+    private val shortTrainLatencies:List<Long>  = listOf(75, 350)
+    private val longLatencies:List<Long>        = listOf(1000, 1280, 1570, 1850, 2140, 2420, 2710, 3000)
 
     // =============================================================================================================================
     // INIT
@@ -133,9 +146,9 @@ class TestTID(ctx: Context,
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.tid_rb1_text), ctx.resources.getString(R.string.tid_rb2_text))
 
         currStimulusDuration = when(subject.type){
-            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO       -> STIMULUS_DURATION_AUDIO
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   -> STIMULUS_DURATION_TACTILE
-            else                                            -> STIMULUS_DURATION_VISUAL
+            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO, TEST_TID_SHORT_AUDIO_TRAIN       -> STIMULUS_DURATION_AUDIO
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE, TEST_TID_SHORT_TACTILE_TRAIN -> STIMULUS_DURATION_TACTILE
+            else                                                                        -> STIMULUS_DURATION_VISUAL
         }
 
         // set values according to chosen latency
@@ -179,7 +192,7 @@ class TestTID(ctx: Context,
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(
-            AudioManager(STIM_TYPE_A1, -1, duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
+            AudioManager(AUDIO_TYPE, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav", duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
             TactileManager(vibrator!!, duration = currStimulusDuration, handler = mStimuliHandler),
             VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
@@ -192,33 +205,46 @@ class TestTID(ctx: Context,
     // =============================================================================================================================    // set question and create trials list
     private fun createConstantTrials(duration:Long){
 
-        var ref_delta = REF_STIM_DUR_SHORT
-        when(subject.type) {
-            TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> ref_delta = REF_STIM_DUR_LONG
+        var ref_delta = when(subject.type) {
+            TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> REF_STIM_DUR_LONG
+            else                                                             -> REF_STIM_DUR_SHORT
         }
+        val block_trials:MutableList<TrialBasic> = mutableListOf()
 
-        for(b in 0 until NUM_BLOCKS){
-
-            val block_trials:MutableList<TrialBasic> = mutableListOf()
-
-            for(t in 0 until currREP_X_BLOCK/2){
-                for(l in 0 until currREP_X_LATENCY){
-                    when(subject.type) {
-                        TEST_TID_SHORT_AUDIO, TEST_TID_SHORT_TACTILE, TEST_TID_SHORT_VISUAL    -> {
-                            block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                            block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, shortLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
-                        }
-                        TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL      -> {
-                            block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                            block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, longLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
-                        }
+        when (subject.type) {
+            TEST_TID_SHORT_AUDIO_TRAIN, TEST_TID_SHORT_TACTILE_TRAIN, TEST_TID_SHORT_VISUAL_TRAIN    -> {
+                for(b in 0 until NUM_BLOCKS){
+                    for(t in 0 until NUM_TRAIN_TRIALS/(4* NUM_BLOCKS)){
+                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortTrainLatencies[0].toInt(), true, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group, subject.session, shortTrainLatencies[0].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortTrainLatencies[1].toInt(), true, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group, subject.session, shortTrainLatencies[1].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
                     }
+                    block_trials.shuffle()
+                    mTrials.addAll(block_trials)
                 }
             }
-            block_trials.shuffle()
-            mTrials.addAll(block_trials)
+            else -> {
+                for(b in 0 until NUM_BLOCKS){
+                    for(t in 0 until currREP_X_BLOCK/2){
+                        for(l in 0 until currREP_X_LATENCY){
+                            when(subject.type) {
+                                TEST_TID_SHORT_AUDIO, TEST_TID_SHORT_TACTILE, TEST_TID_SHORT_VISUAL    -> {
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, shortLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                                }
+                                TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL      -> {
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, longLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                                }
+                            }
+                        }
+                    }
+                    block_trials.shuffle()
+                    mTrials.addAll(block_trials)
+                }
+            }
         }
-
         // set trial id according to its order in the list
         mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
     }
@@ -341,9 +367,9 @@ class TestTID(ctx: Context,
     private fun deliverPair(type:Int, delta:Long){
 
         when(type) {
-            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO       -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_A1)
-            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE   -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_T1)
-            TEST_TID_SHORT_VISUAL, TEST_TID_LONG_VISUAL     -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_V1)
+            TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO, TEST_TID_SHORT_AUDIO_TRAIN       -> mStimuliManager.deliverAlignedStimuliPair(delta, AUDIO_TYPE)
+            TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE, TEST_TID_SHORT_TACTILE_TRAIN -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_T1)
+            TEST_TID_SHORT_VISUAL, TEST_TID_LONG_VISUAL, TEST_TID_SHORT_VISUAL_TRAIN    -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_V1)
         }
     }
 

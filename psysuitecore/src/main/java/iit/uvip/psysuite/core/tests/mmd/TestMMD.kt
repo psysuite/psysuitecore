@@ -102,7 +102,7 @@ class TestMMD(ctx: Context,
         if(isRepeat)    trial.repetitions++
 
         val resname = when(trial.type == 0){
-            true -> "mmc" + (trial as TrialMMD).audio_id + "_same"
+            true  -> "mmc" + (trial as TrialMMD).audio_id + "_same"
             false -> "mmc" + (trial as TrialMMD).audio_id
         }
         try {

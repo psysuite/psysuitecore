@@ -33,8 +33,8 @@ class TestBIS(
         @JvmStatic val TEST_BASIC_LABEL                 = "BIS"
 
         @JvmStatic var NUM_TRIALS                       = 32
-        @JvmStatic val STIMULUS_DURATION_VISUAL:Long    = 150
-        @JvmStatic val STIMULUS_DURATION_TACTILE:Long   = 150
+        @JvmStatic val STIMULUS_DURATION_VISUAL:Long    = 50
+        @JvmStatic val STIMULUS_DURATION_TACTILE:Long   = 50
         @JvmStatic val STIMULUS_DURATION_AUDIO:Long     = 50
         @JvmStatic val QUESTION_DELAY                   = 1500      // latency
         @JvmStatic val FIRST_STIMULUS_DELAY             = 1000L      // ms to wait before sending the first trial
@@ -94,9 +94,12 @@ class TestBIS(
         StimulusBIS(4, 600, STIMULUS_TYPE_AUDIO_VIDEO_LOG)
     )
 
-    private var STIM_A  = StimuliManager.STIM_TYPE_A3
+    private var STIM_A  = StimuliManager.STIM_TYPE_A4
     private var STIM_V  = StimuliManager.STIM_TYPE_V2
+    private var STIM_T  = StimuliManager.STIM_TYPE_T1
+
     private var STIM_AV = STIM_A or STIM_V
+    private var STIM_AT = STIM_A or STIM_T
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
 
@@ -135,7 +138,7 @@ class TestBIS(
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(
-                                         AudioManager(STIM_A, "t1000hz_50ms.wav", duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
+                                         AudioManager(STIM_A, audioResources[STIMULUS_DURATION_AUDIO] ?: "t1000hz_50ms.wav", duration = STIMULUS_DURATION_AUDIO, ctx = ctx, handler = mStimuliHandler),
                                          TactileManager(vibrator!!, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler),
                                          VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler),
                                          delaysAligner, ctx, mStimuliHandler)
@@ -241,7 +244,7 @@ class TestBIS(
         // Thus I anticipate all main onsets by the same ms.
         // Since this code act for every kind of stimulus combination, I assume a trimodal stim
         val time_shift = when(trial.type){
-            TEST_BISECTION_AUDIO_TACTILE    -> delaysAligner.getShift(STIM_AV, 0,0,-1)
+            TEST_BISECTION_AUDIO_TACTILE    -> delaysAligner.getShift(STIM_AT, 0,0,-1)
             TEST_BISECTION_AUDIO_VIDEO      -> delaysAligner.getShift(STIM_AV, 0,-1,0)
             else                            -> 0
         }
@@ -269,7 +272,7 @@ class TestBIS(
         when(trial.type) {
             TEST_BISECTION_AUDIO            ->  mStimuliManager.deliverAStimulus()
             TEST_BISECTION_TACTILE          ->  mStimuliManager.deliverTStimulus()
-            TEST_BISECTION_AUDIO_TACTILE    ->  mStimuliManager.deliverAlignedStimulus(StimuliManager.STIM_TYPE_A1T1)
+            TEST_BISECTION_AUDIO_TACTILE    ->  mStimuliManager.deliverAlignedStimulus(STIM_AT)
             TEST_BISECTION_AUDIO_VIDEO      ->  deliverAVStimuli(trial, stage)
         }
     }

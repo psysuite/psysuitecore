@@ -152,11 +152,8 @@ class TestTFI(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        val audio_resource:String = audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav"
-
-
         mStimuliManager = StimuliManager(
-            AudioManager(STIM_A, audio_resource,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+            AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
             TactileManager(vibrator!!, duration = STIM_DURATION_TACTILE, handler = mStimuliHandler),
             VisualManager(STIM_V, mImageView!!, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
@@ -337,13 +334,12 @@ class TestTFI(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-
             TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
             TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
             TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
-                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
-            }
+                                                    testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
+                                                    testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+                                                   }
         }
     }
 
