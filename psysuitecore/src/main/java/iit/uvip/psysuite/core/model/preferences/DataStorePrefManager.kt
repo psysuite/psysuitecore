@@ -2,9 +2,9 @@ package iit.uvip.psysuite.core.model.preferences
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.datastore.core.DataStore
+//import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.*
-import androidx.datastore.preferences.core.Preferences
+//import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 // import androidx.datastore.preferences.core.preferencesKey
 
@@ -21,11 +21,11 @@ object DataStorePrefManager {
     // private val DELAY_V2    = preferencesKey<Long>("pref_delay_v2")
     // private val MAIN_EMAIL  = preferencesKey<String>("pref_main_email")
 
-    private lateinit var dataStore:DataStore<Preferences>
+//    private lateinit var dataStore:DataStore<Preferences>
     private lateinit var resources:Resources
 
     fun init(context: Context, name:String) {
-        dataStore = context.createDataStore(SETTINGS_PREF)
+        // dataStore = context.createDataStore(SETTINGS_PREF)
         resources = context.resources
     }
 

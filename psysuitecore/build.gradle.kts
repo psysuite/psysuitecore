@@ -3,7 +3,7 @@ plugins {
     kotlin(Plugins.kotlinAndroid)
     kotlin(Plugins.kotlinExtensions)
 
-    id("name.remal.check-dependency-updates") version "1.0.211"
+    id("name.remal.check-dependency-updates") version "1.5.0"
 }
 
 android {
@@ -41,7 +41,7 @@ androidExtensions {
 dependencies {
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.ejml:ejml-kotlin:0.39")
+    implementation("org.ejml:ejml-kotlin:0.41")
     implementation(files( "jvm/koma-core-api-jvm-0.12.jar", "jvm/koma-core-ejml-0.12.jar"))
 
     implementation(Dependencies.Moshi.moshi)
@@ -54,9 +54,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
 
-    testImplementation("junit:junit:4.13")
-    androidTestImplementation("androidx.test:runner:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
