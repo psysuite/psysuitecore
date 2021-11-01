@@ -9,10 +9,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.fragments.TestFragment
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import kotlinx.android.synthetic.main.fragment_answer_tfi.*
 import org.albaspazio.core.accessory.getTimeDifference
+import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 import java.lang.Math.random
 import java.util.*
@@ -27,12 +28,15 @@ class AnswerDialogFragmentTFI: DialogFragment()
     lateinit var onsetDate:Date
     private val mHandler:Handler = Handler()
 
+    private var tts: SpeechManager?                     = null
+
     companion object {
-        fun newInstance(title: String): AnswerDialogFragmentTFI {
+        fun newInstance(title: String, speechManager: SpeechManager): AnswerDialogFragmentTFI {
             val frag = AnswerDialogFragmentTFI()
             val args = Bundle()
             args.putString("title", title)
             frag.setArguments(args)
+            frag.tts = speechManager
 
             return frag
         }
@@ -47,17 +51,17 @@ class AnswerDialogFragmentTFI: DialogFragment()
         super.onViewCreated(view, savedInstanceState)
 
         // Fetch arguments from bundle and set title
-        val title       = requireArguments().getString("title", "Enter Name")
-        val str_trial   = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " of " + requireArguments().getInt("tot_trials", 0)
-        val question    = requireArguments().getString("question", "Enter Name")
-        val debug_info  = requireArguments().getString("debug")
-        isDebug         = requireArguments().getBoolean("isDebug", false)
+        val title           = requireArguments().getString("title", "Enter Name")
+        txt_trials.text     = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " of " + requireArguments().getInt("tot_trials", 0)
+        txt_question.text   = requireArguments().getString("question", "Enter Name")
+        txt_debug.text      = requireArguments().getString("debugInfo")
+        isDebug             = requireArguments().getBoolean("isDebug", false)
 
         dialog?.setTitle(title)
 
-        txt_trials.text     = str_trial
-        txt_question.text   = question
-        txt_debug.text      = debug_info
+        radioGroupAudio.check(radioGroupAudio.getChildAt(0).id)
+        radioGroupTactile.check(radioGroupTactile.getChildAt(0).id)
+        radioGroupVisual.check(radioGroupVisual.getChildAt(0).id)
 
         onsetDate           = Date()
 
@@ -83,7 +87,12 @@ class AnswerDialogFragmentTFI: DialogFragment()
 
             val elapsedms = getTimeDifference(onsetDate)
             val res = getRadioSelection()
-            if(res.isNotEmpty())    sendResult(res, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+
+            when(res){
+                "0,0,0" ->  showToast(getText(R.string.tfi_warning_null_answer).toString(), requireContext())
+                ""      ->  return@setOnClickListener
+                else    ->  sendResult(res, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+            }
         }
 
         bt_clear.setOnClickListener{

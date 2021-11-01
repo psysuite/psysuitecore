@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.SpinnerData
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.TrialBasic
-import iit.uvip.psysuite.core.common.stimuli.AudioManager
-import iit.uvip.psysuite.core.common.stimuli.StimuliManager
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.Populations
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.stimuli.AudioManager
+import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.utility.ConditionData
+import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 
 // show -> onTrialEnd -> EVENT_GIVE_ANSWER
@@ -17,8 +19,9 @@ import org.albaspazio.core.ui.showToast
 class TestMMD(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              data: SubjectBasicParcel
-) : TestBasic(ctx, activity, hostfragment, data) {
+              subject: SubjectBasicParcel,
+              speechManager: SpeechManager?
+) : TestBasic(ctx, activity, hostfragment, subject) {
 
     override var LOG_TAG: String = TestMMD::class.java.simpleName
 
@@ -26,15 +29,10 @@ class TestMMD(ctx: Context,
         @JvmStatic val NUM_TRIALS = 18
         @JvmStatic val TEST_BASIC_LABEL = "MMD"
 
-        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
-            return mutableListOf(SpinnerData(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL))
-        }
+        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(ConditionData(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL, Populations.hearing_populations))
 
-        fun getNextTrialModes():List<List<Int>>{
-            return listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-        }        
+        fun getNextTrialModes():List<List<Int>> =  listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
     }
-
 
     // =============================================================================================================================
     // INIT
@@ -44,7 +42,7 @@ class TestMMD(ctx: Context,
         validAnswers = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
         mQuestion = ctx.resources.getString(R.string.mmeters_question_text)
 
-        if(!subjectparcel.isDebug)  createTrials()
+        if(!subject.isDebug)  createTrials()
         else                        createTrialsDebug()
 
         nTrials     = mTrials.size
@@ -52,13 +50,16 @@ class TestMMD(ctx: Context,
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subjectparcel, TrialMMD.LOG_HEADER)
+        createResultFile(subject, TrialMMD.LOG_HEADER)
 
-        mStimuliManager = StimuliManager(AudioManager(STIM_TYPE_A1, -1,  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx), null, null)
+        mStimuliManager = StimuliManager(
+            AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
+            null, null,
+            delaysAligner, ctx, mStimuliHandler)
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
     }
 
@@ -101,7 +102,7 @@ class TestMMD(ctx: Context,
         if(isRepeat)    trial.repetitions++
 
         val resname = when(trial.type == 0){
-            true -> "mmc" + (trial as TrialMMD).audio_id + "_same"
+            true  -> "mmc" + (trial as TrialMMD).audio_id + "_same"
             false -> "mmc" + (trial as TrialMMD).audio_id
         }
         try {

@@ -20,8 +20,12 @@
     <string name="cancel">cancella</string>
     <string name="continue_label">CONTINUA</string>
     <string name="block_ended">Questa parte del test è terminata\nVuoi continuare o interrompere per poi proseguire un\'altra volta?</string>
-    <string name="test_ended">Il Test è terminato</string>
+    <string name="block_ended_blind">Questa parte del test è terminata...Chiedi assistenza per continuare</string>
+    <string name="test_ended">Il Test è terminato...grazie per aver partecipato</string>
     <string name="test_aborted">Hai deciso di interrompere il test. Vuoi cancellare i risultati fin qui scritti\n o li vuoi mantenere?</string>
+
+    <string name="test_aborted_blind">Hai deciso di interrompere il test. Chiedi assistenza per completare</string>
+    <string name="new_trial">Nuovo stimolo</string>
 
     <string name="name">NOME</string>
     <string name="gender">SESSO</string>
@@ -64,28 +68,31 @@
     <string name="subject_block_present">Esiste una precedente sessione di test\nVuoi proseguirla o vuoi cancellare tutto e ricominciare da zero?</string>
     <string name="select_subject_info">Indicare nome ed età</string>
     <string name="select_gender">Indicare il sesso</string>
+    <string name="select_population">Seleziona una popolazione</string>
     <string name="select_condition">Seleziona una condizione sperimentale</string>
     <string name="select_session">Seleziona una sessione sperimentale</string>
     <string name="select_spinner">Seleziona %1$s</string>
+    <string name="select_one_answer">Seleziona una risposta</string>
+    <string name="warning_dt_again2abort">Vuoi interrompere il test? esegui un altro tocco lungo per confermare o un tocco singolo per continuare il test</string>
+
+    <string name="exp_intro_blind1">Benvenuto in questo esperimento ... Proverai ora come poter rispondere alla domanda che ti verrà posta </string>
+    <string name="exp_intro_blind2">La domanda è</string>
+    <string name="exp_intro_blind3">Scorri un dito verso l\'alto per scegliere l\'opzione</string>
+    <string name="exp_intro_blind4">scorri verso il basso per l\'opzione</string>
+    <string name="exp_intro_blind5">quando sei sicuro della scelta fai un doppio tap veloce</string>
+
+    <string name="exp_intro_blind_assisted">Benvenuto in questo esperimento ... prova a rispondere e quando sei pronto per iniziare, fai un doppio tap veloce </string>
+    <string name="exp_letsstart_blind">L\'esperimento sta per iniziare</string>
+
+    <string name="answer_selected">risposta %1$s</string>
     <string name="subject_info_notcorrected">Le seguenti informazioni del soggetto sono errate:\n\n%1$s</string>
 
-    <string name="yes">yes</string>
+    <string name="yes">si</string>
     <string name="no">no</string>
     <string name="whitenoise">aggiungi rumore bianco</string>
 
     <string name="session">sessione</string>
-
-    <string-array name="populations_array">
-        <item>TD</item>
-        <item>CB</item>
-        <item>LB</item>
-        <item>CLV</item>
-        <item>LLV</item>
-        <item>CAI</item>
-        <item>LAI</item>
-        <item>ADHD</item>
-    </string-array>
-
+    <string name="main_email">psysuite.uvip@gmail.com</string>
 
     <string name="empty_subject_parcel">SOGGETTO E\' VUOTO</string>
     <string name="critical_error">ERRORE IRRECUPERABILE</string>
@@ -101,20 +108,29 @@
     <string name="internal_error">Il codice ha generato il seguente errore\n%1$s</string>
 
 
+    <string name="pref_delay_a1">10</string>
+    <string name="pref_delay_a2">29</string>
+    <string name="pref_delay_a3">18</string>
+    <string name="pref_delay_t1">0</string>
+    <string name="pref_delay_t2">0</string>
+    <string name="pref_delay_v1">29</string>
+    <string name="pref_delay_v2">29</string>
+
+
     <string name="start_bindings">Temporal Bindings</string>
 
     <!-- ATB -->
     <string name="start_atb">AT Binding (AT-B)</string>
 
     <string name="atb_subtask_time_single">Singolo Stimolo</string>
-    <string name="atb_subtask_time_single_tag">SSU</string>
+    <string name="atb_subtask_time_single_tag">SS</string>
     <string name="atb_subtask_time_double">Doppio Stimolo</string>
-    <string name="atb_subtask_time_double_tag">DSU</string>
+    <string name="atb_subtask_time_double_tag">DS</string>
 
     <string name="atb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="atb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="atb_subtask_time_single_tod_tag">SST</string>
     <string name="atb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="atb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="atb_subtask_time_double_tod_tag">DST</string>
 
     <string name="atb_subtask_time_infants">tempo infanti</string>
     <string name="atb_subtask_time_infants_tag">INF</string>
@@ -128,8 +144,10 @@
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
     <string name="atvb_subtask_time_single_tag">SSU</string>
-    <string name="atvb_subtask_time_single2">Singolo Stimolo bilanciato</string>
-    <string name="atvb_subtask_time_single2_tag">SSB</string>
+    <string name="atvb_subtask_time_single_b">Singolo Stimolo bilanciato</string>
+    <string name="atvb_subtask_time_single_b_tag">SSB</string>
+    <string name="atvb_subtask_time_single_b2">Singolo Stimolo bilanciato 2</string>
+    <string name="atvb_subtask_time_single_b2_tag">SSB</string>
     <string name="atvb_subtask_time_double">Doppio Stimolo</string>
     <string name="atvb_subtask_time_double_tag">DSU</string>
     <string name="atvb_subtask_time_double2">Doppio Stimolo bilanciato</string>
@@ -139,19 +157,20 @@
     <string name="atvb_rb3_text">no</string>
     <string name="atvb_question_equal">Sono uguali?</string>
     <string name="atvb_question_synchro">Sono simultanei?</string>
+    <string name="atvb_question_whichsecond">Che tipo di stimolo è il secondo?</string>
 
     <!-- TVB -->
     <string name="start_tvb">TV Binding (TV-B)</string>
 
     <string name="tvb_subtask_time_single">Singolo Stimolo</string>
-    <string name="tvb_subtask_time_single_tag">SSU</string>
+    <string name="tvb_subtask_time_single_tag">SS</string>
     <string name="tvb_subtask_time_double">Doppio Stimolo</string>
-    <string name="tvb_subtask_time_double_tag">DSU</string>
+    <string name="tvb_subtask_time_double_tag">DS</string>
 
     <string name="tvb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="tvb_subtask_time_single_tod_tag">SST</string>
     <string name="tvb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="tvb_subtask_time_double_tod_tag">DST</string>
 
     <string name="tvb_rb1_text">uguali</string>
     <string name="tvb_rb3_text">diversi</string>
@@ -161,14 +180,14 @@
     <string name="start_avb">AV Binding (AV-B)</string>
 
     <string name="avb_subtask_time_single">Singolo Stimolo</string>
-    <string name="avb_subtask_time_single_tag">SSU</string>
+    <string name="avb_subtask_time_single_tag">SS</string>
     <string name="avb_subtask_time_double">Doppio Stimolo</string>
-    <string name="avb_subtask_time_double_tag">DSU</string>
+    <string name="avb_subtask_time_double_tag">DS</string>
 
     <string name="avb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="avb_subtask_time_single_tod_tag">SSUT</string>
+    <string name="avb_subtask_time_single_tod_tag">SST</string>
     <string name="avb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="avb_subtask_time_double_tod_tag">DSUT</string>
+    <string name="avb_subtask_time_double_tod_tag">DST</string>
 
     <string name="avb_rb1_text">uguali</string>
     <string name="avb_rb3_text">diversi</string>
@@ -182,7 +201,8 @@
     <string name="tid_question_text">Quale intervallo in ciascuna coppia era maggiore?\nnella prima o nella seconda coppia?</string>
 
     <string name="tid_rb1_text">primo</string>
-    <string name="tid_rb3_text">secondo</string>
+    <string name="tid_rb2_text">secondo</string>
+    <string name="tid_rb3_text">terzo</string>
 
     <string name="tid_rb_male_text">M</string>
     <string name="tid_rb_female_text">F</string>
@@ -190,7 +210,7 @@
     <string name="tid_rb_short_text">CORTO</string>
     <string name="tid_rb_long_text">LUNGO</string>
 
-    <string name="tid_rb_short_text_short">C</string>
+    <string name="tid_rb_short_text_short">S</string>
     <string name="tid_rb_long_text_short">L</string>
 
     <string name="tid_rb_audio_text">audio</string>
@@ -208,7 +228,6 @@
         <item>sessione 5</item>
         <item>test finale</item>
     </string-array>
-
 
 
 
@@ -252,7 +271,9 @@
 
     <!-- TFI TEST -->
     <string name="tfi_label">TRIPLE FLASH ILLUSION (TFI)</string>
-    <string name="tfi_question">Indica il numero di stimoli che hai visto per ciascuna delle 3 modalità</string>
+    <string name="tfi_question">Indica il numero di stimoli che hai percepito per ciascuna delle 3 modalità</string>
+
+    <string name="tfi_warning_null_answer">seleziona almeno uno stimolo maggiore di zero</string>
 
 
     <!-- SAMPLE TEST -->
@@ -262,9 +283,10 @@
     <string name="select_source">Seleziona almeno una modalità di stimolazione</string>
 
     <string-array name="sample_audio_types">
-        <item>tone</item>
-        <item>resource</item>
-        <item>assets</item>
+        <item>Tone</item>
+        <item>MediaPlayer</item>
+        <item>AudioTrack</item>
+        <item>Nativo</item>
     </string-array>
 
     <string-array name="sample_visual_types">
@@ -277,20 +299,17 @@
         <item>sequence</item>
     </string-array>
 
-    <string-array name="sample_audioresources_array">
-        <item>t1000hz_10ms</item>
-        <item>t1000hz_20ms</item>
-        <item>t1000hz_30ms</item>
-        <item>t1000hz_50ms</item>
-        <item>t200hz_1s</item>
-        <item>t200hz_2s</item>
-        <item>wnoise_20s</item>
-    </string-array>
-
     <string-array name="sample_audioassets_array">
+        <item>t1000hz_7ms.wav</item>
         <item>t1000hz_10ms.wav</item>
+        <item>t1000hz_17ms.wav</item>
+        <item>t1000hz_20ms.wav</item>
         <item>t1000hz_30ms.wav</item>
-        <item>t200hz_1s.wav</item>
+        <item>t1000hz_35ms.wav</item>
+        <item>t1000hz_50ms.wav</item>
+        <item>t1000hz_100ms.wav</item>
+        <item>t1000hz_1000ms.wav</item>
+        <item>t200hz_1000ms.wav</item>
     </string-array>
 
 </resources>

@@ -10,9 +10,10 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.TestBasic
-import iit.uvip.psysuite.core.common.subjects_dialog.SubjectBasicDialogFragment
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import kotlinx.android.synthetic.main.fragment_subject_info_sample.*
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
@@ -87,7 +88,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         }
         spTactile.setSelection(0)
 
-        ArrayAdapter.createFromResource(requireContext(), R.array.sample_audioresources_array, android.R.layout.simple_spinner_item).also { adapter ->
+        ArrayAdapter.createFromResource(requireContext(), R.array.sample_audioassets_array, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spAudioResource.adapter = adapter
         }
@@ -112,6 +113,10 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
                 swInteractive?.isChecked = false
             }
         }
+        //------------------------------------------------------
+        // noise
+        swWhiteNoise.visibility     = View.VISIBLE
+        swWhiteNoise.isChecked      = false
     }
 
     private fun setListeners() {
@@ -190,9 +195,9 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
             swInteractive?.isChecked    = false
             subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
         }
+        swWhiteNoise.isChecked = false
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>) {}
 
     // on change spTactile/spAudio
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -201,6 +206,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         updateVisual()
         updateCondition()
     }
+    override fun onNothingSelected(parent: AdapterView<*>?) {}
 
     private fun updateCondition(){
         when(spCondition.selectedItemPosition) {
@@ -242,7 +248,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
     private fun updateAudio(){
         when(spAudio.selectedItemPosition) {
             0   ->  spAudioResource.isEnabled   = false
-            1   ->  spAudioResource.isEnabled   = true
+            else   ->  spAudioResource.isEnabled   = true
         }
     }
 
@@ -260,19 +266,20 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         var src = 0
         if(swAudio.isChecked) {
             src = when (spAudio.selectedItemPosition) {
-                0       ->  src or TestBasic.STIM_TYPE_A1
-                1       ->  src or TestBasic.STIM_TYPE_A2
-                else    ->  src or TestBasic.STIM_TYPE_A3
+                0       ->  src or StimuliManager.STIM_TYPE_A1
+                1       ->  src or StimuliManager.STIM_TYPE_A2
+                2       ->  src or StimuliManager.STIM_TYPE_A3
+                else    ->  src or StimuliManager.STIM_TYPE_A4
             }
             (subject as SubjectSampleParcel).audioDuration   = etDurationAudio.text.toString().toLong()
             (subject as SubjectSampleParcel).audioResource   = spAudioResource.selectedItem as String
-            (subject as SubjectSampleParcel).audioVolume     = etAudioVolume.text.toString().toFloat()
+            (subject as SubjectSampleParcel).audioVolume     = etAudioVolume.text.toString().toInt()
         }
 
         if(swTactile.isChecked) {
             src = when (spTactile.selectedItemPosition) {
-                0       ->  src or TestBasic.STIM_TYPE_T1
-                else    ->  src or TestBasic.STIM_TYPE_T2
+                0       ->  src or StimuliManager.STIM_TYPE_T1
+                else    ->  src or StimuliManager.STIM_TYPE_T2
             }
             (subject as SubjectSampleParcel).tactileAmplitude    = etTactileAmplitude.text.toString().toInt()
             (subject as SubjectSampleParcel).tactileSequence     = etTactileSchema.text.toString()
@@ -280,8 +287,8 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
 
         if(swVisual.isChecked) {
             src = when (spVisual.selectedItemPosition) {
-                0       ->  src or TestBasic.STIM_TYPE_V1
-                else    ->  src or TestBasic.STIM_TYPE_V2
+                0       ->  src or StimuliManager.STIM_TYPE_V1
+                else    ->  src or StimuliManager.STIM_TYPE_V2
             }
             (subject as SubjectSampleParcel).visualDuration      = etDurationVisual.text.toString().toLong()
             (subject as SubjectSampleParcel).visualDrawableOn    = etVisualDrawableOn.text.toString().toInt()
@@ -318,13 +325,18 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
             1 -> (subject as SubjectSampleParcel).shiftedParams = listOf(   etShiftedAudio.text.toString().toLong(),
                                                                             etShiftedVisual.text.toString().toLong(),
                                                                             etShiftedTactile.text.toString().toLong())
-            2 -> (subject as SubjectSampleParcel).pairDistance = etPairStimDistance.text.toString().toLong()
+
+            2 -> (subject as SubjectSampleParcel).pairDistance = if(etPairStimDistance.text.toString().isEmpty()) 0L
+                                                                 else    etPairStimDistance.text.toString().toLong()
         }
 
         (subject as SubjectSampleParcel).repetitions = etRepetitionNum.text.toString().toInt()
 
         if((subject as SubjectSampleParcel).repetitions > 1)
             (subject as SubjectSampleParcel).iti = etITI.text.toString().toLong()
+
+        subject.whitenoise =    if(swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
+        else                        TestBasic.TEST_WNOISE_CHOOSE_OFF
 
         return subject
     }

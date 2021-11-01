@@ -5,12 +5,33 @@ import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.common.*
-import iit.uvip.psysuite.core.common.stimuli.*
-import iit.uvip.psysuite.core.common.subjects_parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.model.Populations
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.stimuli.*
+import iit.uvip.psysuite.core.tests.TestBasic
+import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_INF
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_TOD
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T_V800
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T800_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.WN_FIRSTSTIM_INTERVAL
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
+import iit.uvip.psysuite.core.utility.ConditionData
+import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
+import iit.uvip.psysuite.core.utility.StimulusATBInfants
+import iit.uvip.psysuite.core.utility.StimulusDelay
 import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 import kotlin.math.roundToInt
 
@@ -18,83 +39,13 @@ import kotlin.math.roundToInt
 class TestTVB(ctx: Context,
               activity: Activity,
               hostfragment: Fragment,
-              subjectparcel: SubjectBasicParcel,
+              subject: SubjectBasicParcel,
               vibrator: VibrationManager?,
-              mImageView: ImageView?
-) : TestBasic(ctx, activity, hostfragment, subjectparcel, vibrator, mImageView)
+              mImageView: ImageView?,
+              speechManager: SpeechManager?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager)
 {
     override var LOG_TAG:String = TestTVB::class.java.simpleName
-
-    private var curISI: Long = 0L
-
-    // stimuli combinations
-    private val STIM_TYPE_TIME_T800_V   = 100
-    private val STIM_TYPE_TIME_T_V800   = 101
-
-    private val BIMODAL_CODE            = STIM_TYPE_T1V1
-
-    private var allQuestions:MutableList<String> = mutableListOf()
-    override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
-
-    // 5   different trials
-    private val lStimuli: List<StimulusATBInfants> = listOf(
-        StimulusATBInfants(BIMODAL_CODE,0),
-        StimulusATBInfants(STIM_TYPE_T1, 1),
-        StimulusATBInfants(STIM_TYPE_V1, 2),
-        StimulusATBInfants(STIM_TYPE_TIME_T_V800,  3),
-        StimulusATBInfants(STIM_TYPE_TIME_T800_V,  4)
-    )
-
-    // 26 different elements
-    private val lStimuliUnBalanced: List<StimulusBindingsUnbalanced> = listOf(
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 50),
-        StimulusBindingsUnbalanced( TYPE_V_T, 50),
-        StimulusBindingsUnbalanced( TYPE_T_V, 50),
-        StimulusBindingsUnbalanced( TYPE_V_T, 50),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 100),
-        StimulusBindingsUnbalanced( TYPE_V_T, 100),
-        StimulusBindingsUnbalanced( TYPE_T_V, 100),
-        StimulusBindingsUnbalanced( TYPE_V_T, 100),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 200),
-        StimulusBindingsUnbalanced( TYPE_V_T, 200),
-        StimulusBindingsUnbalanced( TYPE_T_V, 200),
-        StimulusBindingsUnbalanced( TYPE_V_T, 200),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 300),
-        StimulusBindingsUnbalanced( TYPE_V_T, 300),
-        StimulusBindingsUnbalanced( TYPE_T_V, 300),
-        StimulusBindingsUnbalanced( TYPE_V_T, 300),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 400),
-        StimulusBindingsUnbalanced( TYPE_V_T, 400),
-        StimulusBindingsUnbalanced( TYPE_T_V, 400),
-        StimulusBindingsUnbalanced( TYPE_V_T, 400),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 800),
-        StimulusBindingsUnbalanced( TYPE_V_T, 800),
-        StimulusBindingsUnbalanced( TYPE_T_V, 800),
-        StimulusBindingsUnbalanced( TYPE_V_T, 800),
-
-        StimulusBindingsUnbalanced( TYPE_T_V, 1200),
-        StimulusBindingsUnbalanced( TYPE_V_T, 1200)
-    )
-
-    private val WN_FIRSTSTIM_INTERVAL   = 1000L
-    private val STIM_DURATION_INF       = 1000L
-    private val STIM_DURATION_TOD       = 200L
-    private val STIM_DURATION           = 50L
-    private val ISI                     = 1000L
-    private val ISI_INF                 = 2000L // distance between stimuli onsets
-
-    private val EVENT_SECOND_TRAIN      = 1201
-
-    private val amplitude = 100
-
-    private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
-    private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
 
     companion object {
 
@@ -102,34 +53,86 @@ class TestTVB(ctx: Context,
         @JvmStatic val NUM_REPETITIONS_INFANTS  = 3
         @JvmStatic val NUM_REPETITIONS          = 5
 
-        @JvmStatic val TYPE_TV     = 0
-        @JvmStatic val TYPE_T      = 1
-        @JvmStatic val TYPE_V      = 2
-        @JvmStatic val TYPE_T_V    = 3
-        @JvmStatic val TYPE_V_T    = 4
+        @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
 
-         @JvmStatic val recipients:Array<String> = arrayOf("psysuite.uvip@gmail.com")
+        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_TVB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_TVB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_TVB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_TVB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}", Populations.sighted_populations),
+            ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}", Populations.sighted_populations))
 
-        fun getConditionsInfo(ctx: Context): List<SpinnerData> {
-            return mutableListOf(
-                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single)}" , TEST_TVB_TIME_SINGLESTIM          ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_single_tag)}"),
-                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double)}" , TEST_TVB_TIME_DOUBLESTIM          ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_double_tag)}"),
-                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_single_tod)}" , TEST_TVB_TIME_SINGLESTIM_TOD  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_single_tod_tag)}"),
-                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_double_tod)}" , TEST_TVB_TIME_DOUBLESTIM_TOD  ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_double_tod_tag)}"),
-                SpinnerData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.atb_subtask_time_infants)}", TEST_ATB_TIME_INF                 ,"${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.atb_subtask_time_infants_tag)}"))
-        }
-
-        fun getNextTrialModes():List<List<Int>> {
-            return listOf(
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-                listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
-        }
+        fun getNextTrialModes():List<List<Int>> = listOf(
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_ANSWER), //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+            listOf(TEST_NEXTTRIAL_AUTO, TEST_NEXTTRIAL_BUTTON))
 
         fun getEmailRecipients():Array<String> = recipients
     }
+
+    private var curISI: Long = 0L
+
+    private val STIM_T              = StimuliManager.STIM_TYPE_T1
+    private val STIM_V              = StimuliManager.STIM_TYPE_V1
+    private val BIMODAL_CODE        = STIM_T or STIM_V
+
+    private var allQuestions:MutableList<String>        = mutableListOf()
+    override var mDrawablesResource: MutableList<Int>   = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
+
+    // 5   different trials
+    private val lStimuli: List<StimulusATBInfants> = listOf(
+        StimulusATBInfants(BIMODAL_CODE, 0),
+        StimulusATBInfants(STIM_T, 1),
+        StimulusATBInfants(STIM_V, 2),
+        StimulusATBInfants(STIM_TYPE_TIME_T_V800, 3),
+        StimulusATBInfants(STIM_TYPE_TIME_T800_V, 4)
+    )
+
+    // 26 different elements
+    private val lStimuliUnBalanced: List<StimulusDelay> = listOf(
+
+        StimulusDelay( TYPE_T_V, unbalSD[0].first),
+        StimulusDelay( TYPE_V_T, unbalSD[0].first),
+        StimulusDelay( TYPE_T_V, unbalSD[0].first),
+        StimulusDelay( TYPE_V_T, unbalSD[0].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[1].first),
+        StimulusDelay( TYPE_V_T, unbalSD[1].first),
+        StimulusDelay( TYPE_T_V, unbalSD[1].first),
+        StimulusDelay( TYPE_V_T, unbalSD[1].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[2].first),
+        StimulusDelay( TYPE_V_T, unbalSD[2].first),
+        StimulusDelay( TYPE_T_V, unbalSD[2].first),
+        StimulusDelay( TYPE_V_T, unbalSD[2].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[3].first),
+        StimulusDelay( TYPE_V_T, unbalSD[3].first),
+        StimulusDelay( TYPE_T_V, unbalSD[3].first),
+        StimulusDelay( TYPE_V_T, unbalSD[3].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[4].first),
+        StimulusDelay( TYPE_V_T, unbalSD[4].first),
+        StimulusDelay( TYPE_T_V, unbalSD[4].first),
+        StimulusDelay( TYPE_V_T, unbalSD[4].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[5].first),
+        StimulusDelay( TYPE_V_T, unbalSD[5].first),
+        StimulusDelay( TYPE_T_V, unbalSD[5].first),
+        StimulusDelay( TYPE_V_T, unbalSD[5].first),
+
+        StimulusDelay( TYPE_T_V, unbalSD[6].first),
+        StimulusDelay( TYPE_V_T, unbalSD[6].first)
+    )
+
+    private val EVENT_SECOND_TRAIN      = 1201
+
+    private val amplitude = 100
+
+    private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
+    private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
 
     // =============================================================================================================================
     // INIT
@@ -140,7 +143,7 @@ class TestTVB(ctx: Context,
             mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
             vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
         }
-        nextTrailModality   = subjectparcel.nextTrailModality
+        nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
@@ -148,7 +151,7 @@ class TestTVB(ctx: Context,
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
 
         // set stim duration (presently the same in the two subtasks
-        when (subjectparcel.type) {
+        when (subject.type) {
             TEST_TVB_TIME_SINGLESTIM ->{
                 mQuestion               = allQuestions[0]
                 curISI                  = ISI           // 1000L
@@ -175,49 +178,50 @@ class TestTVB(ctx: Context,
             }
         }
 
-        if(!subjectparcel.isDebug) {
+        if(!subject.isDebug) {
             // create trials/summary
-            when (subjectparcel.type) {
+            when (subject.type) {
                 TEST_TVB_TIME_DOUBLESTIM_TOD,
                 TEST_TVB_TIME_DOUBLESTIM ->{
                     createTrialsTimeDouble()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
 
                 }
                 TEST_TVB_TIME_SINGLESTIM_TOD,
                 TEST_TVB_TIME_SINGLESTIM       -> {
                     createTrialsTimeSingle()
-                    createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
                     initSummary()
                 }
                 TEST_TVB_TIME_INF   -> {
                     initTimeArrays()
                     createTrialsTimeInfants()
-                    createResultFile(subjectparcel, TrialBindingsInfants.LOG_HEADER)
+                    createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
                 }
             }
         }
         else{
-            createResultFile(subjectparcel, TrialBindingsUnBalanced.LOG_HEADER)
+            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
             createTrialsDebug()
         }
         nTrials     = mTrials.size
         currTrial   = 0
 
-        mListBlocks = mutableListOf((3*nTrials / 5F).roundToInt(), (4*nTrials / 5F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+        mListBlocks = mutableListOf((nTrials *0.2F).roundToInt(), (nTrials * 0.4F).roundToInt(), (nTrials * 0.6F).roundToInt(), (nTrials * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
-            if (it.id == subjectparcel.type) mTestLabel = it.label
+            if (it.id == subject.type) mTestLabel = it.label
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        if (subjectparcel.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(null,
             TactileManager(vibrator!!, duration = currStimulusDuration, handler = mStimuliHandler),
-            VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler))
+            VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
+            delaysAligner, ctx, mStimuliHandler)
 
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
     }
@@ -360,13 +364,13 @@ class TestTVB(ctx: Context,
 
     override fun initSummary(){
 
-        mSummary = when (subjectparcel.type) {
+        mSummary = when (subject.type) {
             TEST_TVB_TIME_DOUBLESTIM,
             TEST_TVB_TIME_SINGLESTIM,
             TEST_TVB_TIME_DOUBLESTIM_TOD,
             TEST_TVB_TIME_SINGLESTIM_TOD    ->  TVBUnBalancedSummary(ctx)
 
-            else                            ->  TVBUnBalancedSummary(ctx)
+            else                            ->  null
         }
     }
     // =============================================================================================================================
@@ -378,7 +382,7 @@ class TestTVB(ctx: Context,
 
         mNoise?.start()
 
-        when(subjectparcel.type) {
+        when(subject.type) {
 
             TEST_TVB_TIME_INF -> {
                 mStimuliHandler.postDelayed({
@@ -403,12 +407,16 @@ class TestTVB(ctx: Context,
 
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_STIMULI_START, null))
-                    deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
+                    mStimuliManager.deliverShiftedStimulus(
+                        BIMODAL_CODE,
+                        corr_delays.a,
+                        corr_delays.t,
+                        corr_delays.v
+                    ) // simult
                 }, shift)
                 mStimuliHandler.postDelayed({
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
                 }, shift + curISI)     // to preserve the desired ISI between 1st and 2nd stimuli,
-                                                                                                    // I also add the shift that could be eventually imposed to the fastest modality
             }
         }
     }
@@ -433,18 +441,18 @@ class TestTVB(ctx: Context,
 
         if(V_delay > 0L){
             mStimuliHandler.postDelayed({
-                deliverUnimodalStimulus(STIM_TYPE_V1)
+                mStimuliManager.deliverUnimodalStimulus(STIM_V)
                 testEvent.accept(Pair(EVENT_STIMULI_START, null))
             }, V_delay)
         }
         else {
-            deliverUnimodalStimulus(STIM_TYPE_V1)
+            mStimuliManager.deliverUnimodalStimulus(STIM_V)
             testEvent.accept(Pair(EVENT_STIMULI_START, null))
         }
 
-        mStimuliHandler.postDelayed({   deliverUnimodalStimulus(STIM_TYPE_V1)    }, curISI + V_delay)
+        mStimuliHandler.postDelayed({   mStimuliManager.deliverUnimodalStimulus(STIM_V)    }, curISI + V_delay)
 
-        mStimuliHandler.postDelayed({   deliverUnimodalStimulus(STIM_TYPE_V1)    }, 2*curISI + V_delay)
+        mStimuliHandler.postDelayed({   mStimuliManager.deliverUnimodalStimulus(STIM_V)    }, 2*curISI + V_delay)
     }
 
     // only for infants subtest
@@ -457,21 +465,21 @@ class TestTVB(ctx: Context,
 
         when(type){
             BIMODAL_CODE,
-            STIM_TYPE_V1,
+            STIM_V,
             STIM_TYPE_TIME_T_V800   -> {
                 mStimuliHandler.postDelayed({
-                    deliverUnimodalStimulus(STIM_TYPE_V1)
+                    mStimuliManager.deliverUnimodalStimulus(STIM_V)
                     testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
                 }, 3 * curISI + A_delay)
                 mStimuliHandler.postDelayed({
-                    deliverUnimodalStimulus(STIM_TYPE_V1)
+                    mStimuliManager.deliverUnimodalStimulus(STIM_V)
                 }, 4 * curISI + A_delay)
                 mStimuliHandler.postDelayed({
                     onTrialEnd()
                 }, 5 * curISI + A_delay)
             }
 
-            STIM_TYPE_T1 -> {
+            STIM_T -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
                 }, 3 * curISI)
@@ -482,11 +490,11 @@ class TestTVB(ctx: Context,
 
             STIM_TYPE_TIME_T800_V -> {
                 mStimuliHandler.postDelayed({
-                    deliverUnimodalStimulus(STIM_TYPE_V1)
+                    mStimuliManager.deliverUnimodalStimulus(STIM_V)
                     testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
                 }, (3 * curISI + 800L + A_delay))
                 mStimuliHandler.postDelayed({
-                    deliverUnimodalStimulus(STIM_TYPE_V1)
+                    mStimuliManager.deliverUnimodalStimulus(STIM_V)
                     testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
                 }, (4 * curISI + 800 + A_delay))
                 mStimuliHandler.postDelayed({
@@ -499,7 +507,7 @@ class TestTVB(ctx: Context,
     private fun deliverUnBalancedStimuli(trial:TrialBindingsUnBalanced){
 
         var type = 0
-        val corr_delays:CorrectedStimuliDelay = when(trial.type) {
+        val corr_delays: CorrectedStimuliDelay = when(trial.type) {
             TYPE_TV     -> {
                 type = mStimuliManager.typeTV
                 delaysAligner.arrangeDelays(type, -1,0, 0)
@@ -525,7 +533,7 @@ class TestTVB(ctx: Context,
                 CorrectedStimuliDelay(-1, 0, 0)
             }
         }
-        deliverShiftedStimulus(type, corr_delays.a, corr_delays.t, corr_delays.v){ onTrialEnd()}
+        mStimuliManager.deliverShiftedStimulus(type, corr_delays.a, corr_delays.t, corr_delays.v){ onTrialEnd()}
     }
     // =============================================================================================================================
 }
