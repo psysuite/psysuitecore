@@ -18,6 +18,7 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
     override val LOG_TAG = AnswerGestureDialogFragment::class.java.simpleName
 
     private var selectedAnswer:String  = ""
+    private var selectedAnswerId:Int   = -1
     private lateinit var layoutView:View
     private var isAborting:Boolean = false  // when user DT this flag is set to true, only after another DT, it aborts the test
     companion object {
@@ -42,7 +43,6 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
         super.onViewCreated(view, savedInstanceState)
 
         showResult      = false
-        selectedAnswer  = ""
 
         if(isInstructions)
             tts?.speak(listOf(  resources.getString(R.string.exp_intro_blind1),
@@ -97,8 +97,11 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
     }
 
     private fun selectAnswer(up:Boolean){
-        selectedAnswer =    if(up)  mAnswers[0]
-                            else    mAnswers[1]
+
+        selectedAnswerId =  if(up)  0
+                            else    1
+        selectedAnswer   = mAnswers[selectedAnswerId]
+
         tts?.speak(resources.getString(R.string.answer_selected, selectedAnswer))
     }
 
@@ -111,7 +114,7 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
             tts?.speak(msg){
                 requireActivity().runOnUiThread {
                     val elapsedms = getTimeDifference(onsetDate)
-                    sendResult(selectedAnswer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
+                    sendResult(selectedAnswerId, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
                 }
             }
         }

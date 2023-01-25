@@ -1,3 +1,10 @@
+plugins {
+    id(Plugins.androidLibrary) apply(false)
+    id(Plugins.kotlinAndroid) version Versions.kotlin apply(false)
+    id(Plugins.chaquopy) version Versions.chaquopy apply(false)
+}
+
+
 buildscript {
     repositories {
         gradlePluginPortal()

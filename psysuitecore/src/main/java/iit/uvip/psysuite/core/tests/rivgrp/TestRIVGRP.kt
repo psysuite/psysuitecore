@@ -18,6 +18,7 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.tests.tfi.TFIBISummary
@@ -159,11 +160,9 @@ class TestRIVGRP(ctx: Context,
 
         val resp_type:String    =   if(isContinuosResponse)     "analog"
                                     else                        "discrete"
-        if(!subject.isDebug)  createTrials(resp_type)
-        else                  createTrialsDebug(resp_type)
-
-        nTrials                 = mTrials.size
-        currTrial               = 0
+        val trials = if(!subject.isDebug)  createTrials(resp_type)
+                     else                  createTrialsDebug(resp_type)
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         mTestLabel              = ""
         getConditionsInfo(ctx).map {
@@ -172,7 +171,7 @@ class TestRIVGRP(ctx: Context,
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
         createResultFile(subject, TrialRIVGRP.LOG_HEADER)
-        currVisual = VisualManager(STIM_V, mImageView!!, (mTrials[0] as TrialRIVGRP).img_res, duration = currStimulusDuration, handler = mStimuliHandler)
+        currVisual = VisualManager(STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialRIVGRP).img_res, duration = currStimulusDuration, handler = mStimuliHandler)
         mStimuliManager = StimuliManager(
             null, //AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
             null,
@@ -193,92 +192,94 @@ class TestRIVGRP(ctx: Context,
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(resp_type:String){
+    private fun createTrials(resp_type:String):List<TrialBasic>{
 
+        val trials:MutableList<TrialBasic> = mutableListOf()
         when(subject.type){
             TEST_RIVGRP_RIV_HF  -> {
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_1_LOG}"
-                mTrials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0], imagesNames[0], resp_type))
-                mTrials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
-                mTrials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
-                mTrials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0], imagesNames[0], resp_type))
+                trials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                trials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
+                trials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
             }
             TEST_RIVGRP_GRP_HF     -> {
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_2_LOG}"
-                mTrials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
-                mTrials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                mTrials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[1], resp_type))
-                mTrials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                trials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
+                trials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[1], resp_type))
+                trials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
             }
             TEST_RIVGRP_RIVGRP_HF  -> {
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_1_LOG}_${EFFECT_TYPE_2_LOG}"
                 if(isRivalryFirst) {
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
                 }else{
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
                 }
             }
             TEST_RIVGRP_RIV_HC     -> {
                 currImageName = "${STIMULUS_TYPE_2_LOG}${EFFECT_TYPE_1_LOG}"
-                mTrials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                mTrials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
-                mTrials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                mTrials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                trials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                trials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                trials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
             }
             TEST_RIVGRP_GRP_HC  -> {
                 currImageName = "${STIMULUS_TYPE_2_LOG}${EFFECT_TYPE_2_LOG}"
-                mTrials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
-                mTrials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
-                mTrials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
-                mTrials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                trials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                trials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                trials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
             }
             else                -> {
                 currImageName = "${STIMULUS_TYPE_2_LOG}${EFFECT_TYPE_1_LOG}_${EFFECT_TYPE_2_LOG}"
                 if(isRivalryFirst) {
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
                 }else{
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
-                    mTrials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
-                    mTrials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
-                    mTrials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
-                    mTrials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
+                    trials.add(TrialRIVGRP(2, 2, currImageName, mDrawablesResource[7],imagesNames[7], resp_type))
+                    trials.add(TrialRIVGRP(1, 1, currImageName, mDrawablesResource[4],imagesNames[4], resp_type))
+                    trials.add(TrialRIVGRP(4, 2, currImageName, mDrawablesResource[6],imagesNames[6], resp_type))
+                    trials.add(TrialRIVGRP(3, 1, currImageName, mDrawablesResource[5],imagesNames[5], resp_type))
                 }
             }
         }
+        return trials
     }
 
-    private fun createTrialsDebug(resp_type:String){
-        createTrials(resp_type)
+    private fun createTrialsDebug(resp_type:String):List<TrialBasic>{
+        return createTrials(resp_type)
     }
 
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
 
         // if !last trial && !block end => doNextTrial
         return when {

@@ -2,8 +2,8 @@ package iit.uvip.psysuite.core.tests.mmd
 
 import iit.uvip.psysuite.core.tests.TrialBasic
 
-//                trial_id    0/1      same/diff        si/no                   1-18
-class TrialMMD(id: Int = -1, type: Int, label: String, correct_answer:String, var audio_id: Int) :
+//                trial_id    0/1      same/diff        0/1                   1-18
+class TrialMMD(id: Int = -1, type: Int, label: String, correct_answer:Int, var audio_id: Int) :
     TrialBasic(id, type, label, correct_answer) {
 
     companion object {

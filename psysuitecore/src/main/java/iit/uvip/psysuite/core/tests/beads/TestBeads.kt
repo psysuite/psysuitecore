@@ -24,6 +24,7 @@ import org.albaspazio.core.ui.showToast
 import androidx.constraintlayout.widget.ConstraintLayout
 import iit.uvip.psysuite.core.R
 import androidx.constraintlayout.widget.ConstraintSet
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -129,11 +130,10 @@ class TestBeads(ctx: Context,
 
         currStimulusDuration    = POSITIVE_INFINITY.toLong()
 
-        if(!subject.isDebug)  createTrials()
-        else                  createTrialsDebug()
+        val trials = if(!subject.isDebug)  createTrials()
+                     else                  createTrialsDebug()
 
-        nTrials                 = mTrials.size
-        currTrial               = 0
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         mTestLabel              = ""
         getConditionsInfo(ctx).map {
@@ -142,7 +142,7 @@ class TestBeads(ctx: Context,
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
         createResultFile(subject, TrialBeads.LOG_HEADER)
-        currVisual      = VisualManager(TestTFI.STIM_V, mImageView!!, (mTrials[0] as TrialBeads).img_res, duration = POSITIVE_INFINITY.toLong(), handler = mStimuliHandler)
+        currVisual      = VisualManager(TestTFI.STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialBeads).img_res, duration = POSITIVE_INFINITY.toLong(), handler = mStimuliHandler)
         mStimuliManager = StimuliManager(null, null, currVisual, delaysAligner, ctx, mStimuliHandler)
 
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
@@ -151,21 +151,24 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(){
-        mTrials.add(TrialBeads(1, subject.type, currCondLabel, currImageRes, beads_orders[0]))
-        mTrials.add(TrialBeads(2, subject.type, currCondLabel, currImageRes, beads_orders[1]))
-        mTrials.add(TrialBeads(3, subject.type, currCondLabel, currImageRes, beads_orders[2]))
-        mTrials.add(TrialBeads(4, subject.type, currCondLabel, currImageRes, beads_orders[3]))
+    private fun createTrials():List<TrialBasic>{
+        val trials:MutableList<TrialBasic> = mutableListOf()
+        trials.add(TrialBeads(1, subject.type, currCondLabel, currImageRes, beads_orders[0]))
+        trials.add(TrialBeads(2, subject.type, currCondLabel, currImageRes, beads_orders[1]))
+        trials.add(TrialBeads(3, subject.type, currCondLabel, currImageRes, beads_orders[2]))
+        trials.add(TrialBeads(4, subject.type, currCondLabel, currImageRes, beads_orders[3]))
+
+        return trials
     }
 
-    private fun createTrialsDebug(){
-        createTrials()
+    private fun createTrialsDebug():List<TrialBasic>{
+        return createTrials()
     }
 
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
 
         // if !last trial && !block end => doNextTrial
         return when {

@@ -31,6 +31,8 @@ import iit.uvip.psysuite.core.tests.tid.TestTID
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.core.utility.getIds
 
+import iit.uvip.psysuite.python.SPython
+
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -61,7 +63,7 @@ here        : mTest.start()
 within Test : show -> onTrialEnd -> EVENT_GIVE_ANSWER/EVENT_SHOW_NEXT
 here        : mTest.testEvent.subscribe -> answerdialog/speechrec   -> onAnswer  |-> onNewTrial -> mTest.nextTrial ->  test end | block end | show next trial
                                         -> next button  _________________________|
-within Test : mTrial.setResponse -> saveText -> doNextTrial() -> getNewTrial -> show
+within Test : mTrial.setResponse -> saveText -> doNextTrial() -> trialsmanager.getNewTrial -> show
  */
 
 class TestFragment : BaseFragment(
@@ -98,6 +100,8 @@ class TestFragment : BaseFragment(
     var showResult:Boolean                          = false
 
     private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
+
+    lateinit private var py:SPython
     // ==========================================================================================================================
     // ==========================================================================================================================
     companion object {
@@ -105,15 +109,17 @@ class TestFragment : BaseFragment(
         @JvmStatic val TRG_REQ_CODE_ANSWER:Int        = 1
         @JvmStatic val TRG_REQ_CODE_INSTRUCTIONS:Int  = 2
 
-        @JvmStatic val EVENT_ANSWER_CODE:String     = "answer_code"
-        @JvmStatic val EVENT_ANSWER_RESULT:String   = "answer_result"
-        @JvmStatic val EVENT_TIME_TO_ANSWER:String  = "answer_time"
+        @JvmStatic val EVENT_ANSWER_CODE:String         = "answer_code"
+        @JvmStatic val EVENT_ANSWER_RESULT:String       = "answer_result"
+        @JvmStatic val EVENT_TIME_TO_ANSWER:String      = "answer_time"
+        @JvmStatic val EVENT_ANSWER_RESULT_EXTRA:String = "answer_result_extra"
 
-        fun newIntent(resp: String, elapsedTime: Int, resp_id: Int): Intent {
+        fun newIntent(resp:Int, elapsedTime:Int, resp_id:Int, resp_extra:String=""): Intent {
             val intent = Intent()
             intent.putExtra(EVENT_ANSWER_RESULT, resp)
             intent.putExtra(EVENT_TIME_TO_ANSWER, elapsedTime)
             intent.putExtra(EVENT_ANSWER_CODE, resp_id)
+            intent.putExtra(EVENT_ANSWER_RESULT_EXTRA, resp_extra)
             return intent
         }
     }
@@ -138,6 +144,7 @@ class TestFragment : BaseFragment(
 
                 vibrator                    = VibrationManager(requireContext()).init()
                 speechRecognitionManager    = SpeechRecognitionManager(requireContext())
+                py                          = SPython.getInstance(requireContext())
 
                 when(mSubjectParcel!!.type){
 
@@ -291,7 +298,7 @@ class TestFragment : BaseFragment(
             bt_next.visibility      = View.INVISIBLE
             bt_pause.visibility     = View.INVISIBLE
 
-            onNewTrial()
+            onTrialEnded()
         }
 
         bt_abort.setOnClickListener{
@@ -308,7 +315,7 @@ class TestFragment : BaseFragment(
             if(isPaused){
                 bt_pause.text = resources.getString(R.string.pause)
                 bt_pause.visibility = View.INVISIBLE
-                onNewTrial()
+                onTrialEnded()
             }
             else{
                 mHandler.removeCallbacksAndMessages(null)
@@ -335,43 +342,43 @@ class TestFragment : BaseFragment(
         .subscribe {
             when(it.first){
 
-                TestBasic.EVENT_TEST_SETUP_COMPLETED -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
-                TestBasic.EVENT_GIVE_ANSWER -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
+                TestBasic.EVENT_TEST_SETUP_COMPLETED    -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
+                TestBasic.EVENT_GIVE_ANSWER             -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
                 TestBasic.EVENT_GIVE_VOCAL_ANSWER -> {
-                    bt_abort.visibility = View.VISIBLE
-                    listenForVocalAnswer(mTest.validAnswers)
+                                                           bt_abort.visibility = View.VISIBLE
+                                                           listenForVocalAnswer(mTest.validAnswers)
                 }
-                TestBasic.EVENT_SHOW_NEXT_BUTTON -> showNext()
+                TestBasic.EVENT_SHOW_NEXT_BUTTON        -> showNext()
 
                 // called by SubTests' nextTrial
                 TestBasic.EVENT_UPDATE_TRIAL_ID -> {
-                    try {
-                        val dur = it.second as Long
-                        showTrialId(dur)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showTrialId(1000L)
-                    }
+                                                            try {
+                                                                val dur = it.second as Long
+                                                                showTrialId(dur)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showTrialId(1000L)
+                                                            }
                 }
                 TestBasic.EVENT_SHOW_ABORT -> {
-                    try {
-                        val dur = it.second as Long
-                        showShortAbort(dur)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showShortAbort(1000L)
-                    }
+                                                            try {
+                                                                val dur = it.second as Long
+                                                                showShortAbort(dur)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showShortAbort(1000L)
+                                                            }
                 }
                 TestBasic.EVENT_SHOW_DEBUGINFO -> {
-                    try {
-                        val info = it.second as String
-                        showDebugInfo(info)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showDebugInfo(e.toString())
-                    }
+                                                            try {
+                                                                val info = it.second as String
+                                                                showDebugInfo(info)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showDebugInfo(e.toString())
+                                                            }
                 }
-                TestBasic.EVENT_TEST_ERROR -> onTestError(it.second as String)
+                TestBasic.EVENT_TEST_ERROR              -> onTestError(it.second as String)
 
                 TestBasic.EVENT_STIMULI_START -> {}
                 TestBasic.EVENT_STIMULI_END -> {}
@@ -381,7 +388,7 @@ class TestFragment : BaseFragment(
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
     // called by: 1) onActivityResult after answer, 2) speechrecognition result
-    private fun onAnswer(prev_result: String = "", elapsed: Int = -1){
+    private fun onAnswer(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
 
         // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
         abortRecognition = true
@@ -391,14 +398,14 @@ class TestFragment : BaseFragment(
         }
         closeAnswerDialog()
 
-        // call next trial & check whether it was the last => test ended
-        onNewTrial(prev_result, elapsed)
+        // close trial (e.g. set answer) & check whether it was the last => test ended
+        onTrialEnded(prev_result, elapsed, extra_text)
     }
 
     // called by: onAnswer, bt_next click, bt_pause click
     // define whether: onTestEnded() or onBlockEnded()  or nothing (test continued or closed sending event error)
-    private fun onNewTrial(prev_result: String = "", elapsed: Int = -1){
-        when(mTest.nextTrial(prev_result, elapsed)){
+    private fun onTrialEnded(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
+        when(mTest.onEndTrial(prev_result, elapsed, extra_text)){
             TestBasic.EVENT_TEST_END    -> onTestEnded()
             TestBasic.EVENT_BLOCK_END   -> onBlockEnded()       // ask whether interrupting the test
             TestBasic.EVENT_TEST_ERROR  -> {}                   // do nothing, test class close the test and send EVENT_TEST_ERROR with error message
@@ -540,7 +547,7 @@ class TestFragment : BaseFragment(
             mHandler.postDelayed({
                 bt_abort.visibility = View.INVISIBLE
                 bt_pause.visibility = View.INVISIBLE
-                onNewTrial()
+                onTrialEnded()
             }, remove)
         }
     }
@@ -579,7 +586,7 @@ class TestFragment : BaseFragment(
         b.putBoolean("isDebug", mSubjectParcel?.isDebug ?: false)
 
         b.putBoolean("show_result", mTest.showResult)
-        b.putString("correct_answer", mTest.getTrialCorrectAnswer())
+        b.putInt("correct_answer", mTest.getTrialCorrectAnswer())
 
         answerDialogFragment = answerDialogRef.first?.call(answerDialogRef.second, "", speechManager) as DialogFragment
         if(answerDialogFragment == null){
@@ -608,9 +615,10 @@ class TestFragment : BaseFragment(
 
                 when (data?.getIntExtra(EVENT_ANSWER_CODE, 0)) {
                     TestBasic.EVENT_ANSWER_GIVEN -> {
-                        val result = data.getStringExtra(EVENT_ANSWER_RESULT)
+                        val result      = data.getIntExtra(EVENT_ANSWER_RESULT, -1)
                         val elapsedTime = data.getIntExtra(EVENT_TIME_TO_ANSWER, -1)
-                        onAnswer(result!!, elapsedTime)
+                        val result_extra= data.getStringExtra(EVENT_ANSWER_RESULT_EXTRA) ?: ""
+                        onAnswer(result, elapsedTime, result_extra)
                     }
                     TestBasic.EVENT_TRIAL_REPEAT -> mTest.repeatTrial()
                     TestBasic.EVENT_TRIAL_ABORT -> onAbortTest()
@@ -631,29 +639,34 @@ class TestFragment : BaseFragment(
                 onSuccess = {
                     when (it.first) {
                         SpeechRecognitionManager.REC_SUCCESS -> {
-                            Log.d("", "recognized word $it")
+                            val rec_word    = it.second!!
+                            val elapsedTime = getTimeDifference(onsetDate)
 
-                            // check whether given response is allowed
-                            val res: Boolean = if (valid_results.isEmpty()) true
-                            else valid_results.contains(
-                                it.second
-                            )
+                            Log.d("", "recognized word $rec_word")
 
-                            if (res) {
+                            if (valid_results.isEmpty()) {      // free answer, collect spoken word and send it as results
                                 bt_abort.visibility = View.INVISIBLE
-                                val elapsedTime = getTimeDifference(onsetDate)
-                                onAnswer(it.second!!, elapsedTime)
+                                onAnswer(-1, elapsedTime, rec_word)
+                            }
+                            else{                                // check whether given response is allowed
+                                val answer_id = valid_results.indexOf(rec_word)
 
-                            } else
-                            // text recognized but not allowed
-                                speechManager.speak(
-                                    resources.getString(org.albaspazio.core.R.string.char_recognition_wrong),
-                                    TextToSpeech.QUEUE_FLUSH,
-                                    clb = {
-                                        if (!abortRecognition) listenForVocalAnswer(
-                                            valid_results
-                                        )
-                                    })
+                                if(answer_id == -1){
+                                    // text recognized but not expected
+                                    speechManager.speak(
+                                        resources.getString(org.albaspazio.core.R.string.char_recognition_wrong),
+                                        TextToSpeech.QUEUE_FLUSH,
+                                        clb = {
+                                            if (!abortRecognition) listenForVocalAnswer(
+                                                valid_results
+                                            )
+                                        })
+                                }
+                                else{
+                                    bt_abort.visibility = View.INVISIBLE
+                                    onAnswer(answer_id, elapsedTime, rec_word)
+                                }
+                            }
                         }
                         else ->
 
@@ -663,9 +676,7 @@ class TestFragment : BaseFragment(
                             } else
                             // RECOGNIZER ERROR
                                 speechManager.speak(it.second!!, TextToSpeech.QUEUE_FLUSH, clb = {
-                                    if (!abortRecognition) listenForVocalAnswer(
-                                        valid_results
-                                    )
+                                    if (!abortRecognition) listenForVocalAnswer(valid_results)
                                 })
                     }
                 }

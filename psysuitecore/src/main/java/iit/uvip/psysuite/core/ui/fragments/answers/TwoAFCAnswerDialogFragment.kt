@@ -27,7 +27,7 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
     protected var isInstructions:Boolean    = false
 
     protected var showResult:Boolean = false
-    private var correctAnswer:String = ""
+    private var correctAnswer:Int = 0
     protected var mQuestion:String              = ""
     protected var mAnswers:ArrayList<String>    = arrayListOf()
 
@@ -58,7 +58,7 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         // Fetch arguments from bundle and set title
         val title           = requireArguments().getString("title", "Enter Name")
-        txt_trials.text     = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " di " + requireArguments().getInt("tot_trials", 0)
+        txt_trials.text     = "trial ${(requireArguments().getInt("trial_id", 0) + 1)} di ${requireArguments().getInt("tot_trials", 0)}"
         mQuestion           = requireArguments().getString("question", "Enter Name")
         mAnswers            = requireArguments().getStringArrayList("answers") ?: arrayListOf<String>()
         txt_debug.text      = requireArguments().getString("debugInfo")
@@ -67,13 +67,13 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         showResult          = requireArguments().getBoolean("show_result", false)
         if(showResult && mAnswers.size > 0)
-            correctAnswer   = requireArguments().getString("correct_answer", mAnswers[0])
+            correctAnswer   = requireArguments().getInt("correct_answer", 0)
 
         dialog?.setTitle(title)
         imgvResult.visibility   = View.INVISIBLE
         bt_clear.visibility     = View.VISIBLE
 
-        txt_question.text   = mQuestion
+        txt_question.text       = mQuestion
 
         if (mAnswers.isNotEmpty()) {
             rb_a_0.text = mAnswers[0]
@@ -84,8 +84,8 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         if(isDebug){
             mHandler.postDelayed({
-                if(random() < 0.5)  sendResult(mAnswers[0], 100, TestBasic.EVENT_ANSWER_GIVEN)
-                else                sendResult(mAnswers[1], 100, TestBasic.EVENT_ANSWER_GIVEN)
+                if(random() < 0.5)  sendResult(0, 100, TestBasic.EVENT_ANSWER_GIVEN)
+                else                sendResult(1, 100, TestBasic.EVENT_ANSWER_GIVEN)
             }, 1000L)
         }
     }
@@ -105,7 +105,7 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
         }
 
         bt_clear.setOnClickListener{
-            sendResult("", 0, TestBasic.EVENT_TRIAL_REPEAT)
+            sendResult(-1, 0, TestBasic.EVENT_TRIAL_REPEAT)
         }
 
         bt_abort_test.setOnClickListener{
@@ -115,18 +115,18 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
     protected open fun confirm(){
         if(radioGroupAudio.checkedRadioButtonId != -1)
-            checkResult(mAnswers[radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId))])
+            checkResult(radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId)))
         else
             showToast("Seleziona un'opzione", requireContext())
     }
 
     protected fun abort(){
         mHandler.removeCallbacksAndMessages(null)
-        sendResult("", 0, TestBasic.EVENT_TRIAL_ABORT)
+        sendResult(-1, 0, TestBasic.EVENT_TRIAL_ABORT)
         dismiss()
     }
 
-    private fun checkResult(curr_answer:String){
+    private fun checkResult(curr_answer:Int){
         val elapsedms = getTimeDifference(onsetDate)
         if(showResult) {
             if (curr_answer == correctAnswer)   imgvResult.setImageResource(R.drawable.success_icon)
@@ -144,7 +144,7 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
     }
 
     // last point of the exit/dismiss procedure
-    protected fun sendResult(response: String, elapsedTime: Int, response_id: Int) {
+    protected fun sendResult(response: Int, elapsedTime: Int, response_id: Int) {
         if (targetFragment == null) return
 
         tts?.stop()

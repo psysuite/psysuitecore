@@ -4,7 +4,7 @@ import iit.uvip.psysuite.core.tests.TrialBasic
 
 //                trial_id    0/1      fig_res
 class TrialBeads(id: Int = -1, type: Int, label: String, var img_res:Int, var beads_types:List<Boolean>) :
-    TrialBasic(id, type, label, "") {
+    TrialBasic(id, type, label, -1) {
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\ttype\tfig\n"

@@ -39,9 +39,9 @@ object ProjectPreferences: SharedPreferenceWrapper() {
         setDefault()
     }
 
-    override fun read(key: String, value: Any): Any?{
+    override fun read(key: String, defvalue: Any): Any?{
         return  if(!keysHashMap.contains(key) || !isInitialized()) null
-                else super.read(key, value)
+                else super.read(key, defvalue)
     }
 
     override fun write(key: String, value: Any): Any?{

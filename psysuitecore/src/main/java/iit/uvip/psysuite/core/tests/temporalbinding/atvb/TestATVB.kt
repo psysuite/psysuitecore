@@ -8,6 +8,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.*
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
@@ -266,28 +267,30 @@ class TestATVB(
 
 
 //        subject.isDebug = true
-        if(!subject.isDebug) {
-            when (subject.type) {
-                TEST_ATVB_TIME_S_UNBAL,
-                TEST_ATVB_TIME_D_UNBAL -> {
-                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                    createTrialsTimeUnbalanced()
-                }
+        val trials = if(!subject.isDebug) {
+                        when (subject.type) {
+                            TEST_ATVB_TIME_S_UNBAL,
+                            TEST_ATVB_TIME_D_UNBAL -> {
+                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                createTrialsTimeUnbalanced()
+                            }
 
-                TEST_ATVB_TIME_S_BAL,
-                TEST_ATVB_TIME_D_BAL -> {
-                    createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
-                    createTrialsTimeBalanced()
-                }
-
-//                TEST_ATVB_TIME_S_BAL2 -> {
-//                    createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
-//                    createTrialsTimeBalanced2()
-//                }
-            }
-        }
-        else    createTrialsDebug()
-
+                            TEST_ATVB_TIME_S_BAL,
+                            TEST_ATVB_TIME_D_BAL -> {
+                                createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
+                                createTrialsTimeBalanced()
+                            }
+                            else -> {
+                                throw Exception("ERROR in TESTATVB")
+                            }
+            //                TEST_ATVB_TIME_S_BAL2 -> {
+            //                    createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
+            //                    createTrialsTimeBalanced2()
+            //                }
+                        }
+                    }
+                    else    createTrialsDebug()
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         initSummary()
 
@@ -301,12 +304,7 @@ class TestATVB(
 
         if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
-        // mTrials list
-        nTrials         = mTrials.size
-        currTrial       = 0
-
         mListBlocks     = mutableListOf((nTrials * 0.25F).roundToInt(), (nTrials * 0.5F).roundToInt(), (nTrials * 0.75F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
-
 //        mListBlocks     = mutableListOf(0,2)    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
         mTestLabel      = ""
@@ -328,36 +326,36 @@ class TestATVB(
     // CREATE TRIALS
     // =============================================================================================================================
     // [(36 + 3)*2 + 6] * NUM_REPETITIONS(4) = 336
-    private fun createTrialsTimeUnbalanced() {
+    private fun createTrialsTimeUnbalanced():List<TrialBasic>{
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS) {
 
-            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            val rtrials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
             for (j in 0 until 2) {
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, validAnswers[0]))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, 0))
 
                 // 36
                 lStimuliUnbalanced.map {
-                    trials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, validAnswers[1]))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
                 }
             }
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT_V, unbalSD[6].first, validAnswers[1]))
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_AT, unbalSD[6].first, validAnswers[1]))
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV_T, unbalSD[6].first, validAnswers[1]))
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_AV, unbalSD[6].first, validAnswers[1]))
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV_A, unbalSD[6].first, validAnswers[1]))
-            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_TV, unbalSD[6].first, validAnswers[1]))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT_V, unbalSD[6].first, 1))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_AT, unbalSD[6].first, 1))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV_T, unbalSD[6].first, 1))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_AV, unbalSD[6].first, 1))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV_A, unbalSD[6].first, 1))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_TV, unbalSD[6].first, 1))
 
-            trials.shuffle()
-            mTrials.addAll(trials)
+            rtrials.shuffle()
+            trials.addAll(rtrials)
         }
-        setTrialsID()   // set id according to their order
+        return trials
     }
 
-    private fun createTrialsDebug(){
+    private fun createTrialsDebug():List<TrialBasic>{
 
 //        createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
 //        subject.type = TEST_ATVB_TIME_S_BAL
@@ -366,7 +364,7 @@ class TestATVB(
         subject.type = TEST_ATVB_TIME_S_UNBAL
 
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials:MutableList<TrialBasic> = mutableListOf()
 //        for (i in 0 until 100000) {
 //
 //            val trials: MutableList<TrialBindings3latencies> = mutableListOf()
@@ -382,39 +380,37 @@ class TestATVB(
 
             val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
             for (j in 0 until 2) {
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0, 0))
 //                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_TV, 100, validAnswers[0]))
 //                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV_A, 100, validAnswers[0]))
 //                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_TV, 50, validAnswers[0]))
 //                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV_A, 50, validAnswers[0]))
             }
-            mTrials.addAll(trials)
         }
-        setTrialsID()
+        return trials
     }
 
     // [18 + 3] * 2 * NUM_REPETITIONS2(8) = 336
-    private fun createTrialsTimeBalanced() {
+    private fun createTrialsTimeBalanced():List<TrialBasic> {
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS_B) {   // NUM_REPETITIONS2
-
             for (j in 0 until 2) {
-                val trials: MutableList<TrialBindings3latencies> = mutableListOf()
+                val rtrials: MutableList<TrialBindings3latencies> = mutableListOf()
 
-                trials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
-                trials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
-                trials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
+                rtrials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
+                rtrials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
+                rtrials.add(TrialBindingsBalanced(++cnt, TYPE_ATV, 0L,  validAnswers))
 
                 // 18
                 lStimuliBalancedShort.map {
-                    trials.add(TrialBindingsBalanced(++cnt, it.type, it.delay, validAnswers))
+                    rtrials.add(TrialBindingsBalanced(++cnt, it.type, it.delay, validAnswers))
                 }
-                trials.shuffle()
-                mTrials.addAll(trials)
+                rtrials.shuffle()
+                trials.addAll(rtrials)
              }
         }
-        setTrialsID()   // set id according to their order
+        return trials
     }
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
@@ -436,9 +432,9 @@ class TestATVB(
         }
     }
 
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
         testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.nextTrial(prev_result, elapsed)
+        return super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     override fun initSummary(){

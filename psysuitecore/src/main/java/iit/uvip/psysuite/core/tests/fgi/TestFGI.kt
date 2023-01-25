@@ -32,6 +32,7 @@ import io.reactivex.disposables.Disposable
 import org.albaspazio.core.accessory.toDp
 import java.util.concurrent.TimeUnit
 import android.widget.TextView
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 
 
 // show -> onTrialEnd -> EVENT_GIVE_ANSWER
@@ -171,12 +172,9 @@ class TestFGI(ctx: Context,
                 mDrawablesResource[5]
             }
         }
-
-        if(!subject.isDebug)  createTrials()
-        else                  createTrialsDebug()
-
-        nTrials                 = mTrials.size
-        currTrial               = 0
+        val trials =    if(!subject.isDebug)  createTrials()
+                        else                  createTrialsDebug()
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         currStimulusDuration    = TRIAL_DURATION
         mTestLabel              = ""
@@ -199,31 +197,34 @@ class TestFGI(ctx: Context,
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(){
+    private fun createTrials():List<TrialBasic>{
 
         val audios:List<String> = when(subject.type){
             TEST_FGI_1_UNSCRAMBLED, TEST_FGI_1_SCRAMBLED  -> listOf("", mAudioResourcesNames[0], mAudioResourcesNames[1], mAudioResourcesNames[4], mAudioResourcesNames[0], "", mAudioResourcesNames[4], mAudioResourcesNames[1])
             TEST_FGI_2_UNSCRAMBLED, TEST_FGI_2_SCRAMBLED  -> listOf("", mAudioResourcesNames[3], mAudioResourcesNames[1], mAudioResourcesNames[2], mAudioResourcesNames[3], "", mAudioResourcesNames[2], mAudioResourcesNames[1])
             else                                          -> listOf("", mAudioResourcesNames[0], mAudioResourcesNames[1], mAudioResourcesNames[3], mAudioResourcesNames[0], "", mAudioResourcesNames[3], mAudioResourcesNames[1])
         }
-        mTrials.add(TrialFGI(1,1, currImageName, audios[0]))
-        mTrials.add(TrialFGI(2,3, currImageName, audios[1]))
-        mTrials.add(TrialFGI(3,4, currImageName, audios[2]))
-        mTrials.add(TrialFGI(4,2, currImageName, audios[3]))
-        mTrials.add(TrialFGI(5,3, currImageName, audios[4]))
-        mTrials.add(TrialFGI(6,1, currImageName, audios[5]))
-        mTrials.add(TrialFGI(7,2, currImageName, audios[6]))
-        mTrials.add(TrialFGI(8,4, currImageName, audios[7]))
+        val trials:MutableList<TrialBasic> = mutableListOf()
+        trials.add(TrialFGI(1,1, currImageName, audios[0]))
+        trials.add(TrialFGI(2,3, currImageName, audios[1]))
+        trials.add(TrialFGI(3,4, currImageName, audios[2]))
+        trials.add(TrialFGI(4,2, currImageName, audios[3]))
+        trials.add(TrialFGI(5,3, currImageName, audios[4]))
+        trials.add(TrialFGI(6,1, currImageName, audios[5]))
+        trials.add(TrialFGI(7,2, currImageName, audios[6]))
+        trials.add(TrialFGI(8,4, currImageName, audios[7]))
+
+        return trials
     }
 
-    private fun createTrialsDebug(){
-        createTrials()
+    private fun createTrialsDebug():List<TrialBasic>{
+        return createTrials()
     }
 
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
 
         // if !last trial && !block end => doNextTrial
         return when {

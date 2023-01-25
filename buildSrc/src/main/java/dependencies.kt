@@ -17,6 +17,7 @@ object Versions {
     const val moshi = "1.12.0"
 
     const val fragment = "1.4.0"
+    const val chaquopy = "12.0.1"
 
 }
 
@@ -53,6 +54,8 @@ object Plugins {
     const val androidLibrary        = "com.android.library"
     const val kotlinAndroid         = "android"
     const val kotlinExtensions      = "android.extensions"
+
+    const val chaquopy              = "com.chaquo.python"
 }
 
 object ProGuards {

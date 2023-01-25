@@ -47,6 +47,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":nativeaudio"))
+    implementation(project(":psysuitepython"))
 
     implementation(Dependencies.AndroidX.ktxCore)
     implementation(Dependencies.AndroidX.appCompat)

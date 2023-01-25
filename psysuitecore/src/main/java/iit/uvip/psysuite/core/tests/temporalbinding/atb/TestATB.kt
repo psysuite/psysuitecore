@@ -8,11 +8,12 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.AudioManager
 import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_T1
 import iit.uvip.psysuite.core.stimuli.TactileManager
 import iit.uvip.psysuite.core.stimuli.VibratorNotDefinedException
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
@@ -179,36 +180,33 @@ class TestATB(ctx: Context,
             }
         }
 
-        if(!subject.isDebug) {
-            // create trials/summary
-            when (subject.type) {
-                TEST_ATB_TIME_DOUBLESTIM_TOD,
-                TEST_ATB_TIME_DOUBLESTIM ->{
-                    createTrialsTimeDouble()
-                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                    initSummary()
-
-                }
-                TEST_ATB_TIME_SINGLESTIM_TOD,
-                TEST_ATB_TIME_SINGLESTIM       -> {
-                    createTrialsTimeSingle()
-                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                    initSummary()
-                }
-                TEST_ATB_TIME_INF   -> {
-                    initTimeArrays()
-                    createTrialsTimeInfants()
-                    createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
-                }
-            }
-        }
-        else{
-            createTrialsDebug()
-            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-        }
-
-        nTrials     = mTrials.size
-        currTrial   = 0
+        val trials = if(!subject.isDebug) {
+                        // create trials/summary
+                        when (subject.type) {
+                            TEST_ATB_TIME_DOUBLESTIM_TOD,
+                            TEST_ATB_TIME_DOUBLESTIM ->{
+                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                initSummary()
+                                createTrialsTimeDouble()
+                            }
+                            TEST_ATB_TIME_SINGLESTIM_TOD,
+                            TEST_ATB_TIME_SINGLESTIM       -> {
+                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                initSummary()
+                                createTrialsTimeSingle()
+                            }
+                            else   -> {
+                                initTimeArrays()
+                                createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
+                                createTrialsTimeInfants()
+                            }
+                        }
+                    }
+                    else{
+                        createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                        createTrialsDebug()
+                    }
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         mListBlocks = mutableListOf((nTrials *0.2F).roundToInt(), (nTrials * 0.4F).roundToInt(), (nTrials * 0.6F).roundToInt(), (nTrials * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
 
@@ -250,12 +248,10 @@ class TestATB(ctx: Context,
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrialsTimeInfants() {
+    private fun createTrialsTimeInfants():List<TrialBasic>{
         var cnt = -1
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS_INFANTS) {
-
-            val trials: MutableList<TrialBindingsInfants> = mutableListOf()
-
             trials.add(TrialBindingsInfants(++cnt, lStimuli[0].type, lStimuli[0].tactile_pattern))
             trials.add(TrialBindingsInfants(++cnt, lStimuli[1].type, lStimuli[1].tactile_pattern))
             trials.add(TrialBindingsInfants(++cnt, lStimuli[4].type, lStimuli[4].tactile_pattern))
@@ -264,84 +260,81 @@ class TestATB(ctx: Context,
             trials.add(TrialBindingsInfants(++cnt, lStimuli[0].type, lStimuli[0].tactile_pattern))
             trials.add(TrialBindingsInfants(++cnt, lStimuli[3].type, lStimuli[3].tactile_pattern))
             trials.add(TrialBindingsInfants(++cnt, lStimuli[2].type, lStimuli[2].tactile_pattern))
-
-            mTrials.addAll(trials)
         }
+        return trials
     }
 
     //      at0  a   t  at1200  6latenze
     // 2 x [ 2 + 2 + 2 +  2  +  4 x 6lat] = 2 x 32 = 64
-    private fun createTrialsTimeDouble() {
+    private fun createTrialsTimeDouble():List<TrialBasic>{
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS) {
-            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            val rtrials: MutableList<TrialBasic> = mutableListOf()
             for (j in 0 until 2) {
 
                 // 6
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, validAnswers[1]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, validAnswers[1]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, validAnswers[1]))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, 1))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_A, 0, 1))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, 1))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, 1))
 
                 // 26
                 lStimuliUnBalanced.map {
-                    trials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, validAnswers[1]))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
                 }
             }
-            trials.shuffle()
-            mTrials.addAll(trials)
+            rtrials.shuffle()
+            trials.addAll(rtrials)
         }
-        setTrialsID()   // set id according to their order
+        return trials
     }
 
     // only-A & only-T were removed in single stimulus sub-task. 7/8/2020
     //      at0  at1200  6latenze
     // 2 x [ 2  +  2  +  4 x 6lat] = 2 x 28 = 56
-    private fun createTrialsTimeSingle() {
+    private fun createTrialsTimeSingle():List<TrialBasic>{
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS) {
-            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
+            val rtrials: MutableList<TrialBasic> = mutableListOf()
             for (j in 0 until 2) {
 
                 // 2
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, 0))
 
                 // 26
                 lStimuliUnBalanced.map {
-                    trials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, validAnswers[1]))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
                 }
             }
-            trials.shuffle()
-            mTrials.addAll(trials)
+            rtrials.shuffle()
+            trials.addAll(rtrials)
         }
-        setTrialsID()   // set id according to their order
+        return trials
     }
 
-    private fun createTrialsDebug(){
+    private fun createTrialsDebug():List<TrialBasic>{
         var cnt = -1
-        mTrials = mutableListOf()
+        val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until 100000) {
-
-            val trials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
             for (j in 0 until 2) {
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_T, 50, validAnswers[0]))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_A, 50, validAnswers[0]))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT, 0, 0))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_T, 50, 0))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_A, 50, 0))
             }
-            mTrials.addAll(trials)
         }
+        return trials
     }
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
         testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.nextTrial(prev_result, elapsed)
+        return super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     // called by secondTrain
@@ -478,7 +471,7 @@ class TestATB(ctx: Context,
                 }, 5 * curISI + A_delay)
             }
 
-            UNIMODAL_AUDIO_CODE -> {
+            STIM_TYPE_T1 -> {
                 mStimuliHandler.postDelayed({
                     testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
                 }, 3 * curISI)

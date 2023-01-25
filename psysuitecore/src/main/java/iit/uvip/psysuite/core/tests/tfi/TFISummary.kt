@@ -61,7 +61,7 @@ class TFISummary(ctx: Context) : Summary(ctx){
 
         override fun add(trial: TrialBasic) {
 
-            when((trial as TrialTFI).correct_answer){
+            when((trial as TrialTFI).str_corr_answer){
                 "0,0,1"    -> rows[0].add(trial)
                 "0,0,2"    -> rows[1].add(trial)
                 "1,0,0"    -> rows[2].add(trial)

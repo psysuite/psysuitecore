@@ -67,7 +67,6 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
 
         mImageView.visibility   = View.INVISIBLE
         curStimDuration         = 1000L
-        currTrial               = 0
         validAnswers            = mutableListOf()
 
         ITI                     = (subject as SubjectSampleParcel).iti
@@ -81,7 +80,6 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
 
         createResultFile(subject, LOG_HEADER)
         createTrials()
-        nTrials                 = mTrials.size
         setStimuliManager()
     }
 
@@ -174,7 +172,7 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(){
+    private fun createTrials():List<TrialBasic>{
 
         val extraTrial:Any? = when(subject.type){
             TEST_SAMPLE_SHIFTED     -> (subject as SubjectSampleParcel).shiftedParams
@@ -183,9 +181,11 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
         }
 
         var cnt = -1
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(t in 0 until (subject as SubjectSampleParcel).repetitions){
-            mTrials.add(TrialSample(++cnt, subject.type, "", subject.stim_sources, extraTrial))
+            trials.add(TrialSample(++cnt, subject.type, "", subject.stim_sources, extraTrial))
         }
+        return trials
     }
 
     // =============================================================================================================================

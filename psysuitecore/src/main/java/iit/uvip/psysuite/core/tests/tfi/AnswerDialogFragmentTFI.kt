@@ -109,7 +109,7 @@ class AnswerDialogFragmentTFI: DialogFragment()
     private fun sendResult(response: String, elapsedTime: Int, response_id: Int) {
         if (targetFragment == null) return
 
-        val intent = TestFragment.newIntent(response, elapsedTime, response_id)
+        val intent = TestFragment.newIntent(-1, elapsedTime, response_id, response)
         targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
         dismiss()
     }
