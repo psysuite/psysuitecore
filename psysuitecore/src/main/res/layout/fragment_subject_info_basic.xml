@@ -59,17 +59,16 @@
             app:layout_constraintTop_toBottomOf="@+id/txtName" />
 
     <EditText
-            android:id="@+id/txtName"
-            android:layout_width="135dp"
-            android:layout_height="46dp"
-            android:layout_marginTop="16dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:digits="abcdefghijklmnopqrstuvwxyz_0123456789"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.862"
-            app:layout_constraintStart_toEndOf="@+id/labName"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/txtName"
+        android:layout_width="135dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:digits="abcdefghijklmnopqrstuvwxyz_0123456789"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
             android:id="@+id/radioGroupGender"
@@ -96,10 +95,11 @@
 
     <Button
         android:id="@+id/bt_cancel"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
         android:layout_width="371dp"
         android:layout_height="55dp"
         android:layout_marginTop="84dp"
-        android:text="Cancel"
+        android:text="@string/cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
@@ -108,12 +108,12 @@
 
     <Spinner
         android:id="@+id/spCondition"
-        android:layout_width="310dp"
-        android:layout_height="30dp"
+        android:layout_width="353dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="28dp"
-        android:layout_marginEnd="12dp"
         android:textAlignment="viewEnd"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
     <TextView
@@ -128,7 +128,7 @@
 
     <Switch
         android:id="@+id/swInteractive"
-        android:layout_width="137dp"
+        android:layout_width="135dp"
         android:layout_height="24dp"
         android:layout_marginTop="128dp"
         android:layout_marginEnd="20dp"
@@ -199,7 +199,7 @@
 
     <Spinner
         android:id="@+id/spPopulation"
-        android:layout_width="141dp"
+        android:layout_width="135dp"
         android:layout_height="28dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"

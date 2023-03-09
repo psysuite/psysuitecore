@@ -136,7 +136,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         labWhiteNoise.visibility    = View.VISIBLE
         when(subj.whitenoise){
             TestBasic.TEST_WNOISE_DISABLED,
-            TestBasic.TEST_WNOISE_ENABLED->  {
+            TestBasic.TEST_WNOISE_ENABLED -> {
                 swWhiteNoise.visibility     = View.INVISIBLE
                 labWhiteNoise.visibility    = View.INVISIBLE
             }

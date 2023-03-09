@@ -87,6 +87,7 @@ class TestFragment : BaseFragment(
 
     private var isPaused:Boolean                    = false
     private var mHandler: Handler                   = Handler(Looper.getMainLooper())
+    private var mRunnable: Runnable?                = null      // runnable to be cancelled while confirming abort
 
     private var abortRecognition:Boolean            = false  // set true when I answer manually and speech rec is going to be restarted (e.g. rec busy or error)
     private lateinit var speechRecognitionManager: SpeechRecognitionManager
@@ -230,8 +231,6 @@ class TestFragment : BaseFragment(
                     showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
                     return@SpeechManager
                 }
-
-
                 // get a reference to the AnswerDialogFragment
                 val answerDialogClass = if(isBlindUser)
                                             // population is visually impaired. use AnswerGestureDF
@@ -302,13 +301,18 @@ class TestFragment : BaseFragment(
         }
 
         bt_abort.setOnClickListener{
-
+            mHandler.removeCallbacks(mRunnable!!)
             show2ChoisesDialog(requireActivity(),
                 requireContext().resources.getString(R.string.warning),
                 requireContext().resources.getString(R.string.test_want2abort),
                 requireContext().resources.getString(R.string.yes),         // ok
                 requireContext().resources.getString(R.string.no),       // cancel
-                { onAbortTest() })
+                { onAbortTest() }, {
+                    bt_next.visibility      = View.INVISIBLE
+                    bt_pause.visibility     = View.INVISIBLE
+
+                    onNewTrial()
+                })
         }
 
         bt_pause.setOnClickListener{
@@ -342,43 +346,43 @@ class TestFragment : BaseFragment(
         .subscribe {
             when(it.first){
 
-                TestBasic.EVENT_TEST_SETUP_COMPLETED    -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
-                TestBasic.EVENT_GIVE_ANSWER             -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
+                TestBasic.EVENT_TEST_SETUP_COMPLETED -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
+                TestBasic.EVENT_GIVE_ANSWER -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
                 TestBasic.EVENT_GIVE_VOCAL_ANSWER -> {
-                                                           bt_abort.visibility = View.VISIBLE
-                                                           listenForVocalAnswer(mTest.validAnswers)
+                    bt_abort.visibility = View.VISIBLE
+                    listenForVocalAnswer(mTest.validAnswers)
                 }
-                TestBasic.EVENT_SHOW_NEXT_BUTTON        -> showNext()
+                TestBasic.EVENT_SHOW_NEXT_BUTTON -> showNext()
 
                 // called by SubTests' nextTrial
                 TestBasic.EVENT_UPDATE_TRIAL_ID -> {
-                                                            try {
-                                                                val dur = it.second as Long
-                                                                showTrialId(dur)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showTrialId(1000L)
-                                                            }
+                    try {
+                        val dur = it.second as Long
+                        showTrialId(dur)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        showTrialId(1000L)
+                    }
                 }
                 TestBasic.EVENT_SHOW_ABORT -> {
-                                                            try {
-                                                                val dur = it.second as Long
-                                                                showShortAbort(dur)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showShortAbort(1000L)
-                                                            }
+                    try {
+                        val dur = it.second as Long
+                        showShortAbort(dur)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        showShortAbort(1000L)
+                    }
                 }
                 TestBasic.EVENT_SHOW_DEBUGINFO -> {
-                                                            try {
-                                                                val info = it.second as String
-                                                                showDebugInfo(info)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showDebugInfo(e.toString())
-                                                            }
+                    try {
+                        val info = it.second as String
+                        showDebugInfo(info)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        showDebugInfo(e.toString())
+                    }
                 }
-                TestBasic.EVENT_TEST_ERROR              -> onTestError(it.second as String)
+                TestBasic.EVENT_TEST_ERROR -> onTestError(it.second as String)
 
                 TestBasic.EVENT_STIMULI_START -> {}
                 TestBasic.EVENT_STIMULI_END -> {}
@@ -544,11 +548,14 @@ class TestFragment : BaseFragment(
         bt_pause.visibility = View.VISIBLE
 
         if(remove > 0){
-            mHandler.postDelayed({
+
+            mRunnable = Runnable {
                 bt_abort.visibility = View.INVISIBLE
                 bt_pause.visibility = View.INVISIBLE
-                onTrialEnded()
-            }, remove)
+                onTrialEnded()()
+            }
+
+            mHandler.postDelayed(mRunnable!!, remove)
         }
     }
 

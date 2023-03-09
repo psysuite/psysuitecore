@@ -63,7 +63,7 @@ class TestTFI(ctx: Context,
 
         @JvmStatic val TEST_BASIC_LABEL                 = "TFI"
         @JvmStatic val TEST_BASIC_TODDLERS_LABEL        = "TFI toddlers"
-        @JvmStatic val TEST_BASIC_SHORT_LABEL           = "TFI SHORT"
+        @JvmStatic val TEST_BASIC_BI_LABEL              = "TFI BI"
         @JvmStatic val TEST_BASIC_AV_LABEL              = "DFI AV"
         @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com",
                                                                     "psysuite.uvip@gmail.com")
@@ -71,13 +71,12 @@ class TestTFI(ctx: Context,
         fun getConditionsInfo(ctx: Context): List<ConditionData>{
 
             return if(VibrationManager.sysHasVibrator(ctx)){
-                        mutableListOf(  ConditionData(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
-                                        ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations),
-                                        ConditionData(TEST_BASIC_SHORT_LABEL, TEST_TFI_BIMODAL, "${TEST_BASIC_LABEL}BI", Populations.sighted_hearing_populations),
-                                        ConditionData(TEST_BASIC_AV_LABEL, TEST_TFI_AV, "${TEST_BASIC_LABEL}AV", Populations.sighted_hearing_populations))
+                        mutableListOf(  ConditionData(TEST_BASIC_LABEL          , TEST_TFI          , TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_TODDLERS_LABEL , TEST_TFI_TODDLERS , "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_BI_LABEL       , TEST_TFI_BIMODAL  , "${TEST_BASIC_LABEL}BI",  Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_AV_LABEL       , TEST_TFI_AV       , "${TEST_BASIC_LABEL}AV",  Populations.sighted_hearing_populations))
                     }else{
-                        mutableListOf(  ConditionData(TEST_BASIC_SHORT_LABEL, TEST_TFI_BIMODAL, "${TEST_BASIC_LABEL}BI", Populations.sighted_hearing_populations),
-                                        ConditionData(TEST_BASIC_AV_LABEL, TEST_TFI_AV, "${TEST_BASIC_LABEL}AV", Populations.sighted_hearing_populations))
+                        mutableListOf(  ConditionData(TEST_BASIC_AV_LABEL       , TEST_TFI_AV       , "${TEST_BASIC_LABEL}AV", Populations.sighted_hearing_populations))
                     }
         }
 
@@ -162,13 +161,13 @@ class TestTFI(ctx: Context,
                                 StimuliManager(
                                     AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
                                     TactileManager(vibrator, duration = STIM_DURATION_TACTILE, handler = mStimuliHandler),
-                                    VisualManager(STIM_V, mImageView!!, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
+                                    VisualManager(STIM_V, mImageView, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
                                     delaysAligner, ctx, mStimuliHandler)
                             else
                                 StimuliManager(
                                     AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
                                     null,
-                                    VisualManager(STIM_V, mImageView!!, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
+                                    VisualManager(STIM_V, mImageView, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
                                     delaysAligner, ctx, mStimuliHandler)
 
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))

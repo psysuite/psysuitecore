@@ -78,6 +78,6 @@ data class StimulusDelay (val type: Int, val delay:Long)
 data class StimulusBIS(val ntrials:Int, val position:Int, val conflict:String)
 
 fun VibrationManager.vibrateSingle(paramsT: TactileManager) {
-    this.vibrateSingle(paramsT.duration, paramsT.amplitude)
+    this.vibrateSingle(paramsT.duration, paramsT.amplitudes[0])
 }
 

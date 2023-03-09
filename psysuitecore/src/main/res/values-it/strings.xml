@@ -28,12 +28,12 @@
     <string name="test_aborted_blind">Hai deciso di interrompere il test. Chiedi assistenza per completare</string>
     <string name="new_trial">Nuovo stimolo</string>
 
-    <string name="name">nome</string>
+    <string name="name">name</string>
     <string name="gender">sesso</string>
     <string name="age">ETA\'</string>
     <string name="group">gruppo</string>
 
-    <string name="source">sorgente</string>
+    <string name="source">source</string>
     <string name="type">tipo</string>
     <string name="pattern">pattern</string>
     <string name="audio">audio</string>
@@ -70,7 +70,7 @@
     <string name="firstcond">Cond. Iniziale</string>
 
     <string name="subject_present">Il nome scelto è già esistente. Vuoi continuare ad usare questo nome?</string>
-    <string name="subject_block_present">Esiste una precedente sessione di test Vuoi proseguirla o vuoi cancellare tutto e ricominciare da zero?</string>
+    <string name="subject_block_present">Esiste una precedente sessione di test\nVuoi proseguirla o vuoi cancellare tutto e ricominciare da zero?</string>
     <string name="select_subject_info">Indicare nome ed età</string>
     <string name="select_gender">Indicare il sesso</string>
     <string name="select_population">Seleziona una popolazione</string>
@@ -113,32 +113,17 @@
     <string name="internal_error">Il codice ha generato il seguente errore\n%1$s</string>
 
 
-    <string name="pref_delay_a1" translatable="false">10</string>
-    <string name="pref_delay_a2" translatable="false">29</string>
-    <string name="pref_delay_a3" translatable="false">18</string>
-    <string name="pref_delay_t1" translatable="false">0</string>
-    <string name="pref_delay_t2" translatable="false">0</string>
-    <string name="pref_delay_v1" translatable="false">29</string>
-    <string name="pref_delay_v2" translatable="false">29</string>
-
-
-    <string name="label_bindings" translatable="false">Temporal Bindings</string>
-    <string name="label_temporal_tests">Temporal Tests</string>
-    <string name="label_decision_tests">Decisions Tests</string>
-    <string name="label_illusion_tests">Illusions Tests</string>
+    <string name="label_temporal_tests">Test temporali</string>
+    <string name="label_decision_tests">Tests di decisione</string>
+    <string name="label_illusion_tests">Tests di illusione</string>
 
     <!-- ATB -->
-    <string name="start_atb" translatable="false">AT Binding (AT-B)</string>
 
     <string name="atb_subtask_time_single">Singolo Stimolo</string>
-    <string name="atb_subtask_time_single_tag" translatable="false">SS</string>
     <string name="atb_subtask_time_double">Doppio Stimolo</string>
-    <string name="atb_subtask_time_double_tag" translatable="false">DS</string>
 
-    <string name="atb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="atb_subtask_time_single_tod_tag" translatable="false">SST</string>
-    <string name="atb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="atb_subtask_time_double_tod_tag" translatable="false">DST</string>
+    <string name="atb_subtask_time_single_tod">Singolo Stimolo bambini</string>
+    <string name="atb_subtask_time_double_tod">Doppio Stimolo bambini</string>
 
     <string name="atb_subtask_time_infants">tempo infanti</string>
     <string name="atb_subtask_time_infants_tag">INF</string>
@@ -148,18 +133,12 @@
     <string name="atb_question">Sono uguali?</string>
 
     <!-- ATVB -->
-    <string name="start_atvb" translatable="false">ATV Binding (ATV-B)</string>
 
     <string name="atvb_subtask_time_single">Singolo Stimolo</string>
-    <string name="atvb_subtask_time_single_tag" translatable="false">SSU</string>
     <string name="atvb_subtask_time_single_b">Singolo Stimolo bilanciato</string>
-    <string name="atvb_subtask_time_single_b_tag" translatable="false">SSB</string>
     <string name="atvb_subtask_time_single_b2">Singolo Stimolo bilanciato 2</string>
-    <string name="atvb_subtask_time_single_b2_tag" translatable="false">SSB</string>
     <string name="atvb_subtask_time_double">Doppio Stimolo</string>
-    <string name="atvb_subtask_time_double_tag" translatable="false">DSU</string>
     <string name="atvb_subtask_time_double2">Doppio Stimolo bilanciato</string>
-    <string name="atvb_subtask_time_double2_tag" translatable="false">DSB</string>
 
     <string name="atvb_rb1_text">si</string>
     <string name="atvb_rb3_text">no</string>
@@ -168,34 +147,24 @@
     <string name="atvb_question_whichsecond">Che tipo di stimolo è il secondo?</string>
 
     <!-- TVB -->
-    <string name="start_tvb" translatable="false">TV Binding (TV-B)</string>
 
     <string name="tvb_subtask_time_single">Singolo Stimolo</string>
-    <string name="tvb_subtask_time_single_tag" translatable="false">SS</string>
     <string name="tvb_subtask_time_double">Doppio Stimolo</string>
-    <string name="tvb_subtask_time_double_tag" translatable="false">DS</string>
 
-    <string name="tvb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_single_tod_tag" translatable="false">SST</string>
-    <string name="tvb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="tvb_subtask_time_double_tod_tag" translatable="false">DST</string>
+    <string name="tvb_subtask_time_single_tod">Singolo Stimolo bambini</string>
+    <string name="tvb_subtask_time_double_tod">Doppio Stimolo bambini</string>
 
     <string name="tvb_rb1_text">uguali</string>
     <string name="tvb_rb3_text">diversi</string>
     <string name="tvb_question">Sono uguali?</string>
 
     <!-- AVB -->
-    <string name="start_avb" translatable="false">AV Binding (AV-B)</string>
 
     <string name="avb_subtask_time_single">Singolo Stimolo</string>
-    <string name="avb_subtask_time_single_tag" translatable="false">SS</string>
     <string name="avb_subtask_time_double">Doppio Stimolo</string>
-    <string name="avb_subtask_time_double_tag" translatable="false">DS</string>
 
-    <string name="avb_subtask_time_single_tod">Singolo Stimolo Toddlers</string>
-    <string name="avb_subtask_time_single_tod_tag" translatable="false">SST</string>
-    <string name="avb_subtask_time_double_tod">Doppio Stimolo Toddlers</string>
-    <string name="avb_subtask_time_double_tod_tag" translatable="false">DST</string>
+    <string name="avb_subtask_time_single_tod">Singolo Stimolo bambini</string>
+    <string name="avb_subtask_time_double_tod">Doppio Stimolo bambini</string>
 
     <string name="avb_rb1_text">uguali</string>
     <string name="avb_rb3_text">diversi</string>
@@ -204,7 +173,6 @@
     <!-- TID -->
 
     <string name="tid_label">Temporal Interval Discrimination (TID)</string>
-    <string name="tid_label_short" translatable="false">TID</string>
 
     <string name="tid_question_text">Quale intervallo in ciascuna coppia era maggiore?\nnella prima o nella seconda coppia?</string>
 
@@ -249,7 +217,6 @@
     <string name="tid_start_training_text">INIZIA TRAINING</string>
 
     <!-- BISECTION -->
-    <string name="start_bisection">MULTIMODAL BISECTION</string>
 
     <string-array name="bis_sessions_array">
         <item>pre test</item>
@@ -315,7 +282,7 @@
 
     <!-- SAMPLE TEST -->
 
-    <string name="samples_test">CUSTOM STIMULI CREATOR (CSC) </string>
+    <string name="samples_test">CUSTOM TRIALS GENERATION</string>
 
     <string name="select_source">Seleziona almeno una modalità di stimolazione</string>
 
@@ -348,7 +315,8 @@
         <item>t1000hz_1000ms.wav</item>
         <item>t200hz_1000ms.wav</item>
     </string-array>
-    <string name="abort_test">ANNULLA TEST</string>
+    <string name="start_bisection">BISEZIONE MULTIMODALE</string>
+    <string name="abort_test">ANULLA TEST</string>
     <string name="iti">ITI [s]</string>
 
 </resources>

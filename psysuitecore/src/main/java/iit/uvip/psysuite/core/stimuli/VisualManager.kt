@@ -5,7 +5,13 @@ import android.view.View
 import android.widget.ImageView
 import kotlin.Double
 
-class VisualManager(override val type:Int, private val imgV: ImageView, var drawResOn:Int=1, private val drawResOff:Int=0, override val duration:Long=-1L, val handler: Handler)
+class VisualManager(
+    override val type:Int,
+    private val imgV: ImageView,
+    var drawResOn:Int=1,
+    private val drawResOff:Int=0,
+    override val duration:Long=-1L,
+    val handler: Handler)
     : iStimulusManager{
 
     override val isValid:Boolean
