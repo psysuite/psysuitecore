@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.Fragment2afcAnswerBinding
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
-import kotlinx.android.synthetic.main.fragment_2afc_answer.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -22,6 +22,8 @@ import java.util.*
 open class TwoAFCAnswerDialogFragment: DialogFragment()
 {
     open val LOG_TAG = TwoAFCAnswerDialogFragment::class.java.simpleName
+
+    private lateinit var binding: Fragment2afcAnswerBinding
 
     protected var isDebug:Boolean           = false
     protected var isInstructions:Boolean    = false
@@ -48,9 +50,9 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_2afc_answer, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = Fragment2afcAnswerBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,10 +60,10 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         // Fetch arguments from bundle and set title
         val title           = requireArguments().getString("title", "Enter Name")
-        txt_trials.text     = "trial ${(requireArguments().getInt("trial_id", 0) + 1)} di ${requireArguments().getInt("tot_trials", 0)}"
+        binding.txtTrials.text     = "trial ${(requireArguments().getInt("trial_id", 0) + 1)} di ${requireArguments().getInt("tot_trials", 0)}"
         mQuestion           = requireArguments().getString("question", "Enter Name")
         mAnswers            = requireArguments().getStringArrayList("answers") ?: arrayListOf<String>()
-        txt_debug.text      = requireArguments().getString("debugInfo")
+        binding.txtDebug.text      = requireArguments().getString("debugInfo")
         isDebug             = requireArguments().getBoolean("isDebug", false)
         isInstructions      = (targetRequestCode == TestFragment.TRG_REQ_CODE_INSTRUCTIONS)
 
@@ -70,14 +72,14 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
             correctAnswer   = requireArguments().getInt("correct_answer", 0)
 
         dialog?.setTitle(title)
-        imgvResult.visibility   = View.INVISIBLE
-        bt_clear.visibility     = View.VISIBLE
+        binding.imgvResult.visibility   = View.INVISIBLE
+        binding.btClear.visibility     = View.VISIBLE
 
-        txt_question.text       = mQuestion
+        binding.txtQuestion.text       = mQuestion
 
         if (mAnswers.isNotEmpty()) {
-            rb_a_0.text = mAnswers[0]
-            rb_a_1.text = mAnswers[1]
+            binding.rbA0.text = mAnswers[0]
+            binding.rbA1.text = mAnswers[1]
         }
 
         clear()
@@ -100,22 +102,22 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         super.onResume()
 
-        bt_confirm.setOnClickListener{
+        binding.btConfirm.setOnClickListener{
             confirm()
         }
 
-        bt_clear.setOnClickListener{
+        binding.btClear.setOnClickListener{
             sendResult(-1, 0, TestBasic.EVENT_TRIAL_REPEAT)
         }
 
-        bt_abort_test.setOnClickListener{
+        binding.btAbortTest.setOnClickListener{
             abort()
         }
     }
 
     protected open fun confirm(){
-        if(radioGroupAudio.checkedRadioButtonId != -1)
-            checkResult(radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId)))
+        if(binding.radioGroupAudio.checkedRadioButtonId != -1)
+            checkResult(binding.radioGroupAudio.indexOfChild(binding.radioGroupAudio.findViewById(binding.radioGroupAudio.checkedRadioButtonId)))
         else
             showToast("Seleziona un'opzione", requireContext())
     }
@@ -129,14 +131,14 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
     private fun checkResult(curr_answer:Int){
         val elapsedms = getTimeDifference(onsetDate)
         if(showResult) {
-            if (curr_answer == correctAnswer)   imgvResult.setImageResource(R.drawable.success_icon)
-            else                                imgvResult.setImageResource(R.drawable.failure_icon)
+            if (curr_answer == correctAnswer)   binding.imgvResult.setImageResource(R.drawable.success_icon)
+            else                                binding.imgvResult.setImageResource(R.drawable.failure_icon)
 
-            bt_clear.visibility = View.INVISIBLE
-            bt_confirm.visibility = View.INVISIBLE
-            imgvResult.visibility = View.VISIBLE
+            binding.btClear.visibility = View.INVISIBLE
+            binding.btConfirm.visibility = View.INVISIBLE
+            binding.imgvResult.visibility = View.VISIBLE
             mHandler.postDelayed({
-                imgvResult.visibility = View.INVISIBLE
+                binding.imgvResult.visibility = View.INVISIBLE
                 sendResult(curr_answer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
             }, 1000L)
         }
@@ -155,8 +157,8 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
     }
 
     private fun clear(){
-        radioGroupAudio.clearCheck()
-        rb_a_0.isChecked = false
-        rb_a_1.isChecked = false
+        binding.radioGroupAudio.clearCheck()
+        binding.rbA0.isChecked = false
+        binding.rbA1.isChecked = false
     }
 }

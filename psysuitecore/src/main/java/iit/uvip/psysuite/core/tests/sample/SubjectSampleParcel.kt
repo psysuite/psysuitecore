@@ -43,8 +43,8 @@ open class SubjectSampleParcel(
     var visualDrawableOff:Int   = 0,    //
     var visualDrawableOn:Int    = 0,    //
 
-    var tactileAmplitude:Int = -1,   // amplitude of vibration. default to MAX_AMPLITUDE (-1)
-    var tactileSequence:String = "", // array of off-set, onset or duration (Long)
+    var tactileAmplitudes:String = "-1",    // array of amplitudes of vibration. default to "-1" ( a.k.a.  MAX_AMPLITUDE (-1))
+    var tactileTimings:String = "",         // array of periods (Long)
 
     var shiftedParams:List<Long> = listOf(0L,0L,0L),
     var pairDistance:Long = 0,

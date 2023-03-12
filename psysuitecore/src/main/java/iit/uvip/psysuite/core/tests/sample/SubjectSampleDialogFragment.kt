@@ -10,11 +10,11 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoSampleBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
-import kotlinx.android.synthetic.main.fragment_subject_info_sample.*
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 
@@ -22,22 +22,26 @@ import org.albaspazio.core.ui.showAlert
 open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterView.OnItemSelectedListener
 {
     override val LOG_TAG: String = SubjectSampleDialogFragment::class.java.simpleName
+    private lateinit var binding:FragmentSubjectInfoSampleBinding
 
     companion object {
         @JvmStatic val EVENT_SUBJECT:String = "subject"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_subject_info_sample, container)
+        binding = FragmentSubjectInfoSampleBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        // since this dialog does not have the txtName, I rewrite here all defined in SubjectBasicDialogFragment but for the code related to txtName
         super.onViewCreated(view, savedInstanceState)
 
-        spCondition.onItemSelectedListener  = this
-        spTactile.onItemSelectedListener    = this
-        spAudio.onItemSelectedListener      = this
-        spVisual.onItemSelectedListener     = this
+        binding.spCondition.onItemSelectedListener  = this
+        binding.spTactile.onItemSelectedListener    = this
+        binding.spAudio.onItemSelectedListener      = this
+        binding.spVisual.onItemSelectedListener     = this
     }
 
     override fun onResume() {
@@ -59,44 +63,43 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         //------------------------------------------------------
         setConditions(mTaskCodeLabels)
 
-        etDurationAudio.isEnabled   = false
-        spAudio.isEnabled           = false
-        spAudioResource.isEnabled   = false
+        binding.etDurationAudio.isEnabled   = false
+        binding.spAudio.isEnabled           = false
+        binding.spAudioResource.isEnabled   = false
 
-        etDurationVisual.isEnabled  = false
-        spVisual.isEnabled          = false
+        binding.etDurationVisual.isEnabled  = false
+        binding.spVisual.isEnabled          = false
 
-        spTactile.isEnabled         = false
-        etTactileSchema.isEnabled   = false
-        etTactileAmplitude.isEnabled= false
+        binding.spTactile.isEnabled         = false
+
 
         ArrayAdapter.createFromResource(requireContext(), R.array.sample_audio_types, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spAudio.adapter = adapter
+            binding.spAudio.adapter = adapter
         }
-        spAudio.setSelection(0)
+        binding.spAudio.setSelection(0)
 
         ArrayAdapter.createFromResource(requireContext(), R.array.sample_visual_types, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spVisual.adapter = adapter
+            binding.spVisual.adapter = adapter
         }
-        spVisual.setSelection(0)
+        binding.spVisual.setSelection(0)
 
         ArrayAdapter.createFromResource(requireContext(), R.array.sample_tactile_types, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spTactile.adapter = adapter
+            binding.spTactile.adapter = adapter
         }
-        spTactile.setSelection(0)
+        binding.spTactile.setSelection(0)
 
         ArrayAdapter.createFromResource(requireContext(), R.array.sample_audioassets_array, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spAudioResource.adapter = adapter
+            binding.spAudioResource.adapter = adapter
         }
-        spAudioResource.setSelection(0)
+        binding.spAudioResource.setSelection(0)
 
-        etPairStimDistance.isEnabled = false
+        binding.etPairStimDistance.isEnabled = false
 
-        etRepetitionNum.setText("10000")
+        binding.etRepetitionNum.setText("10000")
 
         //------------------------------------------------------
         // NEXT TRIAL MODALITY
@@ -107,45 +110,45 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         when (subject.nextTrailModality) {
 
             TestBasic.TEST_NEXTTRIAL_BUTTON -> {
-                swInteractive?.isChecked = true
+                binding.swInteractive?.isChecked = true
             }
             TestBasic.TEST_NEXTTRIAL_AUTO -> {
-                swInteractive?.isChecked = false
+                binding.swInteractive?.isChecked = false
             }
         }
         //------------------------------------------------------
         // noise
-        swWhiteNoise.visibility     = View.VISIBLE
-        swWhiteNoise.isChecked      = false
+        binding.swWhiteNoise.visibility     = View.VISIBLE
+        binding.swWhiteNoise.isChecked      = false
     }
 
     private fun setListeners() {
-        bt_confirm.setOnClickListener { confirmData() }
-        bt_clear.setOnClickListener { clear() }
-        bt_cancel.setOnClickListener { sendResult(null) }
+        binding.btConfirm.setOnClickListener { confirmData() }
+        binding.btClear.setOnClickListener { clear() }
+        binding.btCancel.setOnClickListener { sendResult(null) }
 
-        swAudio.setOnCheckedChangeListener { _, b ->
-            etDurationAudio.isEnabled   = b
-            spAudio.isEnabled           = b
-            spAudioResource.isEnabled   = b
+        binding.swAudio.setOnCheckedChangeListener { _, b ->
+            binding.etDurationAudio.isEnabled   = b
+            binding.spAudio.isEnabled           = b
+            binding.spAudioResource.isEnabled   = b
 
             if (b) updateAudio()
         }
 
-        swVisual.setOnCheckedChangeListener { _, b ->
-            etDurationVisual.isEnabled  = b
-            spVisual.isEnabled          = b
+        binding.swVisual.setOnCheckedChangeListener { _, b ->
+            binding.etDurationVisual.isEnabled  = b
+            binding.spVisual.isEnabled          = b
         }
 
-        swTactile.setOnCheckedChangeListener { _, b ->
-            spTactile.isEnabled         = b
-            etTactileSchema.isEnabled   = b
-            etTactileAmplitude.isEnabled= b
+        binding.swTactile.setOnCheckedChangeListener { _, b ->
+            binding.spTactile.isEnabled         = b
+            binding.etTactileAmplitudes.isEnabled   = b
+            binding.etTactileTimings.isEnabled= b
 
             if (b) updateTactile()
         }
 
-        swInteractive?.setOnCheckedChangeListener { _, b ->
+        binding.swInteractive?.setOnCheckedChangeListener { _, b ->
             subject.nextTrailModality = when (b) {
                 true -> TestBasic.TEST_NEXTTRIAL_BUTTON
                 false -> TestBasic.TEST_NEXTTRIAL_AUTO
@@ -182,20 +185,20 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
     // cannot call super.onClear as some UI elements are missing
     override fun clear(){
 
-        swAudio.isChecked   = false
-        swTactile.isChecked = false
-        swVisual.isChecked  = false
+        binding.swAudio.isChecked   = false
+        binding.swTactile.isChecked = false
+        binding.swVisual.isChecked  = false
 
         updateShifted(false)
 
         if (nConditions > 1)
-            spCondition.setSelection(-1)
+            binding.spCondition.setSelection(-1)
 
         if (subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_AUTO || subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_BUTTON) {
-            swInteractive?.isChecked    = false
+            binding.swInteractive?.isChecked    = false
             subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
         }
-        swWhiteNoise.isChecked = false
+        binding.swWhiteNoise.isChecked = false
     }
 
 
@@ -209,53 +212,53 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
     override fun onNothingSelected(parent: AdapterView<*>?) {}
 
     private fun updateCondition(){
-        when(spCondition.selectedItemPosition) {
+        when(binding.spCondition.selectedItemPosition) {
             0   ->  {
-                etPairStimDistance.isEnabled = false
+                binding.etPairStimDistance.isEnabled = false
                 updateShifted(false)
             }
             1   ->  {
-                etPairStimDistance.isEnabled = false
+                binding.etPairStimDistance.isEnabled = false
                 updateShifted(true)
             }
             2   ->  {
-                etPairStimDistance.isEnabled = true
+                binding.etPairStimDistance.isEnabled = true
                 updateShifted(false)
             }
         }
     }
 
     private fun updateTactile(){
-        when(spTactile.selectedItemPosition) {
-            0   ->  labTactileDuration.text = resources.getString(R.string.duration)
-            1   ->  labTactileDuration.text = resources.getString(R.string.pattern)
+        when(binding.spTactile.selectedItemPosition) {
+            0   ->  binding.labTactileDuration.text = resources.getString(R.string.duration)
+            1   ->  binding.labTactileDuration.text = resources.getString(R.string.pattern)
         }
     }
 
     private fun updateVisual(){
-        when(spVisual.selectedItemPosition) {
+        when(binding.spVisual.selectedItemPosition) {
             0   ->  {
-                etVisualDrawableOff.isEnabled   = false
-                etVisualDrawableOn.isEnabled    = false
+                binding.etVisualDrawableOff.isEnabled   = false
+                binding.etVisualDrawableOn.isEnabled    = false
             }
             1   ->  {
-                etVisualDrawableOff.isEnabled   = true
-                etVisualDrawableOn.isEnabled    = true
+                binding.etVisualDrawableOff.isEnabled   = true
+                binding.etVisualDrawableOn.isEnabled    = true
             }
         }
     }
 
     private fun updateAudio(){
-        when(spAudio.selectedItemPosition) {
-            0   ->  spAudioResource.isEnabled   = false
-            else   ->  spAudioResource.isEnabled   = true
+        when(binding.spAudio.selectedItemPosition) {
+            0   ->  binding.spAudioResource.isEnabled   = false
+            else   ->  binding.spAudioResource.isEnabled   = true
         }
     }
 
     private fun updateShifted(enable:Boolean){
-        etShiftedAudio.isEnabled    = enable
-        etShiftedVisual.isEnabled   = enable
-        etShiftedTactile.isEnabled  = enable
+        binding.etShiftedAudio.isEnabled    = enable
+        binding.etShiftedVisual.isEnabled   = enable
+        binding.etShiftedTactile.isEnabled  = enable
     }
 
     //------------------------------------------------------------------------------------
@@ -264,35 +267,35 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
 
     private fun calculateSources():Int{
         var src = 0
-        if(swAudio.isChecked) {
-            src = when (spAudio.selectedItemPosition) {
+        if(binding.swAudio.isChecked) {
+            src = when (binding.spAudio.selectedItemPosition) {
                 0       ->  src or StimuliManager.STIM_TYPE_A1
                 1       ->  src or StimuliManager.STIM_TYPE_A2
                 2       ->  src or StimuliManager.STIM_TYPE_A3
                 else    ->  src or StimuliManager.STIM_TYPE_A4
             }
-            (subject as SubjectSampleParcel).audioDuration   = etDurationAudio.text.toString().toLong()
-            (subject as SubjectSampleParcel).audioResource   = spAudioResource.selectedItem as String
-            (subject as SubjectSampleParcel).audioVolume     = etAudioVolume.text.toString().toInt()
+            (subject as SubjectSampleParcel).audioDuration   = binding.etDurationAudio.text.toString().toLong()
+            (subject as SubjectSampleParcel).audioResource   = binding.spAudioResource.selectedItem as String
+            (subject as SubjectSampleParcel).audioVolume     = binding.etAudioVolume.text.toString().toInt()
         }
 
-        if(swTactile.isChecked) {
-            src = when (spTactile.selectedItemPosition) {
+        if(binding.swTactile.isChecked) {
+            src = when (binding.spTactile.selectedItemPosition) {
                 0       ->  src or StimuliManager.STIM_TYPE_T1
                 else    ->  src or StimuliManager.STIM_TYPE_T2
             }
-            (subject as SubjectSampleParcel).tactileAmplitude    = etTactileAmplitude.text.toString().toInt()
-            (subject as SubjectSampleParcel).tactileSequence     = etTactileSchema.text.toString()
+            (subject as SubjectSampleParcel).tactileAmplitudes  = binding.etTactileAmplitudes.text.toString()
+            (subject as SubjectSampleParcel).tactileTimings     = binding.etTactileTimings.text.toString()
         }
 
-        if(swVisual.isChecked) {
-            src = when (spVisual.selectedItemPosition) {
+        if(binding.swVisual.isChecked) {
+            src = when (binding.spVisual.selectedItemPosition) {
                 0       ->  src or StimuliManager.STIM_TYPE_V1
                 else    ->  src or StimuliManager.STIM_TYPE_V2
             }
-            (subject as SubjectSampleParcel).visualDuration      = etDurationVisual.text.toString().toLong()
-            (subject as SubjectSampleParcel).visualDrawableOn    = etVisualDrawableOn.text.toString().toInt()
-            (subject as SubjectSampleParcel).visualDrawableOff   = etVisualDrawableOff.text.toString().toInt()
+            (subject as SubjectSampleParcel).visualDuration      = binding.etDurationVisual.text.toString().toLong()
+            (subject as SubjectSampleParcel).visualDrawableOn    = binding.etVisualDrawableOn.text.toString().toInt()
+            (subject as SubjectSampleParcel).visualDrawableOff   = binding.etVisualDrawableOff.text.toString().toInt()
         }
         return src
     }
@@ -303,7 +306,7 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
         val errors = mutableListOf<String>()
 
         if(calculateSources() == 0)                 errors.add(resources.getString(R.string.select_source))
-        if (spCondition.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_condition))
+        if (binding.spCondition.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_condition))
 
         return errors
     }
@@ -311,9 +314,9 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
     // subject has been already validated
      override fun updateSubject(): SubjectBasicParcel{
 
-        subject.type                = mTaskCodeLabels[spCondition.selectedItemPosition].id
+        subject.type                = mTaskCodeLabels[binding.spCondition.selectedItemPosition].id
 
-        subject.nextTrailModality = when (swInteractive?.isChecked) {
+        subject.nextTrailModality = when (binding.swInteractive?.isChecked) {
             true -> TestBasic.TEST_NEXTTRIAL_BUTTON
             false -> TestBasic.TEST_NEXTTRIAL_AUTO
             null -> subject.nextTrailModality
@@ -321,21 +324,21 @@ open class SubjectSampleDialogFragment: SubjectBasicDialogFragment(), AdapterVie
 
         (subject as SubjectSampleParcel).stim_sources = calculateSources()
 
-        when(spCondition.selectedItemPosition){
-            1 -> (subject as SubjectSampleParcel).shiftedParams = listOf(   etShiftedAudio.text.toString().toLong(),
-                                                                            etShiftedVisual.text.toString().toLong(),
-                                                                            etShiftedTactile.text.toString().toLong())
+        when(binding.spCondition.selectedItemPosition){
+            1 -> (subject as SubjectSampleParcel).shiftedParams = listOf(   binding.etShiftedAudio.text.toString().toLong(),
+                binding.etShiftedVisual.text.toString().toLong(),
+                binding.etShiftedTactile.text.toString().toLong())
 
-            2 -> (subject as SubjectSampleParcel).pairDistance = if(etPairStimDistance.text.toString().isEmpty()) 0L
-                                                                 else    etPairStimDistance.text.toString().toLong()
+            2 -> (subject as SubjectSampleParcel).pairDistance = if(binding.etPairStimDistance.text.toString().isEmpty()) 0L
+                                                                 else    binding.etPairStimDistance.text.toString().toLong()
         }
 
-        (subject as SubjectSampleParcel).repetitions = etRepetitionNum.text.toString().toInt()
+        (subject as SubjectSampleParcel).repetitions = binding.etRepetitionNum.text.toString().toInt()
 
         if((subject as SubjectSampleParcel).repetitions > 1)
-            (subject as SubjectSampleParcel).iti = etITI.text.toString().toLong()
+            (subject as SubjectSampleParcel).iti = binding.etITI.text.toString().toLong()
 
-        subject.whitenoise =    if(swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
+        subject.whitenoise =    if(binding.swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
         else                        TestBasic.TEST_WNOISE_CHOOSE_OFF
 
         return subject

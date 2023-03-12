@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import iit.uvip.psysuite.core.R
-import kotlinx.android.synthetic.main.fragment_results_list.*
-import kotlinx.android.synthetic.main.fragment_results_list.view.*
+
+import iit.uvip.psysuite.core.databinding.FragmentResultsListBinding
+
 import org.albaspazio.core.filesystem.getFileNamesList
 
 /**
@@ -19,6 +19,7 @@ class ResultsFragment : Fragment() {
 
     var relPath:String = Environment.DIRECTORY_DOWNLOADS
     var filesList:MutableList<ResultFileEntry> = mutableListOf()
+    private lateinit var binding: FragmentResultsListBinding
 
     lateinit var listAdapter:ResultsRecyclerViewAdapter
 
@@ -36,22 +37,24 @@ class ResultsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.fragment_results_list, container, false)
+        binding = FragmentResultsListBinding.inflate(inflater, container, false)
+
+//        val view = inflater.inflate(R.layout.fragment_results_list, container, false)
         // Set the adapter
         listAdapter             = ResultsRecyclerViewAdapter(filesList)
-        view.list.adapter       = listAdapter
-        view.list.layoutManager = LinearLayoutManager(context)
-        return view
+        binding.list.adapter       = listAdapter
+        binding.list.layoutManager = LinearLayoutManager(context)
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
 
-        bt_send_results.setOnClickListener {
+        binding.btSendResults.setOnClickListener {
 
         }
 
-        swSelectAll.setOnCheckedChangeListener { _, b ->
+        binding.swSelectAll.setOnCheckedChangeListener { _, b ->
             listAdapter.selectAll(b)
         }
     }

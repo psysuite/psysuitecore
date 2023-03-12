@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.FragmentAnswerTfiBinding
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
-import kotlinx.android.synthetic.main.fragment_answer_tfi.*
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -22,7 +22,9 @@ import java.util.*
 class AnswerDialogFragmentTFI: DialogFragment()
 {
     val LOG_TAG = AnswerDialogFragmentTFI::class.java.simpleName
-
+    
+    private lateinit var binding:FragmentAnswerTfiBinding
+    
     private var isDebug:Boolean = false
 
     lateinit var onsetDate:Date
@@ -42,9 +44,9 @@ class AnswerDialogFragmentTFI: DialogFragment()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_answer_tfi, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentAnswerTfiBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,16 +54,16 @@ class AnswerDialogFragmentTFI: DialogFragment()
 
         // Fetch arguments from bundle and set title
         val title           = requireArguments().getString("title", "Enter Name")
-        txt_trials.text     = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " of " + requireArguments().getInt("tot_trials", 0)
-        txt_question.text   = requireArguments().getString("question", "Enter Name")
-        txt_debug.text      = requireArguments().getString("debugInfo")
+        binding.txtTrials.text     = "trial " +  (requireArguments().getInt("trial_id", 0) + 1).toString() + " of " + requireArguments().getInt("tot_trials", 0)
+        binding.txtQuestion.text   = requireArguments().getString("question", "Enter Name")
+        binding.txtDebug.text      = requireArguments().getString("debugInfo")
         isDebug             = requireArguments().getBoolean("isDebug", false)
 
         dialog?.setTitle(title)
 
-        radioGroupAudio.check(radioGroupAudio.getChildAt(0).id)
-        radioGroupTactile.check(radioGroupTactile.getChildAt(0).id)
-        radioGroupVisual.check(radioGroupVisual.getChildAt(0).id)
+        binding.radioGroupAudio.check(binding.radioGroupAudio.getChildAt(0).id)
+        binding.radioGroupTactile.check(binding.radioGroupTactile.getChildAt(0).id)
+        binding.radioGroupVisual.check(binding.radioGroupVisual.getChildAt(0).id)
 
         onsetDate           = Date()
 
@@ -83,7 +85,7 @@ class AnswerDialogFragmentTFI: DialogFragment()
 
         super.onResume()
 
-        bt_confirm.setOnClickListener{
+        binding.btConfirm.setOnClickListener{
 
             val elapsedms = getTimeDifference(onsetDate)
             val res = getRadioSelection()
@@ -95,11 +97,11 @@ class AnswerDialogFragmentTFI: DialogFragment()
             }
         }
 
-        bt_clear.setOnClickListener{
+        binding.btClear.setOnClickListener{
             sendResult("", 0, TestBasic.EVENT_TRIAL_REPEAT)
         }
 
-        bt_abort_test.setOnClickListener{
+        binding.btAbortTest.setOnClickListener{
             mHandler.removeCallbacksAndMessages(null)
             sendResult("", 0, TestBasic.EVENT_TRIAL_ABORT)
             dismiss()
@@ -117,24 +119,24 @@ class AnswerDialogFragmentTFI: DialogFragment()
     private fun getRadioSelection():String{
 
         var res = ""
-        when(radioGroupAudio.checkedRadioButtonId != -1) {
-            true -> res = radioGroupAudio.indexOfChild(radioGroupAudio.findViewById(radioGroupAudio.checkedRadioButtonId)).toString()
+        when(binding.radioGroupAudio.checkedRadioButtonId != -1) {
+            true -> res = binding.radioGroupAudio.indexOfChild(binding.radioGroupAudio.findViewById(binding.radioGroupAudio.checkedRadioButtonId)).toString()
             false -> {
                 showToast("Seleziona un'opzione per l\'audio", requireContext())
                 return ""
             }
         }
 
-        when(radioGroupTactile.checkedRadioButtonId != -1) {
-            true -> res = "$res,${radioGroupTactile.indexOfChild(radioGroupTactile.findViewById(radioGroupTactile.checkedRadioButtonId))}"
+        when(binding.radioGroupTactile.checkedRadioButtonId != -1) {
+            true -> res = "$res,${binding.radioGroupTactile.indexOfChild(binding.radioGroupTactile.findViewById(binding.radioGroupTactile.checkedRadioButtonId))}"
             false -> {
                 showToast("Seleziona un'opzione per il tatto", requireContext())
                 return ""
             }
         }
 
-        when(radioGroupVisual.checkedRadioButtonId != -1) {
-            true -> res = "$res,${radioGroupVisual.indexOfChild(radioGroupVisual.findViewById(radioGroupVisual.checkedRadioButtonId))}"
+        when(binding.radioGroupVisual.checkedRadioButtonId != -1) {
+            true -> res = "$res,${binding.radioGroupVisual.indexOfChild(binding.radioGroupVisual.findViewById(binding.radioGroupVisual.checkedRadioButtonId))}"
             false -> {
                 showToast("Seleziona un'opzione per il visivo", requireContext())
                 return ""

@@ -2,36 +2,32 @@ package iit.uvip.psysuite.core.tests.beads
 
 import android.app.Activity
 import android.content.Context
-import android.media.MediaPlayer
 import android.os.SystemClock.uptimeMillis
 import android.view.Gravity
-import android.view.MotionEvent
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.FragmentTestBinding
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.utility.ConditionData
+
 import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.toDp
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
-
-import androidx.constraintlayout.widget.ConstraintLayout
-import iit.uvip.psysuite.core.R
-import androidx.constraintlayout.widget.ConstraintSet
-import iit.uvip.psysuite.core.tests.FixedTrialsManager
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_test.view.*
-
-import org.albaspazio.core.accessory.toDp
-import java.util.concurrent.TimeUnit
 import java.lang.Double.POSITIVE_INFINITY
 
 
@@ -50,6 +46,8 @@ class TestBeads(ctx: Context,
     override var LOG_TAG: String = TestBeads::class.java.simpleName
 
     private var STIM_V  = StimuliManager.STIM_TYPE_V1
+
+    private lateinit var binding: FragmentTestBinding
 
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(
@@ -280,10 +278,10 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     private fun setUI() {
 
-        val mainlayout      = mainView.findViewById(R.id.fragment_test_layout) as ConstraintLayout
-        parent_layout_width = mainlayout.width
+        binding             = FragmentTestBinding.inflate(activity.layoutInflater)
 
-//        mImageView!!.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+        parent_layout_width = binding.fragmentTestLayout.width
+        val mainlayout      = binding.fragmentTestLayout
 
         val constraintSet = ConstraintSet()
         constraintSet.clone(mainlayout)
@@ -291,7 +289,7 @@ class TestBeads(ctx: Context,
         button_left = createBottomButton(buttonsLabels[2], mainlayout, constraintSet, ConstraintSet.LEFT, 250, 100)
         button_right = createBottomButton(buttonsLabels[3], mainlayout, constraintSet, ConstraintSet.RIGHT, 250, 100)
 
-        createBeadsRow(mainlayout, nbeadsXtrial)
+        createBeadsRow(binding.hlayout, nbeadsXtrial)
     }
 
     private fun createBottomButton(txt:String, parent_layout:ConstraintLayout, constr_set:ConstraintSet, hconstr:Int, hconstr_margin:Int, vconstr_margin:Int):Button{
@@ -316,7 +314,7 @@ class TestBeads(ctx: Context,
         return bt
     }
 
-    private fun createBeadsRow(layout:ConstraintLayout, nbut:Int, res:Int=-1){
+    private fun createBeadsRow(layout:LinearLayout, nbut:Int, res:Int=-1){
 
         for (a in 0 until nbut) {
             val iv = ImageView(ctx).apply {
@@ -329,7 +327,7 @@ class TestBeads(ctx: Context,
                     setImageResource(res)
                 }
             }
-            layout.hlayout.addView(iv)
+            layout.addView(iv)
             beads_images.add(iv)
         }
     }
