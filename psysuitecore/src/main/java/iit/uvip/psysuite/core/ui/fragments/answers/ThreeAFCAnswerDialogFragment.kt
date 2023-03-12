@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import iit.uvip.psysuite.core.R
-import kotlinx.android.synthetic.main.fragment_3afc_answer.*
+import iit.uvip.psysuite.core.databinding.Fragment3afcAnswerBinding
 import org.albaspazio.core.speech.SpeechManager
 
 class ThreeAFCAnswerDialogFragment: TwoAFCAnswerDialogFragment() {
 
     override val LOG_TAG = ThreeAFCAnswerDialogFragment::class.java.simpleName
 
+    private lateinit var binding: Fragment3afcAnswerBinding
 
     companion object {
         fun newInstance(title: String, speechManager: SpeechManager): ThreeAFCAnswerDialogFragment {
@@ -25,14 +25,13 @@ class ThreeAFCAnswerDialogFragment: TwoAFCAnswerDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_3afc_answer, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = Fragment3afcAnswerBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rb_a_2.text = mAnswers[2]
+        binding.rbA2.text = mAnswers[2]
     }
 }

@@ -139,18 +139,16 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
             else -> null
         }
 
-        val tactileManager =    if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
-            TactileManager(vibrator!!, subject.tactileAmplitude, duration = subject.tactileSequence.toLong(), handler = mStimuliHandler)
+        val tact_amplitudes = TactileManager.validateAmplitudes(subject.tactileAmplitudes)
+        val tact_timings    = TactileManager.validateTimings(subject.tactileTimings)
 
-        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0){
-            val timings = TactileManager.validatePattern(subject.tactileSequence)
-            if(timings != null) TactileManager(vibrator!!, subject.tactileAmplitude, timings, handler = mStimuliHandler)
-            else {
-                // TODO: ALERT
-                null
-            }
-        }
-        else null
+        val tactileManager  =   if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
+            TactileManager(vibrator!!, tact_amplitudes, duration = subject.tactileTimings.toLong(), handler = mStimuliHandler)
+        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0)
+            TactileManager(vibrator!!, tact_amplitudes, tact_timings, type = StimuliManager.STIM_TYPE_T2, handler = mStimuliHandler)
+        else throw Exception()
+
+
 
         val visualManager = when {
             subject.stim_sources and StimuliManager.STIM_TYPE_V1 > 0 -> {

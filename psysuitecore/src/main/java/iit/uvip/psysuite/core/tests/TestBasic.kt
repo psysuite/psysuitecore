@@ -10,11 +10,13 @@ import android.os.Handler
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
+
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.stimuli.StimuliManager
+
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.logLastTwo
 import org.albaspazio.core.filesystem.*

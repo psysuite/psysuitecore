@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.GestureDetectorCompat
+
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.Fragment2afcAnswerBinding
 import iit.uvip.psysuite.core.tests.TestBasic
-import kotlinx.android.synthetic.main.fragment_2afc_answer.*
+
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.gestures.MyGestureDetector
 import org.albaspazio.core.speech.SpeechManager
@@ -17,10 +19,13 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
 {
     override val LOG_TAG = AnswerGestureDialogFragment::class.java.simpleName
 
+    private lateinit var binding: Fragment2afcAnswerBinding
+
     private var selectedAnswer:String  = ""
     private var selectedAnswerId:Int   = -1
     private lateinit var layoutView:View
     private var isAborting:Boolean = false  // when user DT this flag is set to true, only after another DT, it aborts the test
+
     companion object {
         fun newInstance(title: String, speechManager: SpeechManager): AnswerGestureDialogFragment {
             val frag = AnswerGestureDialogFragment()
@@ -33,9 +38,9 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        layoutView = inflater.inflate(R.layout.fragment_2afc_answer, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = Fragment2afcAnswerBinding.inflate(LayoutInflater.from(context))
+        layoutView = binding.root
         return layoutView
     }
 
@@ -60,17 +65,17 @@ class AnswerGestureDialogFragment: TwoAFCAnswerDialogFragment()
 
         registerGestures()
 
-        bt_confirm.setOnClickListener(null)
-        bt_confirm.visibility = View.INVISIBLE
+        binding.btConfirm.setOnClickListener(null)
+        binding.btConfirm.visibility = View.INVISIBLE
 
-        bt_clear.setOnClickListener(null)
-        bt_clear.visibility = View.INVISIBLE
+        binding.btClear.setOnClickListener(null)
+        binding.btClear.visibility = View.INVISIBLE
 
-        bt_abort_test.setOnClickListener(null)
-        bt_abort_test.visibility = View.INVISIBLE
+        binding.btAbortTest.setOnClickListener(null)
+        binding.btAbortTest.visibility = View.INVISIBLE
 
-        rb_a_0.visibility = View.INVISIBLE
-        rb_a_1.visibility = View.INVISIBLE
+        binding.rbA0.visibility = View.INVISIBLE
+        binding.rbA1.visibility = View.INVISIBLE
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------------

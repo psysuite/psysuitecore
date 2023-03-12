@@ -7,25 +7,27 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
+import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoTidBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectLongitudinalDialogFragment
 import iit.uvip.psysuite.core.utility.ConditionData
-import kotlinx.android.synthetic.main.fragment_subject_info_tid.*
 
 class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterView.OnItemSelectedListener
 {
     override val LOG_TAG: String = SubjectTIDDialogFragment::class.java.simpleName
+    private lateinit var binding:FragmentSubjectInfoTidBinding
 
     private var selGroup: Int = -1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_subject_info_tid, container)
+        binding = FragmentSubjectInfoTidBinding.inflate(LayoutInflater.from(context))
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        spinner.onItemSelectedListener = this
-        spGroup.onItemSelectedListener = this
+        binding.spinner.onItemSelectedListener = this
+        binding.spGroup.onItemSelectedListener = this
     }
 
     override fun initData(subj: SubjectBasicParcel) {
@@ -36,13 +38,13 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         //------------------------------------------------------
         val adapter:ArrayAdapter<ConditionData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, mTaskCodeLabels)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spGroup.adapter = adapter
+        binding.spGroup.adapter = adapter
 
         // nConditions coincided with number of available groups
         if (nConditions == 1) {
             // do not show condition spinner & set subject.type
-            labGroup.visibility = View.GONE
-            spGroup.visibility  = View.GONE
+            binding.labGroup.visibility = View.GONE
+            binding.spGroup.visibility  = View.GONE
             (subject as SubjectTIDParcel).group = mTaskCodeLabels[0].id
             selGroup                            = 0
         }
@@ -51,7 +53,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
                 // set group spinner to subject.group
                 mTaskCodeLabels.mapIndexed { index, taskCode ->
                     if (taskCode.id == (subject as SubjectTIDParcel).group){
-                        spGroup.setSelection(index, false)
+                        binding.spGroup.setSelection(index, false)
                         selGroup            = index
                     }
                 }
@@ -59,7 +61,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
             else {
                 // set group spinner to first sub-task
                 selGroup = 0
-                spGroup.setSelection(selGroup)
+                binding.spGroup.setSelection(selGroup)
                 (subject as SubjectTIDParcel).group = mTaskCodeLabels[0].id
             }
         }
@@ -71,24 +73,24 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
         // when selecting training sessions => selCondition = selGroup (and condition spinner gets disabled)
 
         // check session change
-        when(spinner.selectedItemPosition){
+        when(binding.spinner.selectedItemPosition){
             in 2..6   -> {
-                        setConditions(listOf(mTaskCodeLabels[spGroup.selectedItemPosition])) // make condition spinner GONE
-                        spCondition.isEnabled = false
+                        setConditions(listOf(mTaskCodeLabels[binding.spGroup.selectedItemPosition])) // make condition spinner GONE
+                binding.spCondition.isEnabled = false
             }
             else      -> {
 
-                        val selcond = mTaskCodeLabels[spGroup.selectedItemPosition].id   // get current selected task
+                        val selcond = mTaskCodeLabels[binding.spGroup.selectedItemPosition].id   // get current selected task
                         setConditions(mTaskCodeLabels)                                       // enable all
 
                         mTaskCodeLabels.mapIndexed { index, taskCode ->
-                            if(taskCode.id == selcond)    spCondition.setSelection(index)   // set what was selected before this change
+                            if(taskCode.id == selcond)    binding.spCondition.setSelection(index)   // set what was selected before this change
                         }
-                        spCondition.isEnabled = true
+                binding.spCondition.isEnabled = true
             }
         }
-        labCondition.visibility = View.VISIBLE
-        spCondition.visibility  = View.VISIBLE
+        binding.labCondition.visibility = View.VISIBLE
+        binding.spCondition.visibility  = View.VISIBLE
     }
     override fun onNothingSelected(p0: AdapterView<*>?) {}
 
@@ -96,29 +98,29 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
     override fun checkData():List<String>{
         val errors = super.checkData() as MutableList<String>
 
-        if(spinner.selectedItemPosition == 0)   errors.add(resources.getString(R.string.select_session))
+        if(binding.spinner.selectedItemPosition == 0)   errors.add(resources.getString(R.string.select_session))
         return errors
     }
 
     override fun clear() {
         super.clear()
-        spinner.setSelection(0)
+        binding.spinner.setSelection(0)
     }
 
     override fun updateSubject(): SubjectTIDParcel{
 
         subject  = super.updateSubject() as SubjectTIDParcel
 
-        (subject as SubjectTIDParcel).group     = mTaskCodeLabels[spGroup.selectedItemPosition].id
-        (subject as SubjectTIDParcel).session   = spinner.selectedItemPosition - 1
+        (subject as SubjectTIDParcel).group     = mTaskCodeLabels[binding.spGroup.selectedItemPosition].id
+        (subject as SubjectTIDParcel).session   = binding.spinner.selectedItemPosition - 1
 
-        subject.type = if(spinner.selectedItemPosition in 2..6){
+        subject.type = if(binding.spinner.selectedItemPosition in 2..6){
                                 subject.showResult = true
-                                mTaskCodeLabels[spGroup.selectedItemPosition].id
+                                mTaskCodeLabels[binding.spGroup.selectedItemPosition].id
                        }
                        else{
                                 subject.showResult = false
-                                mTaskCodeLabels[spCondition.selectedItemPosition].id
+                                mTaskCodeLabels[binding.spCondition.selectedItemPosition].id
                         }
 
         return subject as SubjectTIDParcel
