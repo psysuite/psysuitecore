@@ -3,7 +3,7 @@ object Configs {
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
 
-    const val compileSdkVersion = 31
+    const val compileSdkVersion = 32
     const val minSdkVersion     = 26
     const val targetSdkVersion  = 26
 }

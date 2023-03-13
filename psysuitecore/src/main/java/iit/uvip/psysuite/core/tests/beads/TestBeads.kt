@@ -301,7 +301,7 @@ class TestBeads(ctx: Context,
             visibility      = View.INVISIBLE
 
             setBackgroundColor(ctx.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(ctx.resources.getColor(R.color.colorPrimary))
         }
         parent_layout.addView(bt)

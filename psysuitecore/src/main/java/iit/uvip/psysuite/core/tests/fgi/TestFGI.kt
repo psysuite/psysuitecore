@@ -325,7 +325,7 @@ class TestFGI(ctx: Context,
             id = View.generateViewId()
             text = labels.first
             setBackgroundColor(ctx.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(ctx.resources.getColor(R.color.colorPrimary))
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             gravity = Gravity.CENTER
@@ -341,7 +341,7 @@ class TestFGI(ctx: Context,
             text = labels.second
             id = View.generateViewId()
             setBackgroundColor(ctx.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(ctx.resources.getColor(R.color.colorPrimary))
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             gravity = Gravity.CENTER
