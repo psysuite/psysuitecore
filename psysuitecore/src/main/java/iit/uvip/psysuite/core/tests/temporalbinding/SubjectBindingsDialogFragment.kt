@@ -15,30 +15,30 @@ import iit.uvip.psysuite.core.utility.ConditionData
 class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.OnItemSelectedListener
 {
     override val LOG_TAG: String = SubjectBindingsDialogFragment::class.java.simpleName
-    private lateinit var binding:FragmentSubjectInfoBasicBinding
+//    private lateinit var (binding as FragmentSubjectInfoBasicBinding):FragmentSubjectInfoBasicBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentSubjectInfoBasicBinding.inflate(LayoutInflater.from(context))
-        return binding.root
+        return (binding as FragmentSubjectInfoBasicBinding).root
     }
 
     override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-        when((binding.spCondition.selectedItem as ConditionData).id){
+        when(((binding as FragmentSubjectInfoBasicBinding).spCondition.selectedItem as ConditionData).id){
 
             TestBasic.TEST_TVB_TIME_INF,
             TestBasic.TEST_ATB_TIME_INF,
             TestBasic.TEST_AVB_TIME_INF -> {
-                binding.swInteractive.visibility = View.VISIBLE
-                binding.labInteractive.visibility = View.VISIBLE
+                (binding as FragmentSubjectInfoBasicBinding).swInteractive.visibility = View.VISIBLE
+                (binding as FragmentSubjectInfoBasicBinding).labInteractive.visibility = View.VISIBLE
                 if (subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_AUTO || subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_BUTTON) {
-                    binding.swInteractive?.isSelected = false
+                    (binding as FragmentSubjectInfoBasicBinding).swInteractive?.isSelected = false
                     subject.nextTrailModality = TestBasic.TEST_NEXTTRIAL_AUTO
                 }
             }
             else -> {
-                binding.swInteractive.visibility = View.GONE
-                binding.labInteractive.visibility = View.GONE
+                (binding as FragmentSubjectInfoBasicBinding).swInteractive.visibility = View.GONE
+                (binding as FragmentSubjectInfoBasicBinding).labInteractive.visibility = View.GONE
             }
         }
     }
@@ -51,7 +51,7 @@ class SubjectBindingsDialogFragment : SubjectBasicDialogFragment(), AdapterView.
         subject.nextTrailModality = when(subject.type) {                // could choose whether pausing each trial
             TestBasic.TEST_AVB_TIME_INF,
             TestBasic.TEST_TVB_TIME_INF,
-            TestBasic.TEST_ATB_TIME_INF         ->  if(binding.swInteractive.isSelected) TestBasic.TEST_NEXTTRIAL_BUTTON
+            TestBasic.TEST_ATB_TIME_INF         ->  if((binding as FragmentSubjectInfoBasicBinding).swInteractive.isSelected) TestBasic.TEST_NEXTTRIAL_BUTTON
                                                     else                         TestBasic.TEST_NEXTTRIAL_AUTO
 
 

@@ -15,7 +15,7 @@ class SubjectRIVGRPDialogFragment : SubjectBasicDialogFragment(), AdapterView.On
 {
     override val LOG_TAG: String = SubjectRIVGRPDialogFragment::class.java.simpleName
 
-    private lateinit var binding: FragmentSubjectInfoBasicRivgrpBinding
+//    private lateinit var binding: FragmentSubjectInfoBasicRivgrpBinding
 
     private var isRivalryFirst: Boolean = true
 
@@ -26,22 +26,22 @@ class SubjectRIVGRPDialogFragment : SubjectBasicDialogFragment(), AdapterView.On
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.spCondition.onItemSelectedListener = this
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).spCondition.onItemSelectedListener = this
 
-        binding.swFirstCond.setOnCheckedChangeListener { _, isChecked ->
-            binding.swFirstCond.text =  if(isChecked)  "rivalry"
-                                        else           "grouping"
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.setOnCheckedChangeListener { _, isChecked ->
+            (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.text =   if(isChecked)  "rivalry"
+                                                                                    else           "grouping"
         }
     }
 
     override fun initData(subj: SubjectBasicParcel) {
         super.initData(subj)
 
-        binding.txtDurBlocks.setText(((subj as SubjectRIVGRPParcel).blockDuration/1000).toString())
-        binding.txtNBlocks.setText(subj.totBlocks.toString())
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).txtDurBlocks.setText(((subj as SubjectRIVGRPParcel).blockDuration/1000).toString())
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).txtNBlocks.setText(subj.totBlocks.toString())
 
-        binding.swFirstCond.isChecked   = isRivalryFirst
-        binding.swFirstCond.text        = "rivalry"
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.isChecked   = isRivalryFirst
+        (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.text        = "rivalry"
     }
 
 
@@ -51,14 +51,14 @@ class SubjectRIVGRPDialogFragment : SubjectBasicDialogFragment(), AdapterView.On
         // when selecting training sessions => selCondition = selGroup (and condition spinner gets disabled)
 
         // check session change
-        when(binding.spCondition.selectedItemPosition){
+        when((binding as FragmentSubjectInfoBasicRivgrpBinding).spCondition.selectedItemPosition){
             2,5   -> {
-                binding.swFirstCond.visibility  = View.VISIBLE
-                binding.labFirstCond.visibility = View.VISIBLE
+                (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.visibility  = View.VISIBLE
+                (binding as FragmentSubjectInfoBasicRivgrpBinding).labFirstCond.visibility = View.VISIBLE
             }
             else  -> {
-                binding.swFirstCond.visibility  = View.INVISIBLE
-                binding.labFirstCond.visibility = View.INVISIBLE
+                (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.visibility  = View.INVISIBLE
+                (binding as FragmentSubjectInfoBasicRivgrpBinding).labFirstCond.visibility = View.INVISIBLE
             }
         }
     }
@@ -68,9 +68,9 @@ class SubjectRIVGRPDialogFragment : SubjectBasicDialogFragment(), AdapterView.On
     override fun checkData():List<String>{
         val errors = super.checkData() as MutableList<String>
 
-        if(binding.txtDurBlocks.text.toString().toInt() < 5)     errors.add(resources.getString(R.string.select_session))
+        if((binding as FragmentSubjectInfoBasicRivgrpBinding).txtDurBlocks.text.toString().toInt() < 5)     errors.add(resources.getString(R.string.select_session))
 
-        val nblocks = binding.txtNBlocks.text.toString().toInt()
+        val nblocks = (binding as FragmentSubjectInfoBasicRivgrpBinding).txtNBlocks.text.toString().toInt()
         if(nblocks < 2 || ((nblocks % 2) != 0))          errors.add(resources.getString(R.string.warn_blocks))
 
         return errors
@@ -85,9 +85,9 @@ class SubjectRIVGRPDialogFragment : SubjectBasicDialogFragment(), AdapterView.On
 
         subject  = super.updateSubject()
 
-        (subject as SubjectRIVGRPParcel).blockDuration  = binding.txtDurBlocks.text.toString().toLong() * 1000
-        (subject as SubjectRIVGRPParcel).rivFirst       = binding.swFirstCond.isChecked
-        (subject as SubjectRIVGRPParcel).totBlocks      = binding.txtNBlocks.text.toString().toInt()
+        (subject as SubjectRIVGRPParcel).blockDuration  = (binding as FragmentSubjectInfoBasicRivgrpBinding).txtDurBlocks.text.toString().toLong() * 1000
+        (subject as SubjectRIVGRPParcel).rivFirst       = (binding as FragmentSubjectInfoBasicRivgrpBinding).swFirstCond.isChecked
+        (subject as SubjectRIVGRPParcel).totBlocks      = (binding as FragmentSubjectInfoBasicRivgrpBinding).txtNBlocks.text.toString().toInt()
 
         return subject as SubjectRIVGRPParcel
     }

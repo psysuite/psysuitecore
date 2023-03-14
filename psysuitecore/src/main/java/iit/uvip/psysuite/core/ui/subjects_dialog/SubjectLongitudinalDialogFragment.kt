@@ -14,11 +14,13 @@ import iit.uvip.psysuite.core.model.parcel.SubjectLongitParcel
 open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment()
 {
     override val LOG_TAG: String = SubjectLongitudinalDialogFragment::class.java.simpleName
-    private lateinit var binding: FragmentSubjectInfoBasicSpinnerBinding
+//    private lateinit var binding: FragmentSubjectInfoBasicSpinnerBinding
 
     private var nSessions: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        super.onCreateView(inflater, container, savedInstanceState)
+
         binding = FragmentSubjectInfoBasicSpinnerBinding.inflate(LayoutInflater.from(context))
         return binding.root
     }
@@ -29,18 +31,18 @@ open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment
         ArrayAdapter.createFromResource(requireContext(), (subject as SubjectLongitParcel).test_sessions_array, android.R.layout.simple_spinner_item)
             .also { adapter ->
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinner.adapter = adapter
+                (binding as FragmentSubjectInfoBasicSpinnerBinding).spinner.adapter = adapter
                 nSessions = adapter.count
             }
-        binding.spinner.setSelection((subj as SubjectLongitParcel).session)
+        (binding as FragmentSubjectInfoBasicSpinnerBinding).spinner.setSelection((subj as SubjectLongitParcel).session)
 
-        binding.labSpinner.text = resources.getString(R.string.session)
+        (binding as FragmentSubjectInfoBasicSpinnerBinding).labSpinner.text = resources.getString(R.string.session)
     }
 
     override fun checkData():List<String>{
 
         val errors = super.checkData() as MutableList<String>
-        if (binding.spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_session))
+        if ((binding as FragmentSubjectInfoBasicSpinnerBinding).spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_session))
         return errors
     }
 
@@ -48,7 +50,7 @@ open class SubjectLongitudinalDialogFragment : SubjectBasicSpinnerDialogFragment
 
         subject = super.updateSubject() as SubjectLongitParcel
 
-        (subject as SubjectLongitParcel).session = binding.spinner.selectedItemPosition
+        (subject as SubjectLongitParcel).session = (binding as FragmentSubjectInfoBasicSpinnerBinding).spinner.selectedItemPosition
         return subject as SubjectLongitParcel
     }
 }

@@ -1,6 +1,7 @@
 package iit.uvip.psysuite.core.ui.subjects_dialog
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +11,10 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
+import androidx.viewbinding.ViewBinding
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicBinding
+import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicSpinnerBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -24,7 +27,7 @@ import org.albaspazio.core.ui.showAlert
 open class SubjectBasicDialogFragment: DialogFragment(){
 
     open val LOG_TAG: String = SubjectBasicDialogFragment::class.java.simpleName
-    private lateinit var binding:FragmentSubjectInfoBasicBinding
+    protected open lateinit var binding:ViewBinding
 
     private var allowedPopulations:List<IdLabelData> = listOf()
     private var nPopulations: Int = 0
@@ -49,6 +52,9 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+//        binding = FragmentSubjectInfoBasicBinding.inflate(LayoutInflater.from(context))
+
+
         val subj: SubjectBasicParcel? = arguments?.getParcelable(EVENT_SUBJECT)
 
         if (subj == null) {
@@ -66,9 +72,9 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         val ci          = getCompanionObjectMethod(subject.classes[0], "getConditionsInfo")
         mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<ConditionData>
 
-        initData(subject)
+//        initData(subject)
 
-        binding.txtName.requestFocus()      // subclasses may not have this UI elements (e.g. SampleDialog)
+        (binding as FragmentSubjectInfoBasicBinding).txtName.requestFocus()      // subclasses may not have this UI elements (e.g. SampleDialog)
     }
 
     override fun onResume() {
@@ -80,11 +86,11 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         super.onResume()
 
-        binding.btConfirm.setOnClickListener   {confirmData()}
-        binding.btClear.setOnClickListener     {clear()}
-        binding.btCancel.setOnClickListener    {sendResult(null)}
+        (binding as FragmentSubjectInfoBasicBinding).btConfirm.setOnClickListener   {confirmData()}
+        (binding as FragmentSubjectInfoBasicBinding).btClear.setOnClickListener     {clear()}
+        (binding as FragmentSubjectInfoBasicBinding).btCancel.setOnClickListener    {sendResult(null)}
 
-        binding.swInteractive.setOnCheckedChangeListener { _, b ->
+        (binding as FragmentSubjectInfoBasicBinding).swInteractive.setOnCheckedChangeListener { _, b ->
             subject.nextTrailModality = when (b) {
                 true -> TestBasic.TEST_NEXTTRIAL_BUTTON
                 false -> TestBasic.TEST_NEXTTRIAL_AUTO
@@ -108,11 +114,11 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
             TestBasic.TEST_NEXTTRIAL_BUTTON -> {
                 showInteractive(true)
-                binding.swInteractive.isChecked = true
+                (binding as FragmentSubjectInfoBasicBinding).swInteractive.isChecked = true
             }
             TestBasic.TEST_NEXTTRIAL_AUTO -> {
                 showInteractive(true)
-                binding.swInteractive.isChecked = false
+                (binding as FragmentSubjectInfoBasicBinding).swInteractive.isChecked = false
             }
             TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
             TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER,
@@ -123,30 +129,30 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         //------------------------------------------------------
         // SUBJECT DEMOGRAPHIC
         //------------------------------------------------------
-        binding.txtName.setText(subj.label)
+        (binding as FragmentSubjectInfoBasicBinding).txtName.setText(subj.label)
 
-        if (subj.age != -1) binding.txtAge.setText(subj.age.toString())
-        else binding.txtAge.setText("")
+        if (subj.age != -1) (binding as FragmentSubjectInfoBasicBinding).txtAge.setText(subj.age.toString())
+        else (binding as FragmentSubjectInfoBasicBinding).txtAge.setText("")
 
-        if (subj.gender != -1)  binding.radioGroupGender.check(binding.radioGroupGender.getChildAt(subj.gender).id)
-        else                    binding.radioGroupGender.clearCheck()
+        if (subj.gender != -1)  (binding as FragmentSubjectInfoBasicBinding).radioGroupGender.check((binding as FragmentSubjectInfoBasicBinding).radioGroupGender.getChildAt(subj.gender).id)
+        else                    (binding as FragmentSubjectInfoBasicBinding).radioGroupGender.clearCheck()
 
         //------------------------------------------------------
         // noise visibility
-        binding.swWhiteNoise.visibility     = View.VISIBLE
-        binding.labWhiteNoise.visibility    = View.VISIBLE
+        (binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.visibility     = View.VISIBLE
+        (binding as FragmentSubjectInfoBasicBinding).labWhiteNoise.visibility    = View.VISIBLE
         when(subj.whitenoise){
             TestBasic.TEST_WNOISE_DISABLED,
             TestBasic.TEST_WNOISE_ENABLED -> {
-                binding.swWhiteNoise.visibility     = View.INVISIBLE
-                binding.labWhiteNoise.visibility    = View.INVISIBLE
+                (binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.visibility     = View.INVISIBLE
+                (binding as FragmentSubjectInfoBasicBinding).labWhiteNoise.visibility    = View.INVISIBLE
             }
         }
         // noise start value
-        binding.swWhiteNoise.isChecked      = true
+        (binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.isChecked      = true
         when(subj.whitenoise){
             TestBasic.TEST_WNOISE_DISABLED,
-            TestBasic.TEST_WNOISE_CHOOSE_OFF    ->  binding.swWhiteNoise.isChecked      = false
+            TestBasic.TEST_WNOISE_CHOOSE_OFF    ->  (binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.isChecked      = false
         }
         //------------------------------------------------------
     }
@@ -155,13 +161,13 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         val adapter: ArrayAdapter<ConditionData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, tc)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spCondition.adapter = adapter
+        (binding as FragmentSubjectInfoBasicBinding).spCondition.adapter = adapter
         nConditions         = adapter.count
 
         if (nConditions == 1) {
             // do not show condition spinner & set subject.type
-            binding.labCondition.visibility = View.GONE
-            binding.spCondition.visibility  = View.GONE
+            (binding as FragmentSubjectInfoBasicBinding).labCondition.visibility = View.GONE
+            (binding as FragmentSubjectInfoBasicBinding).spCondition.visibility  = View.GONE
             subject.type            = mTaskCodeLabels[0].id
             selCondition            = 0
         }
@@ -170,7 +176,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 // set condition spinner to subject.type
                 mTaskCodeLabels.mapIndexed { index, taskCode ->
                     if (taskCode.id == subject.type){
-                        binding.spCondition.setSelection(index, false)
+                        (binding as FragmentSubjectInfoBasicBinding).spCondition.setSelection(index, false)
                         selCondition            = index
                     }
                 }
@@ -178,14 +184,14 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             else {
                 // set condition spinner to first sub-task
                 selCondition = 0
-                binding.spCondition.setSelection(selCondition)
+                (binding as FragmentSubjectInfoBasicBinding).spCondition.setSelection(selCondition)
                 subject.type            = mTaskCodeLabels[0].id
             }
         }
 
-        binding.spCondition.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+        (binding as FragmentSubjectInfoBasicBinding).spCondition.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                setPopulation(binding.spCondition.selectedItemPosition) }
+                setPopulation((binding as FragmentSubjectInfoBasicBinding).spCondition.selectedItemPosition) }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
@@ -197,14 +203,14 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         val adapter: ArrayAdapter<IdLabelData> = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, allowedPopulations)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spPopulation.adapter = adapter
+        (binding as FragmentSubjectInfoBasicBinding).spPopulation.adapter = adapter
 
         // set condition spinner to subject.type
         selPopulation            = 0
         allowedPopulations.mapIndexed { index, pair ->
             if (pair.id == subject.population)  selPopulation = index
         }
-        binding.spPopulation.setSelection(selPopulation, false)
+        (binding as FragmentSubjectInfoBasicBinding).spPopulation.setSelection(selPopulation, false)
     }
 
     //------------------------------------------------------------------------------------
@@ -229,20 +235,20 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     protected open fun clear(){
 
         if (nConditions > 1)
-            binding.spCondition.setSelection(-1)
+            (binding as FragmentSubjectInfoBasicBinding).spCondition.setSelection(-1)
 
-        binding.spPopulation.setSelection(-1)
+        (binding as FragmentSubjectInfoBasicBinding).spPopulation.setSelection(-1)
 
-        binding.txtName.setText("")
-        binding.txtAge.setText("")
-        binding.radioGroupGender.clearCheck()
+        (binding as FragmentSubjectInfoBasicBinding).txtName.setText("")
+        (binding as FragmentSubjectInfoBasicBinding).txtAge.setText("")
+        (binding as FragmentSubjectInfoBasicBinding).radioGroupGender.clearCheck()
 
         if (subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_AUTO || subject.nextTrailModality == TestBasic.TEST_NEXTTRIAL_BUTTON) {
-            binding.swInteractive.isChecked    = false
+            (binding as FragmentSubjectInfoBasicBinding).swInteractive.isChecked    = false
             subject.nextTrailModality   = TestBasic.TEST_NEXTTRIAL_AUTO
         }
 
-        binding.swWhiteNoise.isChecked = true
+        (binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.isChecked = true
     }
 
     //------------------------------------------------------------------------------------
@@ -253,12 +259,12 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         val errors = mutableListOf<String>()
 
-        if(SubjectBasicParcel.validate(binding.txtName.text.toString(), binding.txtAge.text.toString()).isNotBlank())
+        if(SubjectBasicParcel.validate((binding as FragmentSubjectInfoBasicBinding).txtName.text.toString(), (binding as FragmentSubjectInfoBasicBinding).txtAge.text.toString()).isNotBlank())
                                                                 errors.add(" - " + resources.getString(R.string.select_subject_info))
 
-        if(binding.radioGroupGender.checkedRadioButtonId == -1)         errors.add(" - " + resources.getString(R.string.select_gender))
-        if(binding.spCondition.selectedItemPosition == -1)             errors.add(" - " + resources.getString(R.string.select_condition))
-        if(binding.spPopulation.selectedItemPosition == -1)            errors.add(" - " + resources.getString(R.string.select_population))
+        if((binding as FragmentSubjectInfoBasicBinding).radioGroupGender.checkedRadioButtonId == -1)         errors.add(" - " + resources.getString(R.string.select_gender))
+        if((binding as FragmentSubjectInfoBasicBinding).spCondition.selectedItemPosition == -1)             errors.add(" - " + resources.getString(R.string.select_condition))
+        if((binding as FragmentSubjectInfoBasicBinding).spPopulation.selectedItemPosition == -1)            errors.add(" - " + resources.getString(R.string.select_population))
 
         return errors
     }
@@ -266,13 +272,13 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     // subject has been already validated
     protected open fun updateSubject(): SubjectBasicParcel{
 
-        val gender:Int              = binding.radioGroupGender.indexOfChild(binding.radioGroupGender.findViewById(binding.radioGroupGender.checkedRadioButtonId))
+        val gender:Int              = (binding as FragmentSubjectInfoBasicBinding).radioGroupGender.indexOfChild((binding as FragmentSubjectInfoBasicBinding).radioGroupGender.findViewById((binding as FragmentSubjectInfoBasicBinding).radioGroupGender.checkedRadioButtonId))
 
-        subject.type                = mTaskCodeLabels[binding.spCondition.selectedItemPosition].id
-        subject.population          = allowedPopulations[binding.spPopulation.selectedItemPosition].id
+        subject.type                = mTaskCodeLabels[(binding as FragmentSubjectInfoBasicBinding).spCondition.selectedItemPosition].id
+        subject.population          = allowedPopulations[(binding as FragmentSubjectInfoBasicBinding).spPopulation.selectedItemPosition].id
 
-        subject.label               = binding.txtName.text.toString()
-        subject.age                 = binding.txtAge.text.toString().toInt()
+        subject.label               = (binding as FragmentSubjectInfoBasicBinding).txtName.text.toString()
+        subject.age                 = (binding as FragmentSubjectInfoBasicBinding).txtAge.text.toString().toInt()
         subject.gender              = gender
 
         // only If user can select interaction modality, update his/her selection
@@ -281,14 +287,14 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             subject.nextTrailModality != TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER
         ) {
 
-            subject.nextTrailModality = when (binding.swInteractive.isChecked) {
+            subject.nextTrailModality = when ((binding as FragmentSubjectInfoBasicBinding).swInteractive.isChecked) {
                 true -> TestBasic.TEST_NEXTTRIAL_BUTTON
                 false -> TestBasic.TEST_NEXTTRIAL_AUTO
                 null -> subject.nextTrailModality
             }
         }
 
-        subject.whitenoise =    if(binding.swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
+        subject.whitenoise =    if((binding as FragmentSubjectInfoBasicBinding).swWhiteNoise.isChecked)  TestBasic.TEST_WNOISE_CHOOSE_ON
                                 else                        TestBasic.TEST_WNOISE_CHOOSE_OFF
 
         return subject
@@ -311,7 +317,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                         sendResult(subject)
                     },
                     {   // cancel press. stop. let user change data
-                        binding.txtName.requestFocus()
+                        (binding as FragmentSubjectInfoBasicBinding).txtName.requestFocus()
                     })
             }
             else -> {  // exist at least n-block files.
@@ -346,11 +352,11 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     //------------------------------------------------------------------------------------
     private fun showInteractive(show: Boolean) {
         if (show) {
-            binding.swInteractive?.visibility   = View.VISIBLE
-            binding.labInteractive?.visibility  = View.VISIBLE
+            (binding as FragmentSubjectInfoBasicBinding).swInteractive?.visibility   = View.VISIBLE
+            (binding as FragmentSubjectInfoBasicBinding).labInteractive?.visibility  = View.VISIBLE
         } else {
-            binding.swInteractive?.visibility   = View.GONE
-            binding.labInteractive?.visibility  = View.GONE
+            (binding as FragmentSubjectInfoBasicBinding).swInteractive?.visibility   = View.GONE
+            (binding as FragmentSubjectInfoBasicBinding).labInteractive?.visibility  = View.GONE
         }
     }
 }
