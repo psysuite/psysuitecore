@@ -8,6 +8,7 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.AudioManager
 import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -31,7 +32,7 @@ class TestMMD(ctx: Context,
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(ConditionData(TEST_BASIC_LABEL, TEST_MUSICAL_METERS, TEST_BASIC_LABEL, Populations.hearing_populations))
 
-        fun getNextTrialModes():List<List<Int>> =  listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
+        fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
     }
 
     // =============================================================================================================================
@@ -42,11 +43,10 @@ class TestMMD(ctx: Context,
         validAnswers = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
         mQuestion = ctx.resources.getString(R.string.mmeters_question_text)
 
-        if(!subject.isDebug)  createTrials()
-        else                        createTrialsDebug()
+        val trials = if(!subject.isDebug)  createTrials()
+                     else                  createTrialsDebug()
 
-        nTrials     = mTrials.size
-        currTrial   = 0
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
@@ -66,24 +66,23 @@ class TestMMD(ctx: Context,
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(){
+    private fun createTrials():List<TrialBasic>{
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(i in 1 until (NUM_TRIALS +1) ){
-            mTrials.add(TrialMMD(-1, 0, "same", validAnswers[0], i))
-            mTrials.add(TrialMMD(-1, 1, "diff", validAnswers[1], i))
+            trials.add(TrialMMD(-1, 0, "same", 0, i))
+            trials.add(TrialMMD(-1, 1, "diff", 1, i))
         }
-        mTrials.shuffle()
-
-        // set trial id according to its order in the list
-        for(i in 0 until mTrials.size)
-            mTrials[i].id = (i + 1)
+        trials.shuffle()
+        return trials
     }
 
-    private fun createTrialsDebug(){
+    private fun createTrialsDebug():List<TrialBasic>{
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(i in 1 until 10000 ){
-            mTrials.add(TrialMMD(-1, 0, "same", validAnswers[0], i))
-            mTrials.add(TrialMMD(-1, 1, "diff", validAnswers[1], i))
+            trials.add(TrialMMD(-1, 0, "same", 0, i))
+            trials.add(TrialMMD(-1, 1, "diff", 1, i))
         }
-        setTrialsID()   // set trial id according to its order in the list
+        return trials
     }
 
     // =============================================================================================================================

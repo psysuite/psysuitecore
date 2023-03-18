@@ -4,7 +4,7 @@ import iit.uvip.psysuite.core.tests.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answer:String=""):
+class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answer:Int=-1):
     TrialBasic(id, type, "", correct_answer) {
 
     companion object {

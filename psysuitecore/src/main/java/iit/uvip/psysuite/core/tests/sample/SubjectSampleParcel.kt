@@ -27,6 +27,7 @@ open class SubjectSampleParcel(
     override var block:Int = -1,
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
     override var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
+    override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
     override var vercode: Int = -1,
     override var showResult: Boolean = false,
     override var population: Int = Populations.POPULATION_TD,
@@ -42,8 +43,8 @@ open class SubjectSampleParcel(
     var visualDrawableOff:Int   = 0,    //
     var visualDrawableOn:Int    = 0,    //
 
-    var tactileAmplitude:Int = -1,   // amplitude of vibration. default to MAX_AMPLITUDE (-1)
-    var tactileSequence:String = "", // array of off-set, onset or duration (Long)
+    var tactileAmplitudes:String = "-1",    // array of amplitudes of vibration. default to "-1" ( a.k.a.  MAX_AMPLITUDE (-1))
+    var tactileTimings:String = "",         // array of periods (Long)
 
     var shiftedParams:List<Long> = listOf(0L,0L,0L),
     var pairDistance:Long = 0,
@@ -51,7 +52,7 @@ open class SubjectSampleParcel(
     var repetitions:Int = 1,
     var iti:Long = 1000
 
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelays, whitenoise, vercode, showResult, population, isDebug)
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelays, whitenoise, trman_type, vercode, showResult, population, isDebug)
 
 
 

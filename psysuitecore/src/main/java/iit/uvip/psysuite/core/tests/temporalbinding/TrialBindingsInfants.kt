@@ -4,7 +4,7 @@ import iit.uvip.psysuite.core.tests.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialBindingsInfants(id:Int=-1, type:Int, val tactile_pattern:Int): TrialBasic(id, type, "", ""){
+class TrialBindingsInfants(id:Int=-1, type:Int, val tactile_pattern:Int): TrialBasic(id, type, "", -1){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\ttype\n"

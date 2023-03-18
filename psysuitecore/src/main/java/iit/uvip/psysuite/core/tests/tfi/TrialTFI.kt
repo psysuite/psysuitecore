@@ -7,8 +7,8 @@ import iit.uvip.psysuite.core.tests.TrialBasic
     corresponding to the number of audio/tactile/visual stimuli present in the trial.
 */
 
-class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Long)
-    : TrialBasic(id,type,label, corr_answer){
+class TrialTFI(id:Int=-1, type:Int, label:String, val str_corr_answer:String, val soa:Long)
+    : TrialBasic(id,type,label, -1){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tlabel\tsoa\tres\tcor_ans\tuser_ans\telapsed\n"
@@ -21,7 +21,7 @@ class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Lo
     val stims:MutableList<Int> = mutableListOf(0,0,0)
 
     init{
-        processModalities(corr_answer.split(","))
+        processModalities(str_corr_answer.split(","))
     }
 
     // all class exported as string
@@ -29,9 +29,17 @@ class TrialTFI(id:Int=-1, type:Int, label:String, corr_answer:String, val soa:Lo
         return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + soa + "\t" + success.toString() + "\n"
     }
 
+    override fun setResponse(result: Int, elapsedms: Int, extra_text:String) {
+        user_answer = -1
+        elapsed     = elapsedms
+        user_answer_extra = extra_text
+
+        success     = (user_answer_extra == str_corr_answer)
+    }
+
     // data exported to log file
     override fun Log():String{
-        return id.toString() +  "\t" + label + "\t" + soa.toString() + "\t"+ success.toString() + "\t" + correct_answer + "\t" + user_answer + "\t" + elapsed.toString() + "\t" + repetitions.toString() + "\n"
+        return id.toString() +  "\t" + label + "\t" + soa.toString() + "\t"+ success.toString() + "\t" + str_corr_answer + "\t" + user_answer_extra + "\t" + elapsed.toString() + "\t" + repetitions.toString() + "\n"
     }
 
     override fun debugInfo():String{

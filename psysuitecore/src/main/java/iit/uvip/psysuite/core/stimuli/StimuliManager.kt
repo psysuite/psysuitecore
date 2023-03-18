@@ -268,7 +268,7 @@ class StimuliManager(
 
         val durlist         = mutableListOf<Long>()
 
-        val onsetDate           = Date()
+//        val onsetDate           = Date()
         Log.d(TAG, "${getOnsetDate()}: NEW STIMULUS, type:$type, reciprocal delays A=$a, T=$t, V=$v")
 
         try{

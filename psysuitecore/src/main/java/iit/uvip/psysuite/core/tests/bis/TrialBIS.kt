@@ -3,10 +3,10 @@ package iit.uvip.psysuite.core.tests.bis
 import iit.uvip.psysuite.core.tests.TrialBasic
 
 
-class TrialBIS(id:Int=-1, type:Int, label:String, corr_answer:String, val position:Int, val conflict_type:String, val duration:Int, private val duration2:Int=0): TrialBasic(id,type,label, corr_answer){
+class TrialBIS(id:Int=-1, type:Int, label:String, corr_answer:Int, val position:Int, val conflict_type:String, val duration:Int, private val duration2:Int=0): TrialBasic(id,type,label, corr_answer){
 
     companion object {
-        @JvmStatic val LOG_HEADER           = "id\tlabel\tlat\tconfl\tres\tcor_ans\tuser_ans\telapsed\trep\n"
+        @JvmStatic val LOG_HEADER = "id\tlabel\tlat\tconfl\tres\tcor_ans\tuser_ans\telapsed\trep\n"
     }
 
     // all class exported as string

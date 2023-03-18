@@ -10,11 +10,13 @@ import android.os.Handler
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
+
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.stimuli.StimuliManager
+
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.logLastTwo
 import org.albaspazio.core.filesystem.*
@@ -25,6 +27,7 @@ import org.albaspazio.core.ui.showAlert
 /*
 must contain all the possible codes
 
+TestFragment (instanciate correct TestBasic derived class and call its -> test.initTest
  */
 
 abstract class TestBasic(protected val ctx: Context,
@@ -34,7 +37,7 @@ abstract class TestBasic(protected val ctx: Context,
                          protected val vibrator: VibrationManager? = null,
                          protected val mImageView: ImageView? = null,
                          protected val speechManager: SpeechManager? = null
-) {
+                         ) {
     open var LOG_TAG:String = TestBasic::class.java.simpleName
 
     companion object {
@@ -45,15 +48,15 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_BUNDLE_RESULT_LABEL: String = "result"
 
         @JvmStatic val audioResources:HashMap<Long, String> = hashMapOf(
-            7L to "t1000hz_7ms.wav",
-            10L to "t1000hz_10ms.wav",
-            17L to "t1000hz_17ms.wav",
-            20L to "t1000hz_20ms.wav",
-            30L to "t1000hz_30ms.wav",
-            35L to "t1000hz_35ms.wav",
-            50L to "t1000hz_50ms.wav",
-            100L to "t1000hz_100ms.wav",
-            1000L to "t1000hz_1000ms.wav",
+            7L      to "t1000hz_7ms.wav",
+            10L     to "t1000hz_10ms.wav",
+            17L     to "t1000hz_17ms.wav",
+            20L     to "t1000hz_20ms.wav",
+            30L     to "t1000hz_30ms.wav",
+            35L     to "t1000hz_35ms.wav",
+            50L     to "t1000hz_50ms.wav",
+            100L    to "t1000hz_100ms.wav",
+            1000L   to "t1000hz_1000ms.wav",
         )
         // --------------------------------------------------------------------------------------------
         // trial-by-trial management
@@ -77,6 +80,9 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_WNOISE_CHOOSE_OFF           = 1         //  can choose, disabled by default
         @JvmStatic val TEST_WNOISE_CHOOSE_ON            = 2         //  can choose, enabled by default
         @JvmStatic val TEST_WNOISE_ENABLED              = 4         //  enabled, cannot disable it
+
+        @JvmStatic val TEST_TRMAN_FIXED                 = 0         //  trials are predetermined at test start
+        @JvmStatic val TEST_TRMAN_QUEST                 = 1         //  trials are calculated trial-by-trial according to a Quest algorithm
 
         //-----------------------------------------------------------------------------------------
         //
@@ -151,6 +157,23 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_AVB_TIME_SINGLESTIM_TOD = 183
         @JvmStatic val TEST_AVB_TIME_DOUBLESTIM_TOD = 184
 
+        @JvmStatic val TEST_FGI_1_UNSCRAMBLED       = 190
+        @JvmStatic val TEST_FGI_1_SCRAMBLED         = 191
+        @JvmStatic val TEST_FGI_2_UNSCRAMBLED       = 192
+        @JvmStatic val TEST_FGI_2_SCRAMBLED         = 193
+        @JvmStatic val TEST_FGI_3_UNSCRAMBLED       = 194
+        @JvmStatic val TEST_FGI_3_SCRAMBLED         = 195
+
+        @JvmStatic val TEST_RIVGRP_RIV_HF           = 200
+        @JvmStatic val TEST_RIVGRP_GRP_HF           = 201
+        @JvmStatic val TEST_RIVGRP_RIVGRP_HF        = 202
+        @JvmStatic val TEST_RIVGRP_RIV_HC           = 203
+        @JvmStatic val TEST_RIVGRP_GRP_HC           = 204
+        @JvmStatic val TEST_RIVGRP_RIVGRP_HC        = 205
+
+        @JvmStatic val TEST_BEADS_LOWUNCERT         = 210
+        @JvmStatic val TEST_BEADS_MIDUNCERT         = 211
+
 
         //-----------------------------------------------------------------------------------------
         @JvmStatic val TEST_ABORTED                     = 230
@@ -168,54 +191,46 @@ abstract class TestBasic(protected val ctx: Context,
     var abortMode:Int           = 0     // define abort modality (0:in answer dialog @ trial end, 1:button @ trial end, 2:always)
     var nextTrailModality:Int   = 0     // define how trials are displayed. 0: automatically, 1: after a next button, 2: after answer
 
-    var nTrials:Int                             = 0
-    var currTrial:Int                           = 0
     var mTestLabel: String                      = ""
     var mQuestion:String                        = ""
     var validAnswers: MutableList<String>       = mutableListOf()
     val showResult:Boolean                      = this.subject.showResult
-    val delaysAligner: DelaysAligner = this.subject.stimuliDelays
+    val delaysAligner: DelaysAligner            = this.subject.stimuliDelays
 
 
     // they are just proxy for properties (implemented / edited / accessed) in each subclass
-    protected lateinit var mTrial: TrialBasic
-    protected var mTrials:MutableList<TrialBasic>   = mutableListOf()
+    protected lateinit var mTrialsManager:TrialsManager
 
-    protected var nBlocks:Int                       = 0
+    protected val mTrial: TrialBasic
+        get() = mTrialsManager.mTrial
 
-    protected var mListBlocks:MutableList<Int>      = mutableListOf()
+    val currTrial:Int
+        get() = mTrialsManager.currTrial
+
+    val nTrials:Int
+        get() = mTrialsManager.nTrials
+
+    val mTrials:List<TrialBasic>
+        get() = mTrialsManager.mTrials
+
+    // BLOCKS -------------------------------------------------------------------
+    protected var mListBlocks:MutableList<Int>  = mutableListOf()
         set(value) {
-            field = value
+            field   = value
             nBlocks = value.size + 1
         }
-
-    // this instance is defined and validated during sub-class init{}
-    // in case of error an exception is thrown and test is aborted.
-    // the only susceptible to error is AudioManager in case of the test involves different resources to be loaded
-    protected lateinit var mStimuliManager: StimuliManager
+    private var nBlocks:Int     = 0
+    private var mCurrBlock: Int = 0
 
     protected var mNoise: MediaPlayer? = null
 
     protected open var mDrawablesResource:MutableList<Int>  = mutableListOf()   // list of drawables' resources id to be edited in subclasses
-    protected var mStimuliHandler: Handler                  = Handler()
 
-    protected var mSummary: Summary?                        = null
     private var mResultFile: String                         = ""
     private var mResultUri: Uri?                            = null
 
-    private var mCurrBlock: Int                             = 0
-
-    protected var currStimulusDuration:Long     = 100L          // default value to be used when stimulus duration in not given
-//    protected var currVibrationAmplitude:Int    = -1            // default amplitude to be used when  not given
-//    protected var currVolume:Float              = 1F            // default audio volume to be used when  not given
-    protected var currAudioResourceName:String  = "t200hz_2s"   // default amplitude to be used when  not given
-    protected var ITI:Long                      = 0             // default ITI
-
-    // proxy for methods to be implemented in each subclass
-    abstract fun initTest()
-    abstract fun onTrialEnd()
-    abstract fun show(trial: TrialBasic, isRepeat:Boolean=false)
-
+    // SUMMARY -------------------------------------------------------------------
+    protected var mSummary: Summary?                        = null
     abstract fun initSummary()              // init summary content (mSummary),
 //    fun closeSummary(blk:Int = -1):String = mSummary?.close(subject.composeSummaryFileName(ctx, blk)) ?: "" // writes summary and return filename or empty string
 
@@ -225,17 +240,36 @@ abstract class TestBasic(protected val ctx: Context,
                 else                    mSummary?.close(filename) ?: ""
     }
 
+    // STIMULI -------------------------------------------------------------------
+
+    // this instance is defined and validated during sub-class init{}
+    // in case of error an exception is thrown and test is aborted.
+    // the only susceptible to error is AudioManager in case of the test involves different resources to be loaded
+    protected lateinit var mStimuliManager: StimuliManager
+    protected var mStimuliHandler: Handler = Handler()         // IDE suggested: Handler(Looper.myLooper()!!)
+
+    protected var currStimulusDuration:Long     = 100L          // default value to be used when stimulus duration in not given
+//    protected var currVibrationAmplitude:Int    = -1            // default amplitude to be used when  not given
+//    protected var currVolume:Float              = 1F            // default audio volume to be used when  not given
+    protected var currAudioResourceName:String  = "t200hz_2s"   // default amplitude to be used when  not given
+
+    protected var ITI:Long                      = 0             // default ITI
+
+    // proxy for methods to be implemented in each subclass
+    abstract fun initTest()
+    abstract fun onTrialEnd()
+    abstract fun show(trial: TrialBasic, isRepeat:Boolean=false)
+
+
     // ===============================================================================================================
     fun start():Boolean{
         return  try {
-//                    if(!mStimuliManager.isValid || !this::mTrial.isInitialized){
-//                        onCriticalError(ctx.resources.getString(R.string.test_failure), true)
-//                        return false
-//                    }
+//                    if(!mStimuliManager.isValid || !this::mTrial.isInitialized){onCriticalError(ctx.resources.getString(R.string.test_failure), true)
+//                        return false}
 
                     if(subject.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
 
-                    show(mTrial)
+                    show(mTrialsManager.mTrial)
                     true
                 }
                 catch(e:Exception){
@@ -248,16 +282,18 @@ abstract class TestBasic(protected val ctx: Context,
     fun repeatTrial(){
         show(mTrial, true)
     }
+
     // ===============================================================================================================
     // TRIAL MANAGEMENT
     // ===============================================================================================================
-    open fun nextTrial(prev_result: String = "", elapsed: Int = -1): Int {
+    // prev trial has ended. set user response (if present)
+    // and check whether entire task/block has ended or call next trial
+    open fun onEndTrial(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""): Int {
 
-        if (prev_result != ""){
-            mTrial.setResponse(prev_result, elapsed)
+        if (prev_result != -1 || extra_text != ""){
+            mTrialsManager.setResponse(prev_result, elapsed, extra_text)
             mSummary?.add(mTrial)
         }
-
         // if !last trial && !block end => doNextTrial
         return when {
             currTrial == (nTrials - 1) -> {
@@ -276,9 +312,10 @@ abstract class TestBasic(protected val ctx: Context,
     }
 
     // called by above nextTrial & by TestFragment after user decided to continue after block end
-    private fun doNextTrial():Int{
+    // set/calculate new trial and shows it
+    protected fun doNextTrial():Int{
         return  try {
-                    mTrial = getNewTrial()  // it also updates currTrial
+                    mTrialsManager.getNewTrial() as TrialBasic
 
                     if(subject.isDebug) testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))    // send debug info
 
@@ -296,13 +333,6 @@ abstract class TestBasic(protected val ctx: Context,
     fun startNewBlock(){
         mCurrBlock++
         doNextTrial()
-    }
-
-    // in the present basic form it does not do anything special.
-    // can be overridden to implement custom online trials' values manipulation (e.g. in quest-based tasks)
-    open fun getNewTrial(): TrialBasic {
-        currTrial++
-        return mTrials[currTrial]
     }
 
     fun abortTest(deleteOrShow:Boolean, dir:String= Environment.DIRECTORY_DOWNLOADS){
@@ -349,12 +379,11 @@ abstract class TestBasic(protected val ctx: Context,
         mNoise?.stop()
     }
 
-    private fun saveText(text: String, overwrite: Boolean = false, notifyDm: Boolean = false){
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            saveTextQ(ctx, mResultUri!!, text, overwrite = overwrite, notifyDm = notifyDm)
-        else
-            saveText(ctx, mResultFile, text, overwrite = overwrite, notifyDm = notifyDm)
+    protected fun saveText(text: String, overwrite: Boolean = false, notifyDm: Boolean = false):Any?{
+        return  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        saveTextQ(ctx, mResultUri!!, text, overwrite = overwrite, notifyDm = notifyDm)
+                else
+                        saveText(ctx, mResultFile, text, overwrite = overwrite, notifyDm = notifyDm)
     }
 
     fun adjustBlocks(blk:Int){
@@ -365,16 +394,15 @@ abstract class TestBasic(protected val ctx: Context,
             return
         }
         if(blk == -1){
-            currTrial   = 0
+            mTrialsManager.currTrial   = 0
             mCurrBlock  = 0
         }
         else {  // if it found lab_type_blk2.txt => blk=3)
             mCurrBlock = blk
 
             // following trial of the previous block
-            currTrial = mListBlocks[mCurrBlock-1] + 1
+            mTrialsManager.currTrial = mListBlocks[mCurrBlock-1] + 1
         }
-        mTrial      = mTrials[currTrial]
     }
 
     // is always created without block information, which is added when interrupting after a block
@@ -389,14 +417,11 @@ abstract class TestBasic(protected val ctx: Context,
 
     fun getAbsoluteResultFilePath(): String = getAbsoluteFilePath(mResultFile).second      // is "" if file was not present
 
-    // set trial id according to its order in the list
-    protected fun setTrialsID(){  mTrials.mapIndexed { index, trialBasic -> trialBasic.id = index } }
-
     protected fun getDebugInfo():String = mTrial.debugInfo()
 
-    fun getTrialCorrectAnswer():String{
-        return  if(!this::mTrial.isInitialized)     validAnswers[0]
-        else                                mTrial.getCorrectAnswer()
+    fun getTrialCorrectAnswer():Int{
+        return  if(!this::mTrialsManager.isInitialized) 0
+        else                                            mTrial.correct_answer
     }
 
     protected fun getTestTitle():String = "${ctx.resources.getString(R.string.app_name)} - ${ctx.resources.getString(R.string.lab_test_res)}: $mTestLabel"

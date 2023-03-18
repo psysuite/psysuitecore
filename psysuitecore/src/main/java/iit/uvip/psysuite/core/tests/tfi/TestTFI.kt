@@ -9,6 +9,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.*
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -62,20 +63,24 @@ class TestTFI(ctx: Context,
 
         @JvmStatic val TEST_BASIC_LABEL                 = "TFI"
         @JvmStatic val TEST_BASIC_TODDLERS_LABEL        = "TFI toddlers"
-        @JvmStatic val TEST_BASIC_BIMODAL_LABEL         = "TFI BIMODAL"
-        @JvmStatic val TEST_BASIC_AV_LABEL              = "TFI AV"
+        @JvmStatic val TEST_BASIC_BI_LABEL              = "TFI BI"
+        @JvmStatic val TEST_BASIC_AV_LABEL              = "DFI AV"
         @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com",
-                                                                    "psysuite.uvip@gmail.com",
-                                                                    "alessia.tonelli@iit.it")
+                                                                    "psysuite.uvip@gmail.com")
 
-        fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
-            ConditionData(TEST_BASIC_LABEL, TEST_TFI, TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
-            ConditionData(TEST_BASIC_TODDLERS_LABEL, TEST_TFI_TODDLERS, "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations),
-            ConditionData(TEST_BASIC_BIMODAL_LABEL, TEST_TFI_BIMODAL, "${TEST_BASIC_LABEL}BI", Populations.sighted_hearing_populations),
-            ConditionData(TEST_BASIC_AV_LABEL, TEST_TFI_AV, "${TEST_BASIC_LABEL}AV", Populations.sighted_hearing_populations)
-        )
+        fun getConditionsInfo(ctx: Context): List<ConditionData>{
 
-        fun getNextTrialModes():List<List<Int>> = listOf(listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
+            return if(VibrationManager.sysHasVibrator(ctx)){
+                        mutableListOf(  ConditionData(TEST_BASIC_LABEL          , TEST_TFI          , TEST_BASIC_LABEL, Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_TODDLERS_LABEL , TEST_TFI_TODDLERS , "${TEST_BASIC_LABEL}TOD", Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_BI_LABEL       , TEST_TFI_BIMODAL  , "${TEST_BASIC_LABEL}BI",  Populations.sighted_hearing_populations),
+                                        ConditionData(TEST_BASIC_AV_LABEL       , TEST_TFI_AV       , "${TEST_BASIC_LABEL}AV",  Populations.sighted_hearing_populations))
+                    }else{
+                        mutableListOf(  ConditionData(TEST_BASIC_AV_LABEL       , TEST_TFI_AV       , "${TEST_BASIC_LABEL}AV", Populations.sighted_hearing_populations))
+                    }
+        }
+
+        fun getNextTrialModes(ctx:Context):List<List<Int>> = listOf(listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
 
         fun getEmailRecipients():Array<String> = recipients
     }
@@ -85,10 +90,11 @@ class TestTFI(ctx: Context,
     // =============================================================================================================================
     override fun initTest() {
 
-        when {
-            mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
-        }
+        if(mImageView == null) throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+
+        if(vibrator == null && (subject.type == TEST_TFI || subject.type == TEST_TFI_TODDLERS))
+            throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+
 
         nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
@@ -99,8 +105,6 @@ class TestTFI(ctx: Context,
 
         mQuestion           = ctx.resources.getString(R.string.tfi_question)
         validAnswers        = mutableListOf(ctx.resources.getString(R.string.yes), ctx.resources.getString(R.string.no))
-
-
 
         if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
@@ -124,17 +128,18 @@ class TestTFI(ctx: Context,
         }
 
 //        subject.isDebug = true
-        if(subject.isDebug)  createTrialsDebug()
-        else
-            when(subject.type){
-                TEST_TFI, TEST_TFI_TODDLERS -> createTrials()
-                TEST_TFI_BIMODAL            -> createTrialsBimodal()
-                TEST_TFI_AV                 -> createTrialsAV()
-            }
-        // mTrials list
-        nTrials             = mTrials.size
-        currTrial           = 0
+        val trials =    if(subject.isDebug)  createTrialsDebug()
+                        else
+                            when(subject.type){
+                                TEST_TFI, TEST_TFI_TODDLERS -> createTrials()
+                                TEST_TFI_BIMODAL            -> createTrialsBimodal()
+                                TEST_TFI_AV                 -> createTrialsAV()
+                                else                        -> throw Exception("ERROR in TestTFI")
+                            }
+        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
+
+        // mTrials list
         var onImage         = 1
         when(subject.type){
             TEST_TFI            ->  mListBlocks = mutableListOf((nTrials * 0.25F).roundToInt(), (nTrials * 0.5F).roundToInt(), (nTrials * 0.75F).roundToInt())    // define two blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
@@ -152,11 +157,18 @@ class TestTFI(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        mStimuliManager = StimuliManager(
-            AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
-            TactileManager(vibrator!!, duration = STIM_DURATION_TACTILE, handler = mStimuliHandler),
-            VisualManager(STIM_V, mImageView!!, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
-            delaysAligner, ctx, mStimuliHandler)
+        mStimuliManager =   if(vibrator != null)
+                                StimuliManager(
+                                    AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                                    TactileManager(vibrator, duration = STIM_DURATION_TACTILE, handler = mStimuliHandler),
+                                    VisualManager(STIM_V, mImageView, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
+                                    delaysAligner, ctx, mStimuliHandler)
+                            else
+                                StimuliManager(
+                                    AudioManager(STIM_A, audioResources[currStimulusDuration] ?: "t1000hz_7ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                                    null,
+                                    VisualManager(STIM_V, mImageView, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
+                                    delaysAligner, ctx, mStimuliHandler)
 
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
     }
@@ -166,9 +178,10 @@ class TestTFI(ctx: Context,
     // =============================================================================================================================
     // set question and create trials list
     // [26 cond x 2 soa x 4/2 ] x 4 blocks = 208/104 x 4 blocks
-    private fun createTrials(){
+    private fun createTrials():List<TrialBasic>{
 
         var cond_type = 0
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until NUM_BLOCKS){
             val block_trials:MutableList<TrialTFI> = mutableListOf()
             for(rb in 0 until rip_x_cond_block){
@@ -238,17 +251,16 @@ class TestTFI(ctx: Context,
                 block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,2", soa_2))
             }
             block_trials.shuffle()
-            mTrials.addAll(block_trials)
+            trials.addAll(block_trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
 
     // [4x2 cond + 2x1 cond] x 1 soa x 5 x 2 blocks = 50 x 2 blocks
-    private fun createTrialsBimodal(){
+    private fun createTrialsBimodal():List<TrialBasic>{
 
         var cond_type = 0
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until nblocks){
             val block_trials:MutableList<TrialTFI> = mutableListOf()
             for(rb in 0 until rip_x_cond_block){
@@ -265,17 +277,16 @@ class TestTFI(ctx: Context,
                 block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,0", soa_1))
             }
             block_trials.shuffle()
-            mTrials.addAll(block_trials)
+            trials.addAll(block_trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
 
     // [6x2 cond] x 1 soa x 5 x 2 blocks = 60 x 2 blocks
-    private fun createTrialsAV(){
+    private fun createTrialsAV():List<TrialBasic>{
 
         var cond_type = 0
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until nblocks){
             val block_trials:MutableList<TrialTFI> = mutableListOf()
             for(rb in 0 until rip_x_cond_block){
@@ -289,16 +300,15 @@ class TestTFI(ctx: Context,
                 block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,2", soa_0))
             }
             block_trials.shuffle()
-            mTrials.addAll(block_trials)
+            trials.addAll(block_trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
 
-    private fun createTrialsDebug(){
+    private fun createTrialsDebug():List<TrialBasic>{
 
         var cond_type = 0
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until 1000){
 
             val block_trials:MutableList<TrialTFI> = mutableListOf()
@@ -318,11 +328,9 @@ class TestTFI(ctx: Context,
 //                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,2,0", soa_1))
 //                block_trials.add(TrialTFI(-1, cond_type++, "tfi", "2,0,2", soa_1))
             }
-            mTrials.addAll(block_trials)
+            trials.addAll(block_trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
     //endregion
     // =============================================================================================================================
@@ -343,9 +351,9 @@ class TestTFI(ctx: Context,
         }
     }
 
-    override fun nextTrial(prev_result: String, elapsed: Int): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
         testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.nextTrial(prev_result, elapsed)
+        return super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     override fun initSummary() {
@@ -368,7 +376,7 @@ class TestTFI(ctx: Context,
         val onset2      =  WN_PRESTIM_INTERVAL + 2*trial.soa
         val onsetEnd    =  WN_PRESTIM_INTERVAL + 2*trial.soa + currStimulusDuration + WN_POSTTSTIM_INTERVAL
 
-        var corr_delays = delaysAligner.arrangeDelays(STIM_ATV, 0,0, 0)
+        val corr_delays = delaysAligner.arrangeDelays(STIM_ATV, 0,0, 0)
 
         Log.d("TFI show1", "---------------------Trial type ${trial.correct_answer}, @ $onset0 | $onset1 | $onset2 | $onsetEnd")
 //        Log.d("TFI show2", "delays ${corr_delays.a} | ${corr_delays.t} | ${corr_delays.v}")

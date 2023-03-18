@@ -4,16 +4,18 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.quest.QuestParams
+import iit.uvip.psysuite.quest.QuestWrapper
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.stimuli.*
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_A4
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_T1
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_V1
+import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.utility.ConditionData
-import iit.uvip.psysuite.core.utility.QuestObject
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -37,7 +39,6 @@ class TestTID(ctx: Context,
 {
     override var LOG_TAG:String = TestTID::class.java.simpleName
 
-    private lateinit var mQuest:QuestObject
     private var isUsingQuest:Boolean    = false
 
     private var currISI:Long            = 0L
@@ -46,6 +47,8 @@ class TestTID(ctx: Context,
     private var currREP_X_LATENCY:Int   = 0
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
+
+    private var refDelta:Long           = 0L
 
     companion object {
 
@@ -67,8 +70,7 @@ class TestTID(ctx: Context,
         @JvmStatic val NUM_REP_X_LATENCY_X_BLOCK_LONG   = 4     // MUST BE ODD !!!
         @JvmStatic var NUM_TRIALS_X_BLOCK_LONG          = NUM_FIXED_LATENCIES_LONG * NUM_FIXED_LATENCIES_LONG
 
-        @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com",
-                                                                    "tonelli.alessia@gmail.com",
+        @JvmStatic val recipients:Array<String>         = arrayOf(  "uvip.apptester@gmail.com","psysuite.uvip@gmail.com",
                                                                     "nicola.domenici@iit.it") // "psysuite.uvip@gmail.com",
 
 //        @JvmStatic val TEST_STIMULUS_DURATION_1_MIN = 100
@@ -97,29 +99,46 @@ class TestTID(ctx: Context,
             val sts_sh  = ctx.resources.getString(R.string.tid_rb_short_text_short)
             val stl_sh  = ctx.resources.getString(R.string.tid_rb_long_text_short)
 
-            return mutableListOf(
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"                 , TEST_TID_SHORT_AUDIO          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"               , TEST_TID_SHORT_TACTILE        , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$sts_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$sts"                , TEST_TID_SHORT_VISUAL         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$sts_sh", Populations.sighted_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}_$sts"  , TEST_TID_SHORT_AUDIO_TRAIN    , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}$sts_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}_$sts", TEST_TID_SHORT_TACTILE_TRAIN  , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}$sts_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}_$sts" , TEST_TID_SHORT_VISUAL_TRAIN   , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}$sts_sh", Populations.sighted_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"                 , TEST_TID_LONG_AUDIO           , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"               , TEST_TID_LONG_TACTILE         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$stl_sh", Populations.all_populations),
-                ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$stl"                , TEST_TID_LONG_VISUAL          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$stl_sh", Populations.sighted_populations)
-            )
+            return if(VibrationManager.sysHasVibrator(ctx))
+                        mutableListOf(
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"                 , TEST_TID_SHORT_AUDIO          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$sts"               , TEST_TID_SHORT_TACTILE        , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$sts_sh", Populations.all_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$sts"                , TEST_TID_SHORT_VISUAL         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$sts_sh", Populations.sighted_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}_$sts"  , TEST_TID_SHORT_AUDIO_TRAIN    , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}$sts_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}_$sts", TEST_TID_SHORT_TACTILE_TRAIN  , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}_${TRAIN_LABEL}$sts_sh", Populations.all_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}_$sts" , TEST_TID_SHORT_VISUAL_TRAIN   , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}$sts_sh", Populations.sighted_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"                 , TEST_TID_LONG_AUDIO           , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_$stl"               , TEST_TID_LONG_TACTILE         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_TACTILE}$stl_sh", Populations.all_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$stl"                , TEST_TID_LONG_VISUAL          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$stl_sh", Populations.sighted_populations))
+                    else
+                mutableListOf(
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$sts"                 , TEST_TID_SHORT_AUDIO          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$sts_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$sts"                , TEST_TID_SHORT_VISUAL         , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$sts_sh", Populations.sighted_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}_$sts"  , TEST_TID_SHORT_AUDIO_TRAIN    , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}_${TRAIN_LABEL}$sts_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}_$sts" , TEST_TID_SHORT_VISUAL_TRAIN   , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}_${TRAIN_LABEL}$sts_sh", Populations.sighted_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_$stl"                 , TEST_TID_LONG_AUDIO           , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_AUDIO}$stl_sh", Populations.hearing_populations),
+                            ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_$stl"                , TEST_TID_LONG_VISUAL          , "${TEST_BASIC_LABEL}${STIMULUS_TYPE_VISUAL}$stl_sh", Populations.sighted_populations))
         }
 
-        fun getNextTrialModes():List<List<Int>> = listOf(  listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER),
-                            listOf(TEST_NEXTTRIAL_ANSWER)) //, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER))
-
+        fun getNextTrialModes(ctx:Context):List<List<Int>>{
+            return  if(VibrationManager.sysHasVibrator(ctx))
+                        listOf( listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER))
+                    else
+                        listOf( listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER),
+                                listOf(TEST_NEXTTRIAL_ANSWER))
+        }
 
         fun getEmailRecipients():Array<String> = recipients
     }
@@ -128,6 +147,8 @@ class TestTID(ctx: Context,
     private val shortTrainLatencies:List<Long>  = listOf(75, 350)
     private val longLatencies:List<Long>        = listOf(1000, 1280, 1570, 1850, 2140, 2420, 2710, 3000)
 
+    private val questParams: QuestParams = QuestParams()
+    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.RoelofsQuest", "RoelofsQuest", "1900","1080","40","170")
     // =============================================================================================================================
     // INIT
     // =============================================================================================================================
@@ -137,7 +158,6 @@ class TestTID(ctx: Context,
             mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
             vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
         }
-
         nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
@@ -166,20 +186,21 @@ class TestTID(ctx: Context,
             }
         }
 
-        mQuest      = QuestObject()
-        currTrial   = 0
-
-        if(!subject.isDebug){
-            // set question & create mTrials list
-            if(isUsingQuest){
-                createQuestTrials(currStimulusDuration)
-                setTrialNonRefDelta(0, mQuest.getFirstValue())
-            }
-            else    createConstantTrials(currStimulusDuration)
+        refDelta = when(subject.type) {
+            TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> REF_STIM_DUR_LONG
+            else                                                             -> REF_STIM_DUR_SHORT
         }
-        else                        createTrialsDebug()
 
-        nTrials     = mTrials.size
+        mTrialsManager =    if(!subject.isDebug) {
+                                if(subject.trman_type == TEST_TRMAN_FIXED) {
+                                    val trials = createConstantTrials(currStimulusDuration)
+                                    FixedTrialsManager(trials as MutableList<TrialBasic>)
+                                } else {
+                                    val trials = createQuestTrials(currStimulusDuration)
+                                    QuestManager(trials as MutableList<TrialBasic>, questWrapper, questParams)
+                                }
+                            }
+                            else FixedTrialsManager(createTrialsDebug() as MutableList<TrialBasic>)
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
@@ -191,37 +212,42 @@ class TestTID(ctx: Context,
 
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
-        mStimuliManager = StimuliManager(
-            AudioManager(AUDIO_TYPE, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav", duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
-            TactileManager(vibrator!!, duration = currStimulusDuration, handler = mStimuliHandler),
-            VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
-            delaysAligner, ctx, mStimuliHandler)
+        mStimuliManager =   if(vibrator != null)
+            StimuliManager(
+                AudioManager(AUDIO_TYPE, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                TactileManager(vibrator, duration = currStimulusDuration, handler = mStimuliHandler),
+                VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
+                delaysAligner, ctx, mStimuliHandler)
+        else
+            StimuliManager(
+                AudioManager(AUDIO_TYPE, audioResources[currStimulusDuration] ?: "t1000hz_50ms.wav",  duration = currStimulusDuration, handler = mStimuliHandler, ctx = ctx),
+                null,
+                VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
+                delaysAligner, ctx, mStimuliHandler)
 
         testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
     }
 
+    override fun initSummary(){}
+
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================    // set question and create trials list
-    private fun createConstantTrials(duration:Long){
+    private fun createConstantTrials(duration:Long):List<TrialBasic>{
 
-        var ref_delta = when(subject.type) {
-            TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> REF_STIM_DUR_LONG
-            else                                                             -> REF_STIM_DUR_SHORT
-        }
+        val trials:MutableList<TrialBasic> = mutableListOf()
         val block_trials:MutableList<TrialBasic> = mutableListOf()
-
         when (subject.type) {
             TEST_TID_SHORT_AUDIO_TRAIN, TEST_TID_SHORT_TACTILE_TRAIN, TEST_TID_SHORT_VISUAL_TRAIN    -> {
                 for(b in 0 until NUM_BLOCKS){
                     for(t in 0 until NUM_TRAIN_TRIALS/(4* NUM_BLOCKS)){
-                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortTrainLatencies[0].toInt(), true, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, subject.group, subject.session, shortTrainLatencies[0].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortTrainLatencies[1].toInt(), true, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, subject.group, subject.session, shortTrainLatencies[1].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), shortTrainLatencies[0].toInt(), true, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[0].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, refDelta.toInt(), shortTrainLatencies[1].toInt(), true, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[1].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
                     }
                     block_trials.shuffle()
-                    mTrials.addAll(block_trials)
+                    trials.addAll(block_trials)
                 }
             }
             else -> {
@@ -230,111 +256,62 @@ class TestTID(ctx: Context,
                         for(l in 0 until currREP_X_LATENCY){
                             when(subject.type) {
                                 TEST_TID_SHORT_AUDIO, TEST_TID_SHORT_TACTILE, TEST_TID_SHORT_VISUAL    -> {
-                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, shortLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, shortLatencies[l].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
                                 }
                                 TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL      -> {
-                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, longLatencies[l].toInt(), ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, longLatencies[l].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
                                 }
                             }
                         }
                     }
                     block_trials.shuffle()
-                    mTrials.addAll(block_trials)
+                    trials.addAll(block_trials)
                 }
             }
         }
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
 
-    private fun createQuestTrials(duration:Long){
+    private fun createQuestTrials(duration:Long):List<TrialBasic>{
 
         var ref_delta = REF_STIM_DUR_SHORT
         when(subject.type) {
             TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> ref_delta = REF_STIM_DUR_LONG
         }
 
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until NUM_BLOCKS){
 
-            val block_trials:MutableList<TrialBasic> = mutableListOf()
+            val block_trials:MutableList<TrialTID> = mutableListOf()
 
             for(t in 0 until NUM_TRIALS_X_BLOCK_SHORT /2){
-                // TrialTID(id:Int=-1, val block:Int, val session:Int, type:Int, val modality:Int, val delta1:Int, val delta2:Int, val ref_first:Int, val duration:Int)
+                //                    id:Int=-1, type:Int, val block:Int, val group:Int,            val session:Int,  var delta1:Int, var delta2:Int, val ref_first:Boolean, val duration:Int, answers:List<String>
                 block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), -1, true, duration.toInt(), validAnswers))
-                block_trials.add(TrialTID(-1, subject.type, b, subject.group, subject.session, -1, ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, -1, ref_delta.toInt(),false, duration.toInt(), validAnswers))
             }
             block_trials.shuffle()
-            mTrials.addAll(block_trials)
+            trials.addAll(block_trials)
         }
-
-        // set trial id according to its order in the list
-        mTrials.mapIndexed { index, trial -> trial.id = (index + 1) }
+        return trials
     }
 
-    private fun createTrialsDebug(){
+    private fun createTrialsDebug():List<TrialBasic>{
         val duration = currStimulusDuration
 
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until 10000){
-            mTrials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subject as SubjectTIDParcel).group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
-            mTrials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
-            mTrials.add(TrialTID(-1, TEST_TID_SHORT_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subject as SubjectTIDParcel).group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
 
-            mTrials.add(TrialTID(-1, TEST_TID_LONG_AUDIO, b,  subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
-            mTrials.add(TrialTID(-1, TEST_TID_LONG_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
-            mTrials.add(TrialTID(-1, TEST_TID_LONG_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_AUDIO, b,  subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
         }
-        setTrialsID()   // set trial id according to its order in the list
+        return trials
     }
-    // =============================================================================================================================
-    // MANAGE TRIALS END
-    // =============================================================================================================================
-    override fun onTrialEnd() {
-
-        mNoise?.stop()
-        mNoise?.prepare()
-
-        when (nextTrailModality) {
-            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
-            TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
-                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
-            }
-
-            TEST_NEXTTRIAL_AUTO         -> {
-                // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-                mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
-                }, 1000L)
-            }
-        }
-    }
-
-    // in case of quest-based task, define new trial's nonref-delta & success
-    override fun getNewTrial(): TrialBasic {
-
-        return  if(isUsingQuest) {
-            val newdelta: Float = mQuest.getNewValue(mTrial.success)
-            currTrial++
-            setTrialNonRefDelta(currTrial, newdelta)
-            mTrials[currTrial]
-        }
-        else super.getNewTrial()
-    }
-
-    // set next trial NON-ref delta and success value
-    private fun setTrialNonRefDelta(trial_id:Int, nonref_delta:Float){
-
-        if((mTrials[trial_id] as TrialTID).ref_first)       (mTrials[trial_id] as TrialTID).delta2 = nonref_delta.toInt()
-        else                                                (mTrials[trial_id] as TrialTID).delta1 = nonref_delta.toInt()
-
-        (mTrials[trial_id] as TrialTID).correct_answer =    if((mTrials[trial_id] as TrialTID).delta1 > (mTrials[trial_id] as TrialTID).delta2) validAnswers[0]
-                                                            else                                                                                validAnswers[1]
-    }
-
-    override fun initSummary(){}
 
     // =============================================================================================================================
     // DELIVER STIMULI
@@ -345,7 +322,6 @@ class TestTID(ctx: Context,
     // PAIR2:          FIRST_STIMULUS_DELAY + duration + mTrial.delta1 + duration + ISI
     // QUESTION:    FIRST_STIMULUS_DELAY + duration + mTrial.delta1 + duration + ISI + duration + mTrial.delta2 + duration + QUESTION_DELAY
     override fun show(trial: TrialBasic, isRepeat:Boolean){
-
         mNoise?.start()
         // PAIR 1
         mStimuliHandler.postDelayed({
@@ -370,6 +346,37 @@ class TestTID(ctx: Context,
             TEST_TID_SHORT_AUDIO, TEST_TID_LONG_AUDIO, TEST_TID_SHORT_AUDIO_TRAIN       -> mStimuliManager.deliverAlignedStimuliPair(delta, AUDIO_TYPE)
             TEST_TID_SHORT_TACTILE, TEST_TID_LONG_TACTILE, TEST_TID_SHORT_TACTILE_TRAIN -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_T1)
             TEST_TID_SHORT_VISUAL, TEST_TID_LONG_VISUAL, TEST_TID_SHORT_VISUAL_TRAIN    -> mStimuliManager.deliverAlignedStimuliPair(delta, STIM_TYPE_V1)
+        }
+    }
+
+    // =============================================================================================================================
+    // MANAGE TRIALS END
+    // =============================================================================================================================
+    // I have to transform result in string to results in 0 or 1
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
+        return super.onEndTrial(prev_result, elapsed, extra_text)
+    }
+
+    override fun onTrialEnd() {
+
+        mNoise?.stop()
+        mNoise?.prepare()
+
+        when (nextTrailModality) {
+            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
+            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
+                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
+                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            }
+
+            TEST_NEXTTRIAL_AUTO         -> {
+                // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
+                mStimuliHandler.postDelayed({
+                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
+                }, 1000L)
+            }
         }
     }
 

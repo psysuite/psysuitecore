@@ -43,13 +43,13 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> {
             return mutableListOf(
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}" , TEST_SAMPLE_ALIGNED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.aligned)}", Populations.sighted_hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}" , TEST_SAMPLE_SHIFTED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.shifted)}", Populations.sighted_hearing_populations),
-                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}"    , TEST_SAMPLE_PAIR   , "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.pair)}", Populations.sighted_hearing_populations)
+                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.aligned)}"  , TEST_SAMPLE_ALIGNED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.aligned)}", Populations.sighted_hearing_populations),
+                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.shifted)}"    , TEST_SAMPLE_SHIFTED, "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.shifted)}", Populations.sighted_hearing_populations),
+                ConditionData("$TEST_BASIC_LABEL ${ctx.resources.getString(R.string.pair)}"     , TEST_SAMPLE_PAIR   , "${TEST_BASIC_LABEL}_${ctx.resources.getString(R.string.pair)}", Populations.sighted_hearing_populations)
             )
         }
         
-        fun getNextTrialModes():List<List<Int>>{
+        fun getNextTrialModes(ctx:Context):List<List<Int>>{
             return listOf(listOf(TEST_NEXTTRIAL_BUTTON, TEST_NEXTTRIAL_AUTO))
         }
     }
@@ -61,14 +61,12 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
     // =============================================================================================================================
     override fun initTest(){
 
-        when {
-            mImageView == null  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
-        }
+        if(mImageView == null) throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
 
-        mImageView?.visibility  = View.INVISIBLE
+        // vibrator == null    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+
+        mImageView.visibility   = View.INVISIBLE
         curStimDuration         = 1000L
-        currTrial               = 0
         validAnswers            = mutableListOf()
 
         ITI                     = (subject as SubjectSampleParcel).iti
@@ -82,7 +80,6 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
 
         createResultFile(subject, LOG_HEADER)
         createTrials()
-        nTrials                 = mTrials.size
         setStimuliManager()
     }
 
@@ -142,18 +139,16 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
             else -> null
         }
 
-        val tactileManager =    if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
-            TactileManager(vibrator!!, subject.tactileAmplitude, duration = subject.tactileSequence.toLong(), handler = mStimuliHandler)
+        val tact_amplitudes = TactileManager.validateAmplitudes(subject.tactileAmplitudes)
+        val tact_timings    = TactileManager.validateTimings(subject.tactileTimings)
 
-        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0){
-            val timings = TactileManager.validatePattern(subject.tactileSequence)
-            if(timings != null) TactileManager(vibrator!!, subject.tactileAmplitude, timings, handler = mStimuliHandler)
-            else {
-                // TODO: ALERT
-                null
-            }
-        }
-        else null
+        val tactileManager  =   if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
+            TactileManager(vibrator!!, tact_amplitudes, duration = subject.tactileTimings.toLong(), handler = mStimuliHandler)
+        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0)
+            TactileManager(vibrator!!, tact_amplitudes, tact_timings, type = StimuliManager.STIM_TYPE_T2, handler = mStimuliHandler)
+        else throw Exception()
+
+
 
         val visualManager = when {
             subject.stim_sources and StimuliManager.STIM_TYPE_V1 > 0 -> {
@@ -175,7 +170,7 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
-    private fun createTrials(){
+    private fun createTrials():List<TrialBasic>{
 
         val extraTrial:Any? = when(subject.type){
             TEST_SAMPLE_SHIFTED     -> (subject as SubjectSampleParcel).shiftedParams
@@ -184,9 +179,11 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
         }
 
         var cnt = -1
+        val trials:MutableList<TrialBasic> = mutableListOf()
         for(t in 0 until (subject as SubjectSampleParcel).repetitions){
-            mTrials.add(TrialSample(++cnt, subject.type, "", subject.stim_sources, extraTrial))
+            trials.add(TrialSample(++cnt, subject.type, "", subject.stim_sources, extraTrial))
         }
+        return trials
     }
 
     // =============================================================================================================================

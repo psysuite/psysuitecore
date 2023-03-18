@@ -1,12 +1,15 @@
 package iit.uvip.psysuite.core.utility
 
 import android.os.Parcelable
-import iit.uvip.psysuite.core.stimuli.TactileManager
-import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
-import org.albaspazio.core.accessory.VibrationManager
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
+
 import java.util.*
 import java.util.Collections.max
+
+import iit.uvip.psysuite.core.stimuli.TactileManager
+import org.albaspazio.core.accessory.VibrationManager
+
 
 @Parcelize
 data class StimuliDelay(val a:Long=0L, val t:Long=0L, val v:Long=0L) : Parcelable {// delay in ms of each modality wrt audio onset
@@ -78,6 +81,6 @@ data class StimulusDelay (val type: Int, val delay:Long)
 data class StimulusBIS(val ntrials:Int, val position:Int, val conflict:String)
 
 fun VibrationManager.vibrateSingle(paramsT: TactileManager) {
-    this.vibrateSingle(paramsT.duration, paramsT.amplitude)
+    this.vibrateSingle(paramsT.duration, paramsT.amplitudes[0])
 }
 

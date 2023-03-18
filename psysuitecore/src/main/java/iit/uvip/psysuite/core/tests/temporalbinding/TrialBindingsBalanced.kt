@@ -8,7 +8,7 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T_A
 
 
-class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answers:List<String>):TrialBindings3latencies(id, type, 0,0,0, "") {
+class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answers:List<String>):TrialBindings3latencies(id, type, 0,0,0, -1) {
 
     companion object {
         @JvmStatic
@@ -21,38 +21,38 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_an
                 t = 0
                 a = delay
                 v = delay*2
-                correct_answer = correct_answers[0]
+                correct_answer = 0
             }
             TYPE_V_A_T ->{
                 v = 0
                 a = delay
                 t = delay*2
-                correct_answer = correct_answers[0]
+                correct_answer = 0
             }
             TYPE_A_T_V ->{
                 a = 0
                 t = delay
                 v = delay*2
-                correct_answer = correct_answers[1]
+                correct_answer = 1
             }
             TYPE_V_T_A ->{
                 v = 0
                 t = delay
                 a = delay*2
-                correct_answer = correct_answers[1]
+                correct_answer = 1
             }
 
             TYPE_A_V_T -> {
                 a = 0
                 v = delay
                 t = delay*2
-                correct_answer = correct_answers[2]
+                correct_answer = 2
             }
             TYPE_T_V_A -> {
                 t = 0
                 v = delay
                 a = delay*2
-                correct_answer = correct_answers[2]
+                correct_answer = 2
             }
         }
     }

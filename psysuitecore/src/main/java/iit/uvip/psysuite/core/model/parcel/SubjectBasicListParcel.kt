@@ -26,6 +26,7 @@ open class SubjectBasicListParcel(
     override var block:Int = -1,
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
     override var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
+    override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
     override var vercode: Int = -1,
     override var showResult: Boolean = false,
     override var population: Int = Populations.POPULATION_TD,
@@ -34,7 +35,7 @@ open class SubjectBasicListParcel(
     open var spinner_sel: Int = -1,
     open var spinner_label: String = "",
     open var spinner_data_resource: Int = -1
-) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelays, whitenoise, vercode, showResult, population, isDebug)
+) : SubjectBasicParcel(type, label, age, gender, nextTrailModality, canRecordAudio, classes, device, block, stimuliDelays, whitenoise, trman_type, vercode, showResult, population, isDebug)
 
 
 

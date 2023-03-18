@@ -22,7 +22,7 @@ This class manage simple subjects that participate in tests with only one condit
 in subclasses, user must resolve the condition code according to internal variables
 */
 
-// base class for all tests
+// base class for all Subjects information
 // nextTrailModality = -1 => do not show switch button in the gui
 
 @Parcelize
@@ -38,6 +38,7 @@ open class SubjectBasicParcel(
     open var block: Int = -1,
     open var stimuliDelays: DelaysAligner = DelaysAligner(),
     open var whitenoise: Int = TestBasic.TEST_WNOISE_CHOOSE_ON,
+    open var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
     open var vercode: Int = -1,
     open var showResult: Boolean = false,
     open var population: Int = Populations.POPULATION_TD,
@@ -115,6 +116,7 @@ open class SubjectBasicParcel(
     open fun getFilesPrefix(ctx: Context):String {
 
         val ci                  = getCompanionObjectMethod(classes[0], "getConditionsInfo")
+        @Suppress("UNCHECKED_CAST")
         val type_label          = (ci.first?.call(ci.second, ctx) as List<ConditionData>).getLabelLog(type)
         val population_label    = Populations.all_populations.getLabelLog(population)
 
@@ -164,7 +166,7 @@ open class SubjectBasicParcel(
                     subjectFileName = composeSubjectFileName(context)
                     if(subjectFileName.isEmpty())   ERROR_SUBJECT_INCOMPLETE
                     else {
-                        val res = saveText(context, subjectFileName, jsonAdapter.toJson(this), forceOld = true)        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+                        saveText(context, subjectFileName, jsonAdapter.toJson(this), forceOld = true)        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
                         0
                     }
         }
