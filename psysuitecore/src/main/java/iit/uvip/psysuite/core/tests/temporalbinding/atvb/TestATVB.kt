@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -37,8 +38,7 @@ import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.Stimulus3delay
 import iit.uvip.psysuite.core.utility.StimulusDelay
-import iit.uvip.psysuite.quest.QuestParams
-import iit.uvip.psysuite.quest.QuestWrapper
+import iit.uvip.psysuite.adaptive.quest.QuestParams
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -247,7 +247,7 @@ class TestATVB(
 
     private val nQuestTrials = 30
     private val questParams = QuestParams()
-    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf(800))
+    private val questWrapper: AdaptiveWrapper = AdaptiveWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf(800))
 
     // =============================================================================================================================
     // INIT
@@ -345,7 +345,7 @@ class TestATVB(
 
                 // 36
                 lStimuliUnbalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AT_V, unbalSD[6].first, 1))
@@ -419,7 +419,7 @@ class TestATVB(
 
                 // 18
                 lStimuliBalancedShort.map {
-                    rtrials.add(TrialBindingsBalanced(++cnt, it.type, it.delay, validAnswers))
+                    rtrials.add(TrialBindingsBalanced(++cnt, it.type, it.stim_value, validAnswers))
                 }
                 rtrials.shuffle()
                 trials.addAll(rtrials)
@@ -529,12 +529,12 @@ class TestATVB(
 
         val corr_delays: CorrectedStimuliDelay = when(trial.type){
             TYPE_ATV    ->  delaysAligner.arrangeDelays(STIM_ATV)
-            TYPE_A_TV   ->  delaysAligner.arrangeDelays(STIM_ATV, 0, trial.delay, trial.delay)
-            TYPE_TV_A   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.delay,0,0)
-            TYPE_T_AV   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.delay,0, trial.delay)
-            TYPE_AV_T   ->  delaysAligner.arrangeDelays(STIM_ATV, 0, trial.delay,0)
-            TYPE_V_AT   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.delay, trial.delay,0)
-            TYPE_AT_V   ->  delaysAligner.arrangeDelays(STIM_ATV, 0,0, trial.delay)
+            TYPE_A_TV   ->  delaysAligner.arrangeDelays(STIM_ATV, 0, trial.stim_value, trial.stim_value)
+            TYPE_TV_A   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.stim_value,0,0)
+            TYPE_T_AV   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.stim_value,0, trial.stim_value)
+            TYPE_AV_T   ->  delaysAligner.arrangeDelays(STIM_ATV, 0, trial.stim_value,0)
+            TYPE_V_AT   ->  delaysAligner.arrangeDelays(STIM_ATV, trial.stim_value, trial.stim_value,0)
+            TYPE_AT_V   ->  delaysAligner.arrangeDelays(STIM_ATV, 0,0, trial.stim_value)
             else        ->  delaysAligner.arrangeDelays(STIM_ATV)
         }
         mStimuliManager.deliverShiftedStimulus(STIM_ATV, corr_delays.a, corr_delays.t, corr_delays.v){ onTrialEnd()}

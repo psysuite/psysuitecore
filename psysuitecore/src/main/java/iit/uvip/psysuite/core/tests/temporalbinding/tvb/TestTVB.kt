@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
+import iit.uvip.psysuite.adaptive.ado.ADOParams
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -32,8 +34,6 @@ import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusATBInfants
 import iit.uvip.psysuite.core.utility.StimulusDelay
-import iit.uvip.psysuite.quest.QuestParams
-import iit.uvip.psysuite.quest.QuestWrapper
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -136,8 +136,8 @@ class TestTVB(ctx: Context,
     private val amplitude = 100
 
     private val nQuestTrials = 30
-    private val questParams = QuestParams()
-    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.QuestWrapper", "QuestWrapper", questParams, listOf(800))
+    private val adoParams = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
+    private val adoWrapper: AdaptiveWrapper = AdaptiveWrapper("bisection.BisectionADOPYWrapper", "BisectionADOPYWrapper", adoParams, listOf(800))
 
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
     private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
@@ -293,7 +293,7 @@ class TestTVB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -316,7 +316,7 @@ class TestTVB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -529,11 +529,11 @@ class TestTVB(ctx: Context,
             }
             TYPE_T_V    -> {
                 type = mStimuliManager.typeTV
-                delaysAligner.arrangeDelays(type, -1, 0, trial.delay)
+                delaysAligner.arrangeDelays(type, -1, 0, trial.stim_value)
             }
             TYPE_V_T    -> {
                 type = mStimuliManager.typeTV
-                delaysAligner.arrangeDelays(type, -1, trial.delay,0)
+                delaysAligner.arrangeDelays(type, -1, trial.stim_value,0)
             }
             else        -> {
                 type = mStimuliManager.typeTV

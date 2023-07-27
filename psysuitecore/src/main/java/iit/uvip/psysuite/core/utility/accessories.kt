@@ -77,8 +77,8 @@ data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:Stri
 
 data class StimulusATBInfants(val type: Int, val tactile_pattern:Int)
 data class Stimulus3delay(val type: Int, val a:Long, val t:Long, val v:Long)
-data class StimulusDelay (val type: Int, val delay:Long)
-data class StimulusBIS(val ntrials:Int, val position:Int, val conflict:String)
+data class StimulusDelay (val type: Int, val stim_value:Long)
+data class StimuliSetBIS(val ntrials:Int, val stim_value:Long, val conflict:String)
 
 fun VibrationManager.vibrateSingle(paramsT: TactileManager) {
     this.vibrateSingle(paramsT.duration, paramsT.amplitudes[0])

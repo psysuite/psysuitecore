@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
-import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicBinding
 import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicSpinnerBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicListParcel
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 
 
 open class SubjectBasicSpinnerDialogFragment : SubjectBasicDialogFragment()
@@ -49,7 +47,7 @@ open class SubjectBasicSpinnerDialogFragment : SubjectBasicDialogFragment()
 
     override fun checkData():List<String>{
         val errors = super.checkData() as MutableList<String>
-        if (binding.spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_spinner, (binding as FragmentSubjectInfoBasicSpinnerBinding).labSpinner.text) )
+        if (binding.spinner.selectedItemPosition == -1) errors.add(" - " + resources.getString(R.string.select_spinner, binding.labSpinner.text) )
         return errors
     }
 

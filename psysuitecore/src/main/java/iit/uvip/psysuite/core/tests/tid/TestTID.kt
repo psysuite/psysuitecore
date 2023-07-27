@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import iit.uvip.psysuite.quest.QuestParams
-import iit.uvip.psysuite.quest.QuestWrapper
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
+import iit.uvip.psysuite.adaptive.quest.QuestParams
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.stimuli.*
@@ -16,6 +16,7 @@ import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.trials.QuestTrialsManager
+import iit.uvip.psysuite.core.trials.TrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
@@ -42,7 +43,7 @@ class TestTID(ctx: Context,
 
     private val nQuestTrials = 30
     private val questParams = QuestParams()
-    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf("1900","1080","40","170"))
+    private val questWrapper: AdaptiveWrapper = AdaptiveWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf("1900","1080","40","170"))
 
     private var currISI:Long            = 0L
     private var currREP_X_BLOCK:Int     = 0
@@ -156,8 +157,8 @@ class TestTID(ctx: Context,
     override fun initTest(){
 
         when {
-            mImageView == null -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mImageView == null  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+            vibrator == null    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
         }
         nextTrailModality   = subject.nextTrailModality
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
@@ -242,10 +243,10 @@ class TestTID(ctx: Context,
             TEST_TID_SHORT_AUDIO_TRAIN, TEST_TID_SHORT_TACTILE_TRAIN, TEST_TID_SHORT_VISUAL_TRAIN    -> {
                 for(b in 0 until NUM_BLOCKS){
                     for(t in 0 until NUM_TRAIN_TRIALS/(4* NUM_BLOCKS)){
-                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), shortTrainLatencies[0].toInt(), true, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[0].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, refDelta.toInt(), shortTrainLatencies[1].toInt(), true, duration.toInt(), validAnswers))
-                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[1].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, (subject as SubjectTIDParcel).group, subject.session,  refDelta, shortTrainLatencies[0], true, duration, validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[0], refDelta,false, duration, validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, refDelta, shortTrainLatencies[1], true, duration, validAnswers))
+                        block_trials.add(TrialTID(-1, subject.type, t, subject.group,                       subject.session, shortTrainLatencies[1], refDelta,false, duration, validAnswers))
                     }
                     block_trials.shuffle()
                     trials.addAll(block_trials)
@@ -257,12 +258,12 @@ class TestTID(ctx: Context,
                         for(l in 0 until currREP_X_LATENCY){
                             when(subject.type) {
                                 TEST_TID_SHORT_AUDIO, TEST_TID_SHORT_TACTILE, TEST_TID_SHORT_VISUAL    -> {
-                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), shortLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, shortLatencies[l].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta, shortLatencies[l], true, duration, validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, shortLatencies[l], refDelta,false, duration, validAnswers))
                                 }
                                 TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL      -> {
-                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta.toInt(), longLatencies[l].toInt(), true, duration.toInt(), validAnswers))
-                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, longLatencies[l].toInt(), refDelta.toInt(),false, duration.toInt(), validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  refDelta, longLatencies[l], true, duration, validAnswers))
+                                    block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, longLatencies[l], refDelta,false, duration, validAnswers))
                                 }
                             }
                         }
@@ -289,8 +290,8 @@ class TestTID(ctx: Context,
 
             for(t in 0 until NUM_TRIALS_X_BLOCK_SHORT /2){
                 //                    id:Int=-1, type:Int, val block:Int, val group:Int,            val session:Int,  var delta1:Int, var delta2:Int, val ref_first:Boolean, val duration:Int, answers:List<String>
-                block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta.toInt(), -1, true, duration.toInt(), validAnswers))
-                block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, -1, ref_delta.toInt(),false, duration.toInt(), validAnswers))
+                block_trials.add(TrialTID(-1, subject.type, b, (subject as SubjectTIDParcel).group, subject.session,  ref_delta, TrialsManager.ADAPTIVE_VALUE, true, duration, validAnswers))
+                block_trials.add(TrialTID(-1, subject.type, b, subject.group,                       subject.session, TrialsManager.ADAPTIVE_VALUE, ref_delta,false, duration, validAnswers))
             }
             block_trials.shuffle()
             trials.addAll(block_trials)
@@ -303,13 +304,13 @@ class TestTID(ctx: Context,
 
         val trials:MutableList<TrialBasic> = mutableListOf()
         for(b in 0 until 10000){
-            trials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subject as SubjectTIDParcel).group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
-            trials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
-            trials.add(TrialTID(-1, TEST_TID_SHORT_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_SHORT.toInt(),         100, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_AUDIO, b,  (subject as SubjectTIDParcel).group, subject.session,  REF_STIM_DUR_SHORT,         100, true, duration, validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_SHORT,         100, true, duration, validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_SHORT_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_SHORT,         100, true, duration, validAnswers))
 
-            trials.add(TrialTID(-1, TEST_TID_LONG_AUDIO, b,  subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
-            trials.add(TrialTID(-1, TEST_TID_LONG_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
-            trials.add(TrialTID(-1, TEST_TID_LONG_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_LONG.toInt(),         2000, true, duration.toInt(), validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_AUDIO, b,  subject.group, subject.session,  REF_STIM_DUR_LONG,         2000, true, duration, validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_TACTILE, b, subject.group, subject.session,  REF_STIM_DUR_LONG,         2000, true, duration, validAnswers))
+            trials.add(TrialTID(-1, TEST_TID_LONG_VISUAL, b, subject.group, subject.session,  REF_STIM_DUR_LONG,         2000, true, duration, validAnswers))
         }
         return trials
     }

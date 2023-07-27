@@ -3,6 +3,7 @@ package iit.uvip.psysuite.core.tests.temporalbinding.atb
 import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -33,8 +34,7 @@ import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusATBInfants
 import iit.uvip.psysuite.core.utility.StimulusDelay
-import iit.uvip.psysuite.quest.QuestParams
-import iit.uvip.psysuite.quest.QuestWrapper
+import iit.uvip.psysuite.adaptive.quest.QuestParams
 
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
@@ -142,7 +142,7 @@ class TestATB(ctx: Context,
 
     private val nQuestTrials = 30
     private val questParams = QuestParams()
-    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf(800))
+    private val questWrapper: AdaptiveWrapper = AdaptiveWrapper("roelofs.RoelofsQuest", "RoelofsQuest", questParams, listOf(800))
 
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
     private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
@@ -188,7 +188,7 @@ class TestATB(ctx: Context,
                 currStimulusDuration    = STIM_DURATION_INF // 1000L
             }
         }
-        subject.trman_type = TEST_TRMAN_QUEST
+        subject.trman_type = TEST_TRMAN_ADAPTIVE
         mTrialsManager =    if(subject.trman_type == TEST_TRMAN_FIXED){
                                 val trials = if(!subject.isDebug) {
                                     // create trials/summary
@@ -299,7 +299,7 @@ class TestATB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -324,7 +324,7 @@ class TestATB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -538,11 +538,11 @@ class TestATB(ctx: Context,
             }
             TYPE_A_T    -> {
                 type = mStimuliManager.typeAT
-                delaysAligner.arrangeDelays(type, 0,trial.delay, -1)
+                delaysAligner.arrangeDelays(type, 0,trial.stim_value, -1)
             }
             TYPE_T_A    -> {
                 type = mStimuliManager.typeAT
-                delaysAligner.arrangeDelays(type, trial.delay,0, -1)
+                delaysAligner.arrangeDelays(type, trial.stim_value,0, -1)
             }
             else        -> {
                 type = mStimuliManager.typeAT

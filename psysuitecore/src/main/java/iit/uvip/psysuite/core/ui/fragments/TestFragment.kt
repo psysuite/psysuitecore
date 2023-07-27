@@ -76,18 +76,17 @@ class TestFragment : BaseFragment(
 ){
 
     private var _binding: FragmentTestBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
     private lateinit var mTest: TestBasic
     private lateinit var mSubjectParcel:SubjectBasicParcel
 
-    override val LOG_TAG                     = TestFragment::class.java.simpleName
+    override val LOG_TAG                            = TestFragment::class.java.simpleName
     private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
 
     private var answerDialogFragment:DialogFragment? = null
     private var isAnswerDialogOn:Boolean            = false
 
-    private var userPopulation:Int                  = Populations.POPULATION_TD
     private var isBlindUser:Boolean                 = false
     private var isDeafUser:Boolean                  = false
 
@@ -108,8 +107,7 @@ class TestFragment : BaseFragment(
 
     private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
 
-    // ==========================================================================================================================
-    // ==========================================================================================================================
+
     companion object {
 
         @JvmStatic val TRG_REQ_CODE_ANSWER:Int        = 1
@@ -130,6 +128,9 @@ class TestFragment : BaseFragment(
         }
     }
 
+    // ==========================================================================================================================
+    // FRAGMENT OVERRIDES
+    // ==========================================================================================================================
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTestBinding.inflate(inflater, container, false)
         mMainView = binding.root
@@ -169,7 +170,6 @@ class TestFragment : BaseFragment(
 
                 vibrator                    = VibrationManager(requireContext()).init()
                 speechRecognitionManager    = SpeechRecognitionManager(requireContext())
-                SPython.getInstance(requireContext())   // init python here that we have a context. in Test Classes we get the instance created here
 
                 when(mSubjectParcel.type){
 
@@ -247,9 +247,9 @@ class TestFragment : BaseFragment(
                     }
                 }
 
-                userPopulation  = mSubjectParcel.population
-                isBlindUser     = Populations.vi_populations.getIds().contains(userPopulation)
-                isDeafUser      = Populations.ai_populations.getIds().contains(userPopulation)
+                isBlindUser     = mSubjectParcel.isBlindUser
+                isDeafUser      = mSubjectParcel.isDeafUser
+
                 if(isBlindUser && !speechManager.isValid){
                     showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
                     return@SpeechManager
@@ -280,29 +280,6 @@ class TestFragment : BaseFragment(
         }
     }
 
-    // triggered by testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
-    private fun onTestSetupComplete(){
-
-        // block is always -1 but when is continuing a previous session (in that case if it found ..._blk2.txt => block=3 ...thus is always > 0)
-        mTest.adjustBlocks(mSubjectParcel.block)     // set currTrial, mCurrBlock, mTrial
-
-        if(isBlindUser)     showAnswerDialog(TRG_REQ_CODE_INSTRUCTIONS)
-        else                startTest()
-    }
-
-    private fun startTest(){
-
-        mHandler.postDelayed({
-            if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS) {
-                binding.btAbort.visibility = View.VISIBLE
-                binding.btPause.visibility = View.VISIBLE
-            }
-            mTest.start()
-            if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
-
-        }, 1000L)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 
@@ -325,15 +302,15 @@ class TestFragment : BaseFragment(
         }
 
         binding.btAbort.setOnClickListener{
-            mHandler.removeCallbacks(mRunnable!!)
+            mRunnable?.let{ mHandler.removeCallbacks(it) }
             show2ChoisesDialog(requireActivity(),
                 requireContext().resources.getString(R.string.warning),
                 requireContext().resources.getString(R.string.test_want2abort),
                 requireContext().resources.getString(R.string.yes),         // ok
                 requireContext().resources.getString(R.string.no),       // cancel
                 { onAbortTest() }, {
-                    binding.btNext.visibility      = View.INVISIBLE
-                    binding.btPause.visibility     = View.INVISIBLE
+                    binding.btNext.visibility = View.INVISIBLE
+                    binding.btPause.visibility = View.INVISIBLE
 
                     onTrialEnded()
                 })
@@ -356,6 +333,34 @@ class TestFragment : BaseFragment(
     override fun onPause(){
         super.onPause()
         disposable.clear()
+    }
+
+
+    // ==========================================================================================================================
+    // triggered by testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
+    private fun onTestSetupComplete(){
+
+        // block is always -1 but when is continuing a previous session (in that case if it found ..._blk2.txt => block=3 ...thus is always > 0)
+        mTest.adjustBlocks(mSubjectParcel.block)     // set currTrial, mCurrBlock, mTrial
+
+        if(isBlindUser)     showAnswerDialog(TRG_REQ_CODE_INSTRUCTIONS)
+        else                startTest()
+    }
+
+    // called by:
+    //  - onTestSetupComplete
+    //  - onActivityResult->TRG_REQ_CODE_INSTRUCTIONS
+    private fun startTest(){
+
+        mHandler.postDelayed({
+            if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS) {
+                binding.btAbort.visibility = View.VISIBLE
+                binding.btPause.visibility = View.VISIBLE
+            }
+            mTest.start()
+            if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
+
+        }, 1000L)
     }
 
     // here I manage all trial-by-trial behaviours invoked by Tests
@@ -413,21 +418,6 @@ class TestFragment : BaseFragment(
             }
         }
         .addTo(disposable)
-    }
-    //---------------------------------------------------------------------------------------------------------------------------------------
-    // called by: 1) onActivityResult after answer, 2) speechrecognition result
-    private fun onAnswerGiven(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
-
-        // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
-        abortRecognition = true
-        mHandler.post {
-            speechRecognitionManager.stop()
-            speechManager.stop()
-        }
-        closeAnswerDialog()
-
-        // close trial (e.g. set answer) & check whether it was the last => test ended
-        onTrialEnded(prev_result, elapsed, extra_text)
     }
 
     // called by: onAnswer, btNext click, btPause click
@@ -560,6 +550,7 @@ class TestFragment : BaseFragment(
     // ELEMENT VISIBILITY
     //---------------------------------------------------------------------------------------------------------------------------------------
     // called by TestBasic.EVENT_SHOW_NEXT_BUTTON
+    // PURE UI: just show btNext and btAbort
     private fun showNext() {
         binding.btNext.visibility = View.VISIBLE
 
@@ -567,6 +558,28 @@ class TestFragment : BaseFragment(
             binding.btAbort.visibility = View.VISIBLE
     }
 
+    // PURE UI: just show trial id info
+    private fun showTrialId(remove: Long = 0){
+        binding.txtTrialId.visibility   = View.VISIBLE
+        binding.txtTrialId.text         = resources.getString(
+            R.string.trial_id,
+            (mTest.currTrial + 1).toString()
+        )
+        if(remove > 0)
+            mHandler.postDelayed({  binding.txtTrialId.visibility = View.INVISIBLE  }, remove)
+    }
+
+    // PURE UI: just show debug info
+    private fun showDebugInfo(msg: String, remove: Long = 0){
+        currDebugInfo           = msg
+        binding.txtDebugInfo.visibility = View.VISIBLE
+        binding.txtDebugInfo.text       = currDebugInfo
+
+        if(remove > 0)
+            mHandler.postDelayed({    binding.txtDebugInfo.visibility = View.INVISIBLE    }, remove)
+    }
+
+    // show abort button for remove-ms and then call onTrialEnded
     private fun showShortAbort(remove: Long = 1000L){
         binding.btAbort.visibility = View.VISIBLE
         binding.btPause.visibility = View.VISIBLE
@@ -583,29 +596,11 @@ class TestFragment : BaseFragment(
         }
     }
 
-    private fun showTrialId(remove: Long = 0){
-        binding.txtTrialId.visibility   = View.VISIBLE
-        binding.txtTrialId.text         = resources.getString(
-            R.string.trial_id,
-            (mTest.currTrial + 1).toString()
-        )
-        if(remove > 0)
-            mHandler.postDelayed({  binding.txtTrialId.visibility = View.INVISIBLE  }, remove)
-    }
-
-    private fun showDebugInfo(msg: String, remove: Long = 0){
-        currDebugInfo           = msg
-        binding.txtDebugInfo.visibility = View.VISIBLE
-        binding.txtDebugInfo.text       = currDebugInfo
-
-        if(remove > 0)
-            mHandler.postDelayed({    binding.txtDebugInfo.visibility = View.INVISIBLE    }, remove)
-    }
-
     //=======================================================================================================================================
     // ANSWERS
     //=======================================================================================================================================
-    // create answer dialog and process response (repeat same trial or show next one)
+    // called by mTest.testEvent listener (when test trial stimulus and user response is needed) & onTestSetupComplete (for blind users)
+    // PURE UI: create answer dialog
     private fun showAnswerDialog(trg_req_code: Int){
 
         val b = Bundle()
@@ -634,6 +629,7 @@ class TestFragment : BaseFragment(
         isAnswerDialogOn = true
     }
 
+    // PURE UI: called by onAnswerGiven
     private fun closeAnswerDialog(){
         if(isAnswerDialogOn) {
             answerDialogFragment?.dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
@@ -716,6 +712,22 @@ class TestFragment : BaseFragment(
                 }
             )
             .addTo(disposable)
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------------------------
+    // called by: 1) onActivityResult after answer, 2) speechrecognition result
+    private fun onAnswerGiven(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
+
+        // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
+        abortRecognition = true
+        mHandler.post {
+            speechRecognitionManager.stop()
+            speechManager.stop()
+        }
+        closeAnswerDialog()
+
+        // close trial (e.g. set answer) & check whether it was the last => test ended
+        onTrialEnded(prev_result, elapsed, extra_text)
     }
     // ========================================================================================================================================
 }

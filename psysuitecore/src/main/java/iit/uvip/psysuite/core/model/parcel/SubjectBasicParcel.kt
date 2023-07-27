@@ -11,6 +11,7 @@ import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TestBasic.Companion.TEST_NEXTTRIAL_NOCHOOSE
 import iit.uvip.psysuite.core.utility.ConditionData
+import iit.uvip.psysuite.core.utility.getIds
 import iit.uvip.psysuite.core.utility.getLabelLog
 
 import org.albaspazio.core.accessory.Device
@@ -81,6 +82,9 @@ abstract class SubjectBasicParcel(
         }
         return this
     }
+
+    val isBlindUser:Boolean = Populations.vi_populations.getIds().contains(population)
+    val isDeafUser:Boolean  = Populations.ai_populations.getIds().contains(population)
 
     private fun loadJsonText(jsontext: String): SubjectBasicParcel {
 

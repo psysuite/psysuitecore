@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -22,6 +23,7 @@ import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import iit.uvip.psysuite.core.utility.ConditionData
 
 import org.albaspazio.core.accessory.VibrationManager
@@ -47,7 +49,7 @@ class TestBeads(ctx: Context,
 
     private var STIM_V  = StimuliManager.STIM_TYPE_V1
 
-    private lateinit var binding: FragmentTestBinding
+    private val binding: FragmentTestBinding =  (hostfragment as TestFragment).binding
 
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(
@@ -84,7 +86,7 @@ class TestBeads(ctx: Context,
     private var currVisual: VisualManager?  = null
 
     private var trialStartMs:Long               = 0L
-    private var parent_layout_width:Int         = 0
+    private var parent_layout_width:Int         = binding.root.width
 
 
     companion object {
@@ -278,10 +280,10 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     private fun setUI() {
 
-        binding             = FragmentTestBinding.inflate(activity.layoutInflater)
-
-        parent_layout_width = binding.fragmentTestLayout.width
-        val mainlayout      = binding.fragmentTestLayout
+        val mainlayout = binding.root
+//        binding             = FragmentTestBinding.inflate(activity.layoutInflater)
+//        val mainlayout      = binding.root
+//        parent_layout_width = mainlayout.width
 
         val constraintSet = ConstraintSet()
         constraintSet.clone(mainlayout)
@@ -293,7 +295,7 @@ class TestBeads(ctx: Context,
     }
 
     private fun createBottomButton(txt:String, parent_layout:ConstraintLayout, constr_set:ConstraintSet, hconstr:Int, hconstr_margin:Int, vconstr_margin:Int):Button{
-        val bt = Button(ctx).apply {
+        val bt = AppCompatButton(ctx).apply {
             id              = View.generateViewId()
             text            = txt
             textAlignment   = TextView.TEXT_ALIGNMENT_CENTER

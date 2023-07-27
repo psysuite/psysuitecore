@@ -56,22 +56,22 @@ class TestRIVGRP(ctx: Context,
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(
         R.drawable.rivalry_chouse_rface,
-        R.drawable.rivalry_chouse_rface,
+        R.drawable.rivalry_rhouse_cface,
         R.drawable.grouping_house_face_1,
         R.drawable.grouping_house_face_2,
         R.drawable.rivalry_chouse_rcar,
-        R.drawable.rivalry_chouse_rcar,
+        R.drawable.rivalry_rhouse_ccar,
         R.drawable.grouping_house_car_1,
         R.drawable.grouping_house_car_2
     )
 
     private var imagesNames: MutableList<String> = mutableListOf(
         "rivalry_chouse_rface",
-        "rivalry_chouse_rface",
+        "rivalry_rhouse_cface",
         "grouping_house_face_1",
         "grouping_house_face_2",
         "rivalry_chouse_rcar",
-        "rivalry_chouse_rcar",
+        "rivalry_rhouse_ccar",
         "grouping_house_car_1",
         "grouping_house_car_2"
     )
@@ -198,7 +198,7 @@ class TestRIVGRP(ctx: Context,
         when(subject.type){
             TEST_RIVGRP_RIV_HF  -> {
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_1_LOG}"
-                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0], imagesNames[0], resp_type))
+                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
                 trials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
                 trials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
                 trials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
@@ -207,7 +207,7 @@ class TestRIVGRP(ctx: Context,
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_2_LOG}"
                 trials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
                 trials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[1], resp_type))
+                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
                 trials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
             }
             TEST_RIVGRP_RIVGRP_HF  -> {

@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
+import iit.uvip.psysuite.adaptive.ado.ADOParams
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -13,7 +15,6 @@ import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.TrialBasic
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
@@ -26,7 +27,6 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_A
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.WN_FIRSTSTIM_INTERVAL
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsQuestParams
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
@@ -34,8 +34,7 @@ import iit.uvip.psysuite.core.trials.QuestTrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusDelay
-import iit.uvip.psysuite.quest.QuestParams
-import iit.uvip.psysuite.quest.QuestWrapper
+import iit.uvip.psysuite.core.tests.bis.BisectionADOParams
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 import kotlin.math.roundToInt
@@ -127,10 +126,10 @@ class TestAVB(ctx: Context,
 
     private val amplitude = 100
 
-    private val nQuestTrials = 30
-    private val questParams = QuestParams()
-    private val taskQuestParams = BindingsQuestParams(10000F, 0F)
-    private val questWrapper: QuestWrapper = QuestWrapper("roelofs.QuestWrapper", "QuestWrapper", questParams, taskQuestParams)
+    private val nQuestTrials  = 30
+    private val adoParams     = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
+    private val taskAdoParams = BisectionADOParams(400, 500)
+    private val adoWrapper:AdaptiveWrapper = AdaptiveWrapper("bisection.BisectionADOPYWrapper", "BisectionADOPYWrapper", adoParams, taskAdoParams)
 
     // =============================================================================================================================
     // INIT
@@ -211,7 +210,7 @@ class TestAVB(ctx: Context,
                 FixedTrialsManager(trials as MutableList<TrialBasic>)
             } else {
                 val trials = createTrialsQuest()
-                QuestTrialsManager(trials as MutableList<TrialBasic>, questWrapper)
+                QuestTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
             }
 
         mListBlocks = mutableListOf((nTrials *0.2F).roundToInt(), (nTrials * 0.4F).roundToInt(), (nTrials * 0.6F).roundToInt(), (nTrials * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
@@ -271,7 +270,7 @@ class TestAVB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -294,7 +293,7 @@ class TestAVB(ctx: Context,
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.stim_value, 1))
                 }
             }
             rtrials.shuffle()
@@ -307,7 +306,7 @@ class TestAVB(ctx: Context,
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until nQuestTrials) {
-            trials.add(TrialBindingsUnBalanced(++cnt, BindingsConstants.TYPE_AT, 0, 0))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0, 0))
         }
         return trials
     }
@@ -476,11 +475,11 @@ class TestAVB(ctx: Context,
             }
             TYPE_A_V    -> {
                 type = mStimuliManager.typeAV
-                delaysAligner.arrangeDelays(type, 0,-1, trial.delay)
+                delaysAligner.arrangeDelays(type, 0,-1, trial.stim_value)
             }
             TYPE_V_A    -> {
                 type = mStimuliManager.typeAV
-                delaysAligner.arrangeDelays(type, trial.delay,-1, 0)
+                delaysAligner.arrangeDelays(type, trial.stim_value,-1, 0)
             }
             else        -> {
                 type = mStimuliManager.typeAV

@@ -1,10 +1,7 @@
 package iit.uvip.psysuite.core.trials
 
 import android.util.Log
-import com.chaquo.python.PyObject
 import iit.uvip.psysuite.adaptive.AdaptiveWrapper
-import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.python.SPython
 
 
 // this class manages quest-driven tasks
@@ -18,38 +15,43 @@ import iit.uvip.psysuite.python.SPython
 //          1- get = retrieve the dynamic value
 //          2- set = set subject's answer
 //
-open class QuestTrialsManager(trials:MutableList<TrialBasic>, questWrapper: AdaptiveWrapper):TrialsManager(TestBasic.TEST_TRMAN_ADAPTIVE, trials) {
+class MixedQuestTrialsManager(trials:MutableList<TrialBasic>, private val questWrapper: AdaptiveWrapper):QuestTrialsManager(trials, questWrapper) {
 
-    val sPy:SPython = SPython.getInstance(null)     // singleton already initialized in TestFragment, here I dont'need a Context
-
-    protected val wrapperClass: PyObject
+//
+//    override fun setResponse(result: Int, elapsedms: Int, extra_text:String){
+//        mTrial.setResponse(result, elapsedms)
+//        wrapperClass.callAttr("set", result)
+//    }
 
     init {
-        val questparams_dict   = sPy.class2dict(questWrapper.qparams)
-        val taskparams_dict    = sPy.class2dict(questWrapper.params)
-
-        wrapperClass = sPy.instanciate(questWrapper.module, questWrapper.classname, questparams_dict, taskparams_dict)
         setFirstStimulus()
     }
 
+
     private fun setFirstStimulus(){
+
+//        if()
         val firstvalue      = wrapperClass.callAttr("get").toFloat()
         Log.d("QUEST_VALUE FIRST", firstvalue.toString())
         mTrial.updateTrial(firstvalue)
     }
 
-    override fun setResponse(result: Int, elapsedms: Int, extra_text:String){
-        mTrial.setResponse(result, elapsedms)
-        wrapperClass.callAttr("set", result)
-    }
+
 
     // get new value, get next trial, update with new value and return it
     override fun getNewTrial(): TrialBasic {
         val prev_resp = mTrial.user_answer
-        val newvalue = wrapperClass.callAttr("get").toFloat()
-        Log.d("QUEST_VALUE", "${newvalue} , prev resp: $prev_resp")
         currTrial++
-        mTrial.updateTrial(newvalue)
+
+        var newvalue = 0F
+        if(mTrial.stim_value == ADAPTIVE_VALUE) {
+            newvalue = wrapperClass.callAttr("get").toFloat()
+            mTrial.updateTrial(newvalue)
+        }
+        else
+            newvalue = mTrial.stim_value.toFloat()
+        Log.d("QUEST_VALUE", "${newvalue} , prev resp: $prev_resp")
+
         return mTrial
     }
 }

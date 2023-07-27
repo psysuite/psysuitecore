@@ -1,6 +1,4 @@
-package iit.uvip.psysuite.core.tests
-
-import iit.uvip.psysuite.core.trials.TrialBasic
+package iit.uvip.psysuite.core.trials
 
 
 /*
@@ -12,12 +10,22 @@ type:
 
 abstract class TrialsManager(val type:Int = 0, val mTrials:MutableList<TrialBasic>) {
 
+    companion object {
+        val ADAPTIVE_VALUE: Long = -987654321L
+    }
+
+    init {
+        if(mTrials.isEmpty())
+            throw Exception("ERROR in TrialsManager. given trials list is empty")
+        setTrialsID()
+    }
+
     var currTrial:Int = 0
 
     val nTrials:Int
         get() = mTrials.size
 
-    open var mTrial: TrialBasic
+    open var mTrial:TrialBasic
         get() = mTrials[currTrial]
         set(value) {
             mTrials[currTrial] = value
@@ -26,6 +34,8 @@ abstract class TrialsManager(val type:Int = 0, val mTrials:MutableList<TrialBasi
     open fun setResponse(result:Int, elapsedms:Int, extra_text:String = ""){
         mTrial.setResponse(result, elapsedms, extra_text)
     }
+
+    protected fun setTrialsID(){  mTrials.mapIndexed { index, trialBasic -> trialBasic.id = index } }
 
     abstract fun getNewTrial():Any
 

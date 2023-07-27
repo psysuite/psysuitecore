@@ -17,6 +17,7 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.trials.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialsManager
 
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.logLastTwo
@@ -58,6 +59,9 @@ abstract class TestBasic(protected val ctx: Context,
     // ---------------------------------------------------------------
     abstract fun initTest()
 
+    // ===============================================================================================================
+    // PUBLIC
+    // ===============================================================================================================
     fun start():Boolean{
         return  try {
             if(!mStimuliManager.isValid || !this::mTrialsManager.isInitialized){
@@ -118,6 +122,7 @@ abstract class TestBasic(protected val ctx: Context,
         doNextTrial()
     }
 
+    //called by TestFragment::onAbortTest()
     fun abortTest(deleteOrShow:Boolean, dir:String= Environment.DIRECTORY_DOWNLOADS){
 
         unloadStimuli()
@@ -129,6 +134,7 @@ abstract class TestBasic(protected val ctx: Context,
         else    notifyFile(mResultFile, ctx, dir)
     }
 
+    //called by TestFragment::onStoppedAfterBlock()
     fun stopTestAfterBlock(dir:String= Environment.DIRECTORY_DOWNLOADS):Triple<String,String,String>{
 
         unloadStimuli()
@@ -146,12 +152,14 @@ abstract class TestBasic(protected val ctx: Context,
         return Triple(newresname, newsubjname, newsummaryname)
     }
 
+    //called by TestFragment::onTestEnded()
     fun unloadStimuli(){
         mStimuliManager.unloadStimuli()
         mStimuliHandler.removeCallbacksAndMessages(null)
         mNoise?.stop()
     }
 
+    //called by TestFragment::onTestSetupComplete()
     fun adjustBlocks(blk:Int){
 
         if((nBlocks == 1 && blk > 0) || (blk >= nBlocks)){
@@ -171,8 +179,10 @@ abstract class TestBasic(protected val ctx: Context,
         }
     }
 
+    //called by TestFragment::onAbortTest()/onTestEnded()/onTestError()
     fun getAbsoluteResultFilePath(): String = getAbsoluteFilePath(mResultFile).second      // is "" if file was not present
 
+    //called by TestFragment::showAnswerDialog
     open fun getTrialCorrectAnswer():Int{
         return  if(!this::mTrialsManager.isInitialized) 0
                 else                                    mTrial.correct_answer
@@ -221,8 +231,10 @@ abstract class TestBasic(protected val ctx: Context,
 
         @JvmStatic val TEST_TRMAN_FIXED                 = 0         //  trials are predetermined at test start
         @JvmStatic val TEST_TRMAN_CHOOSE_FIXED          = 1         //  can choose, predetermined by default
-        @JvmStatic val TEST_TRMAN_CHOOSE_QUEST          = 2         //  can choose, Quest by default
-        @JvmStatic val TEST_TRMAN_QUEST                 = 3         //  trials are calculated trial-by-trial according to a Quest algorithm
+        @JvmStatic val TEST_TRMAN_CHOOSE_MIXED          = 2         //  can choose, mixed by default
+        @JvmStatic val TEST_TRMAN_CHOOSE_ADAPTIVE       = 3         //  can choose, Quest by default
+        @JvmStatic val TEST_TRMAN_MIXED                 = 4         //  some trials are calculated trial-by-trial according to a Quest algorithm, other are predetermined
+        @JvmStatic val TEST_TRMAN_ADAPTIVE              = 5         //  trials are calculated trial-by-trial according to a Quest algorithm
 
         //-----------------------------------------------------------------------------------------
         //
@@ -335,7 +347,7 @@ abstract class TestBasic(protected val ctx: Context,
     protected val delaysAligner: DelaysAligner  = subject.stimuliDelays
 
     // they are just proxy for properties (implemented / edited / accessed) in each subclass
-    protected lateinit var mTrialsManager:TrialsManager
+    protected lateinit var mTrialsManager: TrialsManager
 
     protected val mTrial: TrialBasic
         get() = mTrialsManager.mTrial
@@ -367,11 +379,11 @@ abstract class TestBasic(protected val ctx: Context,
     protected lateinit var mStimuliManager: StimuliManager
     protected var mStimuliHandler: Handler = Handler()         // IDE suggested: Handler(Looper.myLooper()!!)
 
+    protected var currStimulusLabel:String     = ""
     protected var currStimulusDuration:Long     = 100L          // default value to be used when stimulus duration in not given
     protected var currAudioResourceName:String  = "t200hz_2s"   // default amplitude to be used when  not given
 
     protected var ITI:Long                      = 0             // default ITI
-
 
     // called by above nextTrial & by TestFragment after user decided to continue after block end
     // set/calculate new trial and shows it

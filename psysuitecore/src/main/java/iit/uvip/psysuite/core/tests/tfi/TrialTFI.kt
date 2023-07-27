@@ -8,7 +8,7 @@ import iit.uvip.psysuite.core.trials.TrialBasic
 */
 
 class TrialTFI(id:Int=-1, type:Int, label:String, correct_answer:Int=-1, val soa:Long, val valid_answers:List<String>)
-    : TrialBasic(id,type,label, correct_answer){
+    : TrialBasic(id,type,label, correct_answer=correct_answer){
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\tlabel\tsoa\tres\tcor_ans\tuser_ans\telapsed\n"
@@ -25,12 +25,12 @@ class TrialTFI(id:Int=-1, type:Int, label:String, correct_answer:Int=-1, val soa
 
     // all class exported as string
     override fun toString():String{
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + soa + "\t" + success.toString() + "\n"
+        return "$id\t$type\t$label\t$soa\t$success\n"
     }
 
     // data exported to log file
     override fun Log():String{
-        return id.toString() +  "\t" + label + "\t" + soa.toString() + "\t"+ success.toString() + "\t" + valid_answers[correct_answer] + "\t" + user_answer_extra + "\t" + elapsed.toString() + "\t" + repetitions.toString() + "\n"
+        return "$id\t$label\t$soa\t$success\t${valid_answers[correct_answer]}\t$user_answer_extra\t$elapsed\t$repetitions\n"
     }
 
     override fun debugInfo():String{

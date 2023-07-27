@@ -3,10 +3,10 @@ package iit.uvip.psysuite.core.tests.tid
 import iit.uvip.psysuite.core.trials.TrialBasic
 
 
-class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:Int, val refdelta:Int, nonrefdelta:Int, val ref_first:Boolean, val duration:Int, val answers:List<String>): TrialBasic(id, type,"", -1){
+class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:Int, val refdelta:Long, nonrefdelta:Long, val ref_first:Boolean, val duration:Long, val answers:List<String>): TrialBasic(id, type,"", -1){
 
-    var delta1:Int = 0
-    var delta2:Int = 0
+    var delta1:Long = 0L
+    var delta2:Long = 0L
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\ttype\tbl\tgrp\tses\tanswer\tsucc\telapsed\td1\td2\tref_first\n"
@@ -19,10 +19,10 @@ class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:In
     override fun updateTrial(newvalue:Float){
         if(ref_first){
             delta1 = refdelta
-            delta2 = newvalue.toInt()
+            delta2 = newvalue.toLong()
         }else{
             delta2 = refdelta
-            delta1 = newvalue.toInt()
+            delta1 = newvalue.toLong()
         }
 
         // in quest mode, this assignment is wrong. correct_answer is updated when the new test value is calculated on-line
@@ -41,7 +41,7 @@ class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:In
 
     // all class exported as string
     override fun toString():String{
-        return "" //id.toString() + "\t" + type.toString() + "\t" + label + "\t" + conflict_type + "\t" + position.toString() + "\t" + duration.toString() + "\t" + success.toString() + "\t" + duration2.toString()+ "\n"
+        return "" //id.toString() + "\t" + type.toString() + "\t" + label + "\t" + conflict_type + "\t" + stim_value.toString() + "\t" + duration.toString() + "\t" + success.toString() + "\t" + duration2.toString()+ "\n"
     }
 
     // data exported to log file
