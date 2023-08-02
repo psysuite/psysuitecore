@@ -11,5 +11,4 @@ class FixedTrialsManager(trials:MutableList<TrialBasic>):
         currTrial++
         return mTrial
     }
-
 }

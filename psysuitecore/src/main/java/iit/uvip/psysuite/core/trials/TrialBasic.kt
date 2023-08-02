@@ -2,8 +2,6 @@ package iit.uvip.psysuite.core.trials
 
 abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:String="", open var stim_value:Long=-999999999L, var correct_answer:Int=0, var variable_param:Any? = null) {
 
-    val UNSET_VALUE:Long = -999999999L
-
     var user_answer:Int             = -1
     var repetitions:Int             =  1
     var elapsed:Int                 = -1
@@ -26,7 +24,7 @@ abstract class TrialBasic(var id:Int=-1, val type:Int, protected val label:Strin
     }
 
     // this has been added to manage adaptive trials after new value has been defined. must be implemented in each Test
-    open fun updateTrial(newvalue:Float){}
+    open fun updateTrial(newvalue:Long){}
 }
 
 

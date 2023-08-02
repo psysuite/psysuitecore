@@ -30,7 +30,7 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
-import iit.uvip.psysuite.core.trials.QuestTrialsManager
+import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusDelay
@@ -177,16 +177,16 @@ class TestAVB(ctx: Context,
         when (subject.type) {
             TEST_AVB_TIME_DOUBLESTIM_TOD,
             TEST_AVB_TIME_DOUBLESTIM -> {
-                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                 initSummary()
             }
             TEST_AVB_TIME_SINGLESTIM_TOD,
             TEST_AVB_TIME_SINGLESTIM -> {
-                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                 initSummary()
             }
             TEST_AVB_TIME_INF ->
-                createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
+                createResultFile(TrialBindingsInfants.LOG_HEADER)
 
             else -> throw Exception("ERROR IN AVB")
         }
@@ -209,8 +209,8 @@ class TestAVB(ctx: Context,
                                 else                            createTrialsDebug()
                 FixedTrialsManager(trials as MutableList<TrialBasic>)
             } else {
-                val trials = createTrialsQuest()
-                QuestTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
+                val trials = createTrialsAdaptive()
+                AdaptiveTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
             }
 
         mListBlocks = mutableListOf((nTrials *0.2F).roundToInt(), (nTrials * 0.4F).roundToInt(), (nTrials * 0.6F).roundToInt(), (nTrials * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
@@ -229,7 +229,7 @@ class TestAVB(ctx: Context,
             VisualManager(STIM_V, mImageView, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -302,7 +302,7 @@ class TestAVB(ctx: Context,
         return trials
     }
 
-    private fun createTrialsQuest():List<TrialBasic>{
+    private fun createTrialsAdaptive():List<TrialBasic>{
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until nQuestTrials) {
@@ -329,9 +329,9 @@ class TestAVB(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     // called by secondTrain
@@ -341,11 +341,11 @@ class TestAVB(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
             TEST_NEXTTRIAL_AUTO         ->  // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-                mStimuliHandler.postDelayed({   testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))     }, currStimulusDuration)
+                mStimuliHandler.postDelayed({   testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))     }, currStimulusDuration)
 
-            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
         }
     }
 
@@ -376,7 +376,7 @@ class TestAVB(ctx: Context,
             TEST_AVB_TIME_SINGLESTIM,
             TEST_AVB_TIME_SINGLESTIM_TOD -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced){ onTrialEnd() }
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -389,7 +389,7 @@ class TestAVB(ctx: Context,
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(
                         BIMODAL_CODE,
                         corr_delays.a,
@@ -414,7 +414,7 @@ class TestAVB(ctx: Context,
         val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
         // first train
         mStimuliHandler.postDelayed({
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             mStimuliManager.deliverShiftedStimulus(
                 BIMODAL_CODE,
                 corr_delays.a,
@@ -424,7 +424,7 @@ class TestAVB(ctx: Context,
         }, shift)
 
         mStimuliHandler.postDelayed({
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             mStimuliManager.deliverShiftedStimulus(
                 BIMODAL_CODE,
                 corr_delays.a,
@@ -434,7 +434,7 @@ class TestAVB(ctx: Context,
         }, shift + curISI)
 
         mStimuliHandler.postDelayed({
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             mStimuliManager.deliverShiftedStimulus(
                 BIMODAL_CODE,
                 corr_delays.a,

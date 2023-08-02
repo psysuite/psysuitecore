@@ -100,7 +100,7 @@ class TestTFI(ctx: Context,
         abortMode           = TEST_ABORT_TRIALEND       // abort @ trial end
         showTrialsID        = TEST_SHOWTRIALS_ALWAYS    // trial id always shown
 
-        createResultFile(subject, TrialTFI.LOG_HEADER)
+        createResultFile(TrialTFI.LOG_HEADER)
         initSummary()
 
         mQuestion           = ctx.resources.getString(R.string.tfi_question)
@@ -172,7 +172,7 @@ class TestTFI(ctx: Context,
                                     VisualManager(STIM_V, mImageView, mDrawablesResource[onImage], duration = currStimulusDuration, handler = mStimuliHandler),
                                     delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -344,18 +344,18 @@ class TestTFI(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
             TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
-                                                    testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                                                    testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+                                                    testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+                                                    testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
                                                    }
         }
     }
 
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     override fun initSummary() {

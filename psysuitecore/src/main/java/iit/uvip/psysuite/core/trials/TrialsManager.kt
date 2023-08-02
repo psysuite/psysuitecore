@@ -11,7 +11,7 @@ type:
 abstract class TrialsManager(val type:Int = 0, val mTrials:MutableList<TrialBasic>) {
 
     companion object {
-        val ADAPTIVE_VALUE: Long = -987654321L
+        val ADAPTIVE_VALUE: Long = -99999999L
     }
 
     init {
@@ -30,6 +30,11 @@ abstract class TrialsManager(val type:Int = 0, val mTrials:MutableList<TrialBasi
         set(value) {
             mTrials[currTrial] = value
         }
+
+    // used in Quest managers to set the first value
+    open fun getStimulus():Long{
+        return mTrial.stim_value
+    }
 
     open fun setResponse(result:Int, elapsedms:Int, extra_text:String = ""){
         mTrial.setResponse(result, elapsedms, extra_text)

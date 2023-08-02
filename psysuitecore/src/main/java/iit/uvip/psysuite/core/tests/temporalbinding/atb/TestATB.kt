@@ -29,7 +29,7 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
-import iit.uvip.psysuite.core.trials.QuestTrialsManager
+import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusATBInfants
@@ -195,32 +195,32 @@ class TestATB(ctx: Context,
                                     when (subject.type) {
                                         TEST_ATB_TIME_DOUBLESTIM_TOD,
                                         TEST_ATB_TIME_DOUBLESTIM ->{
-                                            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                            createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                             initSummary()
                                             createTrialsTimeDouble()
                                         }
                                         TEST_ATB_TIME_SINGLESTIM_TOD,
                                         TEST_ATB_TIME_SINGLESTIM       -> {
-                                            createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                            createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                             initSummary()
                                             createTrialsTimeSingle()
                                         }
                                         else   -> {
                                             initTimeArrays()
-                                            createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
+                                            createResultFile(TrialBindingsInfants.LOG_HEADER)
                                             createTrialsTimeInfants()
                                         }
                                     }
                                 }
                                 else{
-                                    createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                    createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                     createTrialsDebug()
                                 }
                                 FixedTrialsManager(trials as MutableList<TrialBasic>)
                             }
                             else{
-                                val trials = createTrialsQuest()
-                                QuestTrialsManager(trials as MutableList<TrialBasic>, questWrapper)
+                                val trials = createTrialsAdaptive()
+                                AdaptiveTrialsManager(trials as MutableList<TrialBasic>, questWrapper)
                             }
 
 
@@ -240,7 +240,7 @@ class TestATB(ctx: Context,
                 null,
                 delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
     //              _   _   _   _   _
     // 9 segments  | |_| |_| |_| |_| |
@@ -333,7 +333,7 @@ class TestATB(ctx: Context,
         return trials
     }
 
-    private fun createTrialsQuest():List<TrialBasic>{
+    private fun createTrialsAdaptive():List<TrialBasic>{
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until nQuestTrials) {
@@ -357,8 +357,8 @@ class TestATB(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
         return super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
@@ -369,18 +369,18 @@ class TestATB(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
             TEST_NEXTTRIAL_AUTO         ->  {
                 // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
+                    testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))
                 }, currStimulusDuration)
             }
-            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
             TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
-                                                    testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                                                    testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+                                                    testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+                                                    testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
                                                    }
         }
     }
@@ -416,7 +416,7 @@ class TestATB(ctx: Context,
             TEST_ATB_TIME_SINGLESTIM,
             TEST_ATB_TIME_SINGLESTIM_TOD -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -431,7 +431,7 @@ class TestATB(ctx: Context,
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(BIMODAL_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
                 }, shift)
                 mStimuliHandler.postDelayed({
@@ -458,12 +458,12 @@ class TestATB(ctx: Context,
         if(A_delay > 0L){
             mStimuliHandler.postDelayed({
                 mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
-                testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             }, A_delay)
         }
         else {
             mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }
 
         mStimuliHandler.postDelayed({   mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)    }, curISI + A_delay)
@@ -485,7 +485,7 @@ class TestATB(ctx: Context,
             STIM_TYPE_TIME_A_T800   -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI + A_delay)
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
@@ -497,7 +497,7 @@ class TestATB(ctx: Context,
 
             STIM_TYPE_T1 -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI)
                 mStimuliHandler.postDelayed({
                     onTrialEnd()
@@ -507,11 +507,11 @@ class TestATB(ctx: Context,
             STIM_TYPE_TIME_A800_T -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (3 * curISI + 800L + A_delay))
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(UNIMODAL_AUDIO_CODE)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (4 * curISI + 800 + A_delay))
                 mStimuliHandler.postDelayed({
                     onTrialEnd()

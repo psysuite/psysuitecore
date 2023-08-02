@@ -277,20 +277,20 @@ class TestATVB(
                         when (subject.type) {
                             TEST_ATVB_TIME_S_UNBAL,
                             TEST_ATVB_TIME_D_UNBAL -> {
-                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                 createTrialsTimeUnbalanced()
                             }
 
                             TEST_ATVB_TIME_S_BAL,
                             TEST_ATVB_TIME_D_BAL -> {
-                                createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
+                                createResultFile(TrialBindingsBalanced.LOG_HEADER)
                                 createTrialsTimeBalanced()
                             }
                             else -> {
                                 throw Exception("ERROR in TESTATVB")
                             }
             //                TEST_ATVB_TIME_S_BAL2 -> {
-            //                    createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
+            //                    createResultFile(TrialBindingsBalanced.LOG_HEADER)
             //                    createTrialsTimeBalanced2()
             //                }
                         }
@@ -325,7 +325,7 @@ class TestATVB(
             VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -361,7 +361,7 @@ class TestATVB(
         return trials
     }
 
-    private fun createTrialsQuest():List<TrialBasic>{
+    private fun createTrialsAdaptive():List<TrialBasic>{
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until nQuestTrials) {
@@ -372,10 +372,10 @@ class TestATVB(
 
     private fun createTrialsDebug():List<TrialBasic>{
 
-//        createResultFile(subject, TrialBindingsBalanced.LOG_HEADER)
+//        createResultFile(TrialBindingsBalanced.LOG_HEADER)
 //        subject.type = TEST_ATVB_TIME_S_BAL
 
-        createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+        createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
         subject.type = TEST_ATVB_TIME_S_UNBAL
 
         var cnt = -1
@@ -437,17 +437,17 @@ class TestATVB(
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
             TEST_NEXTTRIAL_AUTO         ->  // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-                                            mStimuliHandler.postDelayed({   testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))     }, currStimulusDuration)
+                                            mStimuliHandler.postDelayed({   testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))     }, currStimulusDuration)
 
-            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
         }
     }
 
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     override fun initSummary(){
@@ -469,7 +469,7 @@ class TestATVB(
 
         // TODO: to remove
 //        if(subject.type == TEST_ATVB_TIME_S_BAL || subject.type == TEST_ATVB_TIME_S_BAL2)
-//            testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, getDebugInfo()))
+//            testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, getDebugInfo()))
 
         if (isRepeat) trial.repetitions++
 
@@ -479,7 +479,7 @@ class TestATVB(
 
             TEST_ATVB_TIME_S_UNBAL -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     deliverUnBalancedStimuli((trial as TrialBindingsUnBalanced))
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -491,7 +491,7 @@ class TestATVB(
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(STIM_ATV, corr_delays.a, corr_delays.t, corr_delays.v) // simult
                 }, shift)
 
@@ -507,7 +507,7 @@ class TestATVB(
                 val corr_delays = delaysAligner.arrangeDelays(STIM_ATV, (trial as TrialBindings3latencies).a, trial.t, trial.v)
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(STIM_ATV, corr_delays.a, corr_delays.t, corr_delays.v){ onTrialEnd()}
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -515,7 +515,7 @@ class TestATVB(
 //            TEST_ATVB_TIME_D_BAL -> {
 //                val corr_delays = arrangeDelays(0,0,0, subject.stimuliDelay)
 //                mStimuliHandler.postDelayed({
-//                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+//                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
 //                    deliverShiftedStimulus(TRIMODAL_AUDIO_CODE, corr_delays.a, corr_delays.t, corr_delays.v) // simult
 //                }, WN_FIRSTSTIM_INTERVAL)
 //                mStimuliHandler.postDelayed({

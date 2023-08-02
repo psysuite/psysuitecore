@@ -79,7 +79,7 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
 
         if (subject.whitenoise > TEST_SWITCH_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
-        createResultFile(subject, LOG_HEADER)
+        createResultFile(LOG_HEADER)
         val trials = createTrials()
         mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
 
@@ -168,7 +168,7 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
             else -> null
         }
 
-        mStimuliManager = StimuliManager(audioManager, tactileManager, visualManager, delaysAligner, ctx, mStimuliHandler){  testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))}
+        mStimuliManager = StimuliManager(audioManager, tactileManager, visualManager, delaysAligner, ctx, mStimuliHandler){  testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))}
     }
     // =============================================================================================================================
     // CREATE TRIALS
@@ -198,11 +198,11 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON -> testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_BUTTON -> testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
             TEST_NEXTTRIAL_AUTO -> {
                 // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
+                    testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))
                 }, ITI)
             }
         }

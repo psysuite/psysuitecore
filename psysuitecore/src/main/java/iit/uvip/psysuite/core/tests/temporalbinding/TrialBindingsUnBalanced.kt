@@ -25,7 +25,7 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, override var stim_value:Lon
         return "${super.debugInfo()}, delay=$stim_value"
     }
 
-    override fun updateTrial(newvalue:Float){
-        stim_value = newvalue.toLong()
+    override fun updateTrial(newvalue:Long){
+        stim_value = newvalue
     }
 }

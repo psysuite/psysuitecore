@@ -191,26 +191,26 @@ class TestTVB(ctx: Context,
                         when (subject.type) {
                             TEST_TVB_TIME_DOUBLESTIM_TOD,
                             TEST_TVB_TIME_DOUBLESTIM ->{
-                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                 initSummary()
                                 createTrialsTimeDouble()
                             }
                             TEST_TVB_TIME_SINGLESTIM_TOD,
                             TEST_TVB_TIME_SINGLESTIM       -> {
-                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                                 initSummary()
                                 createTrialsTimeSingle()
                             }
                             TEST_TVB_TIME_INF   -> {
                                 initTimeArrays()
-                                createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
+                                createResultFile(TrialBindingsInfants.LOG_HEADER)
                                 createTrialsTimeInfants()
                             }
                             else -> throw Exception("ERROR in TESTTVB")
                         }
                     }
                     else{
-                        createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
+                        createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
                         createTrialsDebug()
                     }
         mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
@@ -230,7 +230,7 @@ class TestTVB(ctx: Context,
             VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
     //              _   _   _   _   _
     // 9 segments  | |_| |_| |_| |_| |
@@ -325,7 +325,7 @@ class TestTVB(ctx: Context,
         return trials
     }
 
-    private fun createTrialsQuest():List<TrialBasic>{
+    private fun createTrialsAdaptive():List<TrialBasic>{
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until nQuestTrials) {
@@ -349,9 +349,9 @@ class TestTVB(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     // called by secondTrain
@@ -361,11 +361,11 @@ class TestTVB(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
             TEST_NEXTTRIAL_AUTO         ->  // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-                mStimuliHandler.postDelayed({   testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))     }, currStimulusDuration)
+                mStimuliHandler.postDelayed({   testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))     }, currStimulusDuration)
 
-            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
         }
     }
 
@@ -400,7 +400,7 @@ class TestTVB(ctx: Context,
             TEST_TVB_TIME_SINGLESTIM,
             TEST_TVB_TIME_SINGLESTIM_TOD -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -413,7 +413,7 @@ class TestTVB(ctx: Context,
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(
                         BIMODAL_CODE,
                         corr_delays.a,
@@ -449,12 +449,12 @@ class TestTVB(ctx: Context,
         if(V_delay > 0L){
             mStimuliHandler.postDelayed({
                 mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             }, V_delay)
         }
         else {
             mStimuliManager.deliverUnimodalStimulus(STIM_V)
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }
 
         mStimuliHandler.postDelayed({   mStimuliManager.deliverUnimodalStimulus(STIM_V)    }, curISI + V_delay)
@@ -476,7 +476,7 @@ class TestTVB(ctx: Context,
             STIM_TYPE_TIME_T_V800   -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI + A_delay)
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
@@ -488,7 +488,7 @@ class TestTVB(ctx: Context,
 
             STIM_T -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI)
                 mStimuliHandler.postDelayed({
                     onTrialEnd()
@@ -498,11 +498,11 @@ class TestTVB(ctx: Context,
             STIM_TYPE_TIME_T800_V -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (3 * curISI + 800L + A_delay))
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (4 * curISI + 800 + A_delay))
                 mStimuliHandler.postDelayed({
                     onTrialEnd()

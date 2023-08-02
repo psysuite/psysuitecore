@@ -141,11 +141,11 @@ class TestBeads(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialBeads.LOG_HEADER)
+        createResultFile(TrialBeads.LOG_HEADER)
         currVisual      = VisualManager(TestTFI.STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialBeads).img_res, duration = POSITIVE_INFINITY.toLong(), handler = mStimuliHandler)
         mStimuliManager = StimuliManager(null, null, currVisual, delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -168,13 +168,13 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
 
         // if !last trial && !block end => doNextTrial
-        return when {
+        when {
             currTrial == (nTrials - 1) -> {
                 saveText("", notifyDm = true)
-                EVENT_TEST_END            // END !
+                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))           // END !
             }
             mListBlocks.contains(currTrial) -> {
                 EVENT_BLOCK_END
@@ -191,7 +191,7 @@ class TestBeads(ctx: Context,
         for(b in 0 until nbeadsXtrial)  beads_images[b].visibility = View.INVISIBLE
         currVisual?.stop()
 
-        mStimuliHandler.postDelayed({ testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null)) }, 2000L)
+        mStimuliHandler.postDelayed({ testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf())) }, 2000L)
     }
 
     override fun initSummary(){}

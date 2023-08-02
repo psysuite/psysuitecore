@@ -170,7 +170,7 @@ class TestRIVGRP(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialRIVGRP.LOG_HEADER)
+        createResultFile(TrialRIVGRP.LOG_HEADER)
         currVisual = VisualManager(STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialRIVGRP).img_res, duration = currStimulusDuration, handler = mStimuliHandler)
         mStimuliManager = StimuliManager(
             null, //AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
@@ -178,7 +178,7 @@ class TestRIVGRP(ctx: Context,
             currVisual,
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     override fun initSummary() {
@@ -279,13 +279,13 @@ class TestRIVGRP(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
 
         // if !last trial && !block end => doNextTrial
-        return when {
+        when {
             currTrial == (nTrials - 1) -> {
                 saveText("", notifyDm = true)
-                EVENT_TEST_END            // END !
+                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
             }
             mListBlocks.contains(currTrial) -> {
                 EVENT_BLOCK_END
@@ -310,7 +310,7 @@ class TestRIVGRP(ctx: Context,
         currMP?.stop()
         currVisual?.stop()
 
-        mStimuliHandler.postDelayed({ testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null)) }, 2000L)
+        mStimuliHandler.postDelayed({ testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf())) }, 2000L)
     }
 
     // =============================================================================================================================
@@ -522,7 +522,7 @@ class TestRIVGRP(ctx: Context,
                                 else if(!isLeftPressed && isRightPressed)   2
                                 else                                        0
                             }
-//        testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, "pressed button: $response"))
+//        testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, "pressed button: $response"))
 
         saveText("$elapsed\t$response\n", notifyDm = false)
     }

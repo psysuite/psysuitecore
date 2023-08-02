@@ -13,16 +13,16 @@ class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:In
     }
 
     init {
-        updateTrial(nonrefdelta.toFloat())
+        updateTrial(nonrefdelta)
     }
 
-    override fun updateTrial(newvalue:Float){
+    override fun updateTrial(newvalue:Long){
         if(ref_first){
             delta1 = refdelta
-            delta2 = newvalue.toLong()
+            delta2 = newvalue
         }else{
             delta2 = refdelta
-            delta1 = newvalue.toLong()
+            delta1 = newvalue
         }
 
         // in quest mode, this assignment is wrong. correct_answer is updated when the new test value is calculated on-line

@@ -183,7 +183,7 @@ class TestFGI(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialFGI.LOG_HEADER)
+        createResultFile(TrialFGI.LOG_HEADER)
         currVisual = VisualManager(TestTFI.STIM_V, mImageView!!, onImageRes, duration = currStimulusDuration, handler = mStimuliHandler)
         mStimuliManager = StimuliManager(
             AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
@@ -191,7 +191,7 @@ class TestFGI(ctx: Context,
             currVisual,
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -224,13 +224,13 @@ class TestFGI(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
 
         // if !last trial && !block end => doNextTrial
-        return when {
+        when {
             currTrial == (nTrials - 1) -> {
                 saveText("", notifyDm = true)
-                EVENT_TEST_END            // END !
+                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
             }
             mListBlocks.contains(currTrial) -> {
                 EVENT_BLOCK_END
@@ -249,7 +249,7 @@ class TestFGI(ctx: Context,
         currMP?.stop()
         currVisual?.stop()
 
-        mStimuliHandler.postDelayed({ testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null)) }, 2000L)
+        mStimuliHandler.postDelayed({ testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf())) }, 2000L)
     }
 
     override fun initSummary(){}
@@ -368,7 +368,7 @@ class TestFGI(ctx: Context,
 
     private fun setPressedButton(){
 
-//        testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, "pressed button: $currPressedButton"))
+//        testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, "pressed button: $currPressedButton"))
         val elapsed = uptimeMillis() - trialStartMs
         saveText("$elapsed\t$currPressedButton\n", notifyDm = false)
     }

@@ -15,7 +15,7 @@ import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_V1
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.TrialBasic
-import iit.uvip.psysuite.core.trials.QuestTrialsManager
+import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
 import iit.uvip.psysuite.core.trials.TrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import org.albaspazio.core.accessory.VibrationManager
@@ -199,7 +199,7 @@ class TestTID(ctx: Context,
                                     FixedTrialsManager(trials as MutableList<TrialBasic>)
                                 } else {
                                     val trials = createQuestTrials(currStimulusDuration)
-                                    QuestTrialsManager(trials as MutableList<TrialBasic>, questWrapper)
+                                    AdaptiveTrialsManager(trials as MutableList<TrialBasic>, questWrapper)
                                 }
                             }
                             else FixedTrialsManager(createTrialsDebug() as MutableList<TrialBasic>)
@@ -210,7 +210,7 @@ class TestTID(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialTID.LOG_HEADER)
+        createResultFile(TrialTID.LOG_HEADER)
 
         mNoise = AudioManager.getAudioResource(ctx,"wnoise_20s", 0.01f)
 
@@ -227,7 +227,7 @@ class TestTID(ctx: Context,
                 VisualManager(STIM_TYPE_V1, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
                 delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     override fun initSummary(){}
@@ -328,7 +328,7 @@ class TestTID(ctx: Context,
         // PAIR 1
         mStimuliHandler.postDelayed({
             deliverPair((trial as TrialTID).type, trial.delta1.toLong())
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }, FIRST_STIMULUS_DELAY)
 
         // PAIR 2
@@ -355,9 +355,9 @@ class TestTID(ctx: Context,
     // MANAGE TRIALS END
     // =============================================================================================================================
     // I have to transform result in string to results in 0 or 1
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     override fun onTrialEnd() {
@@ -366,17 +366,17 @@ class TestTID(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+            TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+            TEST_NEXTTRIAL_ANSWER               ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
             TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER  -> {
-                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+                testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
+                testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
             }
 
             TEST_NEXTTRIAL_AUTO         -> {
                 // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
+                    testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))
                 }, 1000L)
             }
         }
