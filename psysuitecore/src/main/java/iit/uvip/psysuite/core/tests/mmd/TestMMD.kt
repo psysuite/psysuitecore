@@ -8,9 +8,9 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.AudioManager
 import iit.uvip.psysuite.core.stimuli.StimuliManager
-import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -54,13 +54,13 @@ class TestMMD(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialMMD.LOG_HEADER)
+        createResultFile(TrialMMD.LOG_HEADER)
 
         mStimuliManager = StimuliManager(
             AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
             null, null,
             delaysAligner, ctx, mStimuliHandler)
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -89,7 +89,7 @@ class TestMMD(ctx: Context,
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
     override fun onTrialEnd(){
-        testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
+        testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
     }
 
     override fun initSummary(){}

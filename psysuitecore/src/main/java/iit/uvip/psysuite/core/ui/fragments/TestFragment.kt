@@ -12,6 +12,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.Navigation
+
+import java.util.*
+import kotlin.reflect.KFunction
+
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
+
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentTestBinding
 import iit.uvip.psysuite.core.model.Populations
@@ -33,12 +41,8 @@ import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
 import iit.uvip.psysuite.core.utility.TestResult
 import iit.uvip.psysuite.core.utility.getIds
-
 import iit.uvip.psysuite.python.SPython
 
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import org.albaspazio.core.accessory.*
 import org.albaspazio.core.filesystem.getAbsoluteFilePath
 import org.albaspazio.core.fragments.BaseFragment
@@ -48,21 +52,18 @@ import org.albaspazio.core.speech.SpeechRecognitionManager
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.ui.showToast
-import java.util.*
-import kotlin.reflect.KFunction
-
 
 /*
-Three operative modalities:
+Three operative modalities (mSubjectParcel.nextTrailModality):
 
-- trial have an answer dialog, where user can also abort
-- trial have no answer dialog, at the end of the trial, the following trial is displayed
-- trial have no answer dialog, at the end of the trial, test stops and wait for user press.
+- trial have an answer dialog, where user can also abort                                    // TEST_NEXTTRIAL_ANSWER, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
+- trial have no answer dialog, at the end of the trial, the following trial is displayed    // TEST_NEXTTRIAL_NOCHOOSE
+- trial have no answer dialog, at the end of the trial, test stops and wait for user press. // TEST_NEXTTRIAL_BUTTON
 
 normal trial-by-trial flow is:
 
 here        : mTest.start()
-within Test : show -> onTrialEnd -> EVENT_GIVE_ANSWER/EVENT_SHOW_NEXT
+within Test : show -> onTrialEnd -> EVENT_GIVE_ANSWER/EVENT_SHOW_NEXT_BUTTON/EVENT_SHOW_ABORT
 here        : mTest.testEvent.subscribe -> answerdialog/speechrec   -> onAnswer  |-> onNewTrial -> mTest.nextTrial ->  test end | block end | show next trial
                                         -> next button  _________________________|
 within Test : mTrial.setResponse -> saveText -> doNextTrial() -> trialsmanager.getNewTrial -> show
@@ -75,18 +76,17 @@ class TestFragment : BaseFragment(
 ){
 
     private var _binding: FragmentTestBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
     private lateinit var mTest: TestBasic
-    private var mSubjectParcel:SubjectBasicParcel?  = null
+    private lateinit var mSubjectParcel:SubjectBasicParcel
 
-    override val LOG_TAG                     = TestFragment::class.java.simpleName
+    override val LOG_TAG                            = TestFragment::class.java.simpleName
     private val ANSWER_DIALOG_TAG                   = "ANSWER_DIALOG_TAG"
 
     private var answerDialogFragment:DialogFragment? = null
     private var isAnswerDialogOn:Boolean            = false
 
-    private var userPopulation:Int                  = Populations.POPULATION_TD
     private var isBlindUser:Boolean                 = false
     private var isDeafUser:Boolean                  = false
 
@@ -107,9 +107,7 @@ class TestFragment : BaseFragment(
 
     private lateinit var answerDialogRef:Pair<KFunction<*>?, Any?>
 
-    lateinit private var py:SPython
-    // ==========================================================================================================================
-    // ==========================================================================================================================
+
     companion object {
 
         @JvmStatic val TRG_REQ_CODE_ANSWER:Int        = 1
@@ -130,7 +128,10 @@ class TestFragment : BaseFragment(
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    // ==========================================================================================================================
+    // FRAGMENT OVERRIDES
+    // ==========================================================================================================================
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTestBinding.inflate(inflater, container, false)
         mMainView = binding.root
         return mMainView
@@ -140,7 +141,9 @@ class TestFragment : BaseFragment(
         super.onDestroyView()
         _binding = null
     }
+
     // main access point. it does:
+    // - init & validate mSubjectParcel
     // - (try) instanciate the correct TestClass
     // - call mTest.initTest() and wait for EVENT_TEST_SETUP_COMPLETED
     // - onTestSetupComplete() -> mTest.adjustBlocks, mTest.start()
@@ -154,22 +157,28 @@ class TestFragment : BaseFragment(
         binding.btPause.visibility     = View.INVISIBLE
         binding.txtDebugInfo.visibility = View.INVISIBLE
 
-        mSubjectParcel          = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL) ?: return
+        val subj:SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL)
+        if(subj == null){
+            showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
+            showAlert(requireActivity(), resources.getString(R.string.critical_error), "Subject Info is null")
+            Navigation.findNavController(requireView()).popBackStack()
+        }
+        else mSubjectParcel = subj
+
         speechManager           = SpeechManager(requireContext()){
             try{
 
                 vibrator                    = VibrationManager(requireContext()).init()
                 speechRecognitionManager    = SpeechRecognitionManager(requireContext())
-                py                          = SPython.getInstance(requireContext())
 
-                when(mSubjectParcel!!.type){
+                when(mSubjectParcel.type){
 
                     TestBasic.TEST_BISECTION_AUDIO,
                     TestBasic.TEST_BISECTION_TACTILE,
                     TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-                    TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager)
+                    TestBasic.TEST_BISECTION_AUDIO_VIDEO    -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
 
-                    TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel!!, speechManager)
+                    TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel, speechManager)
 
                     TestBasic.TEST_TID_SHORT_AUDIO,
                     TestBasic.TEST_TID_SHORT_TACTILE,
@@ -185,25 +194,25 @@ class TestFragment : BaseFragment(
                     TestBasic.TEST_ATB_TIME_DOUBLESTIM,
                     TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_ATB_TIME_INF      -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, speechManager)
+                    TestBasic.TEST_ATB_TIME_INF      -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, speechManager)
 
                     TestBasic.TEST_AVB_TIME_SINGLESTIM,
                     TestBasic.TEST_AVB_TIME_DOUBLESTIM,
                     TestBasic.TEST_AVB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_AVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_AVB_TIME_INF      -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel!!, binding.circleView, speechManager)
+                    TestBasic.TEST_AVB_TIME_INF      -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel, binding.circleView, speechManager)
 
                     TestBasic.TEST_TVB_TIME_SINGLESTIM,
                     TestBasic.TEST_TVB_TIME_DOUBLESTIM,
                     TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
                     TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_TVB_TIME_INF      -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager)
+                    TestBasic.TEST_TVB_TIME_INF      -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
 
                     TestBasic.TEST_ATVB_TIME_S_UNBAL,
                     TestBasic.TEST_ATVB_TIME_S_BAL,
                     TestBasic.TEST_ATVB_TIME_S_BAL2,
                     TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                    TestBasic.TEST_ATVB_TIME_D_BAL   -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager)
+                    TestBasic.TEST_ATVB_TIME_D_BAL   -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
 
                     TestBasic.TEST_SAMPLE_ALIGNED,
                     TestBasic.TEST_SAMPLE_SHIFTED,
@@ -212,24 +221,24 @@ class TestFragment : BaseFragment(
                     TestBasic.TEST_TFI,
                     TestBasic.TEST_TFI_BIMODAL,
                     TestBasic.TEST_TFI_AV,
-                    TestBasic.TEST_TFI_TODDLERS ->      mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager)
+                    TestBasic.TEST_TFI_TODDLERS ->      mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
 
                     TestBasic.TEST_FGI_1_UNSCRAMBLED,
                     TestBasic.TEST_FGI_1_SCRAMBLED,
                     TestBasic.TEST_FGI_2_UNSCRAMBLED,
                     TestBasic.TEST_FGI_2_SCRAMBLED,
                     TestBasic.TEST_FGI_3_UNSCRAMBLED,
-                    TestBasic.TEST_FGI_3_SCRAMBLED ->   mTest = TestFGI(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager, mMainView)
+                    TestBasic.TEST_FGI_3_SCRAMBLED ->   mTest = TestFGI(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
 
                     TestBasic.TEST_RIVGRP_RIV_HF,
                     TestBasic.TEST_RIVGRP_GRP_HF,
                     TestBasic.TEST_RIVGRP_RIVGRP_HF,
                     TestBasic.TEST_RIVGRP_RIV_HC,
                     TestBasic.TEST_RIVGRP_GRP_HC,
-                    TestBasic.TEST_RIVGRP_RIVGRP_HC ->  mTest = TestRIVGRP(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager, mMainView)
+                    TestBasic.TEST_RIVGRP_RIVGRP_HC ->  mTest = TestRIVGRP(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
 
                     TestBasic.TEST_BEADS_LOWUNCERT,
-                    TestBasic.TEST_BEADS_MIDUNCERT ->   mTest = TestBeads(requireContext(), requireActivity(), this, mSubjectParcel!!, vibrator, binding.circleView, speechManager, mMainView)
+                    TestBasic.TEST_BEADS_MIDUNCERT ->   mTest = TestBeads(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
                     else    -> {
                         Log.e("TestFragment", "Test non riconosciuto")
                         showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
@@ -238,21 +247,21 @@ class TestFragment : BaseFragment(
                     }
                 }
 
-                userPopulation  = mSubjectParcel!!.population
-                isBlindUser     = Populations.vi_populations.getIds().contains(userPopulation)
-                isDeafUser      = Populations.ai_populations.getIds().contains(userPopulation)
+                isBlindUser     = mSubjectParcel.isBlindUser
+                isDeafUser      = mSubjectParcel.isDeafUser
 
                 if(isBlindUser && !speechManager.isValid){
                     showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
                     return@SpeechManager
                 }
+
                 // get a reference to the AnswerDialogFragment
                 val answerDialogClass = if(isBlindUser)
                                             // population is visually impaired. use AnswerGestureDF
                                             "iit.uvip.psysuite.core.ui.fragments.answers.AnswerGestureDialogFragment"
                                         else {
-                                            if (mSubjectParcel!!.classes.size > 1 && mSubjectParcel!!.classes[1].isNotEmpty())
-                                                mSubjectParcel!!.classes[1]
+                                            if (mSubjectParcel.classes.size > 1 && mSubjectParcel.classes[1].isNotEmpty())
+                                                mSubjectParcel.classes[1]
                                             else "iit.uvip.psysuite.core.ui.fragments.answers.TwoAFCAnswerDialogFragment"
                                         }
                 answerDialogRef       = getCompanionObjectMethod(answerDialogClass, "newInstance")
@@ -269,29 +278,6 @@ class TestFragment : BaseFragment(
                 return@SpeechManager
             }
         }
-    }
-
-    // triggered by testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
-    private fun onTestSetupComplete(){
-
-        // block is always -1 but when is continuing a previous session (in that case if it found ..._blk2.txt => block=3 ...thus is always > 0)
-        mTest.adjustBlocks(mSubjectParcel!!.block)     // set currTrial, mCurrBlock, mTrial
-
-        if(isBlindUser)     showAnswerDialog(TRG_REQ_CODE_INSTRUCTIONS)
-        else                startTest()
-    }
-
-    private fun startTest(){
-
-        mHandler.postDelayed({
-            if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS) {
-                binding.btAbort.visibility = View.VISIBLE
-                binding.btPause.visibility = View.VISIBLE
-            }
-            mTest.start()
-            if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
-
-        }, 1000L)
     }
 
     override fun onDestroy() {
@@ -312,21 +298,22 @@ class TestFragment : BaseFragment(
             binding.btNext.visibility      = View.INVISIBLE
             binding.btPause.visibility     = View.INVISIBLE
 
-            onTrialEnded()
+            mTest.onEndTrial()
         }
 
         binding.btAbort.setOnClickListener{
-            mHandler.removeCallbacks(mRunnable!!)
+            mRunnable?.let{ mHandler.removeCallbacks(it) }
             show2ChoisesDialog(requireActivity(),
                 requireContext().resources.getString(R.string.warning),
                 requireContext().resources.getString(R.string.test_want2abort),
                 requireContext().resources.getString(R.string.yes),         // ok
-                requireContext().resources.getString(R.string.no),       // cancel
-                { onAbortTest() }, {
-                    binding.btNext.visibility      = View.INVISIBLE
-                    binding.btPause.visibility     = View.INVISIBLE
+                requireContext().resources.getString(R.string.no),{       // cancel
+                    onAbortTest()
+                },{
+                    binding.btNext.visibility = View.INVISIBLE
+                    binding.btPause.visibility = View.INVISIBLE
 
-                    onTrialEnded()
+                    mTest.onEndTrial()
                 })
         }
 
@@ -334,7 +321,7 @@ class TestFragment : BaseFragment(
             if(isPaused){
                 binding.btPause.text = resources.getString(R.string.pause)
                 binding.btPause.visibility = View.INVISIBLE
-                onTrialEnded()
+                mTest.onEndTrial()
             }
             else{
                 mHandler.removeCallbacksAndMessages(null)
@@ -349,6 +336,8 @@ class TestFragment : BaseFragment(
         disposable.clear()
     }
 
+    // ==========================================================================================================================
+    // observer of events emitted by test sub classes
     // here I manage all trial-by-trial behaviours invoked by Tests
     private fun setTestEventsObservable(){
 
@@ -357,148 +346,102 @@ class TestFragment : BaseFragment(
         if(disposable.size() > 0) return
 
         mTest.testEvent
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe {
-            when(it.first){
-
-                TestBasic.EVENT_TEST_SETUP_COMPLETED -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
-                TestBasic.EVENT_GIVE_ANSWER -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
-                TestBasic.EVENT_GIVE_VOCAL_ANSWER -> {
-                    binding.btAbort.visibility = View.VISIBLE
-                    listenForVocalAnswer(mTest.validAnswers)
-                }
-                TestBasic.EVENT_SHOW_NEXT_BUTTON -> showNext()
-
-                // called by SubTests' nextTrial
-                TestBasic.EVENT_UPDATE_TRIAL_ID -> {
-                    try {
-                        val dur = it.second as Long
-                        showTrialId(dur)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showTrialId(1000L)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                when(it.first){
+                    TestBasic.EVENT_TEST_SETUP_COMPLETED -> onTestSetupComplete()        // Test asynchronously loaded all its needed resources and is fully ready
+                    TestBasic.EVENT_GIVE_ANSWER          -> showAnswerDialog(TRG_REQ_CODE_ANSWER)
+                    TestBasic.EVENT_GIVE_VOCAL_ANSWER    -> {
+                                                            binding.btAbort.visibility = View.VISIBLE
+                                                            listenForVocalAnswer(mTest.validAnswers)
                     }
-                }
-                TestBasic.EVENT_SHOW_ABORT -> {
-                    try {
-                        val dur = it.second as Long
-                        showShortAbort(dur)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showShortAbort(1000L)
-                    }
-                }
-                TestBasic.EVENT_SHOW_DEBUGINFO -> {
-                    try {
-                        val info = it.second as String
-                        showDebugInfo(info)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showDebugInfo(e.toString())
-                    }
-                }
-                TestBasic.EVENT_TEST_ERROR -> onTestError(it.second as String)
+                    TestBasic.EVENT_BLOCK_END            -> onBlockEnded()
+                    TestBasic.EVENT_TRIAL_STARTED        -> onBeforeTrialShow()
+                    TestBasic.EVENT_TEST_END             -> onTestEnded()
+                    TestBasic.EVENT_NAVIGATE_BACK        -> navigateBack(it.second as Int, it.third)
 
-                TestBasic.EVENT_STIMULI_START -> {}
-                TestBasic.EVENT_STIMULI_END -> {}
+                    TestBasic.EVENT_SHOW_NEXT_BUTTON     -> showNext()
+                    TestBasic.EVENT_SHOW_ABORT           -> {
+                                                            try {
+                                                                val dur = it.second as Long
+                                                                showShortAbort(dur)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showShortAbort(1000L)
+                                                            }
+                    }
+                    TestBasic.EVENT_UPDATE_TRIAL_ID      -> {
+                                                            try {
+                                                                val dur = it.second as Long
+                                                                showTrialId(dur)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showTrialId(1000L)
+                                                            }
+                    }
+                    TestBasic.EVENT_SHOW_DEBUGINFO       -> {
+                                                            try {
+                                                                val info = it.second as String
+                                                                showDebugInfo(info)
+                                                            } catch (e: Exception) {
+                                                                e.printStackTrace()
+                                                                showDebugInfo(e.toString())
+                                                            }
+                    }
+                    TestBasic.EVENT_TEST_ERROR           -> onTestError(it.second as String, it.third)
+
+                    // unused
+                    TestBasic.EVENT_STIMULI_START        -> {}
+                    TestBasic.EVENT_STIMULI_END          -> {}
+                }
             }
-        }
-        .addTo(disposable)
-    }
-    //---------------------------------------------------------------------------------------------------------------------------------------
-    // called by: 1) onActivityResult after answer, 2) speechrecognition result
-    private fun onAnswer(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
-
-        // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
-        abortRecognition = true
-        mHandler.post {
-            speechRecognitionManager.stop()
-            speechManager.stop()
-        }
-        closeAnswerDialog()
-
-        // close trial (e.g. set answer) & check whether it was the last => test ended
-        onTrialEnded(prev_result, elapsed, extra_text)
+            .addTo(disposable)
     }
 
-    // called by: onAnswer, btNext click, btPause click
-    // define whether: onTestEnded() or onBlockEnded()  or nothing (test continued or closed sending event error)
-    private fun onTrialEnded(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
-        when(mTest.onEndTrial(prev_result, elapsed, extra_text)){
-            TestBasic.EVENT_TEST_END    -> onTestEnded()
-            TestBasic.EVENT_BLOCK_END   -> onBlockEnded()       // ask whether interrupting the test
-            TestBasic.EVENT_TEST_ERROR  -> {}                   // do nothing, test class close the test and send EVENT_TEST_ERROR with error message
-            else                        -> onBeforeTrialShow()  // next trial has been started
-        }
+    // ==========================================================================================================================
+    // triggered by testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null)) run on each Test class
+    private fun onTestSetupComplete(){
+
+        // block is always -1 but when is continuing a previous session (in that case if it found ..._blk2.txt => block=3 ...thus is always > 0)
+        mTest.adjustBlocks(mSubjectParcel.block)     // set currTrial, mCurrBlock, mTrial
+
+        if(isBlindUser)     showAnswerDialog(TRG_REQ_CODE_INSTRUCTIONS)
+        else                startTest()
     }
-    //---------------------------------------------------------------------------------------------------------------------------------------
-    // manage TrialID text and abort button, called after mTest.nextTrial if test is not finished
-    private fun onBeforeTrialShow(){
 
-        binding.txtTrialId.visibility   = View.INVISIBLE
-        binding.btAbort.visibility     = View.INVISIBLE
+    // called by:
+    //  - onTestSetupComplete
+    //  - onActivityResult->TRG_REQ_CODE_INSTRUCTIONS
+    private fun startTest(){
 
-        when(mTest.showTrialsID) {
-            TestBasic.TEST_SHOWTRIALS_ALWAYS    -> showTrialId()
-            TestBasic.TEST_SHOWTRIALS_TRIALEND  -> showTrialId(1000L)
-        }
-        if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS)  binding.btAbort.visibility = View.VISIBLE
+        mHandler.postDelayed({
+            if (mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS) {
+                binding.btAbort.visibility = View.VISIBLE
+                binding.btPause.visibility = View.VISIBLE
+            }
+            mTest.start()
+            if (mTest.showTrialsID == TestBasic.TEST_SHOWTRIALS_ALWAYS) showTrialId()
+
+        }, 1000L)
     }
 
     // ==========================================================================================================================================
+    // EVENTS ASKING USER INTERACTION (pressed abort, ask to confirm + block ended, ask to continue or stop)
     // ==========================================================================================================================================
-    //  (READY TO) TERMINATE TEST or CONTINUE
-    // ==========================================================================================================================================
-    // ==========================================================================================================================================
-    // => greetings & mTest.unloadStimuli() & NAVIGATEBACK
-    private fun onTestEnded(){
-        val msg = getText(R.string.test_ended).toString()
-
-        mTest.unloadStimuli()
-
-        if(isBlindUser) speechManager.speak(msg)
-        else            showToast(msg, requireContext())
-
-        navigateBack(TestBasic.TEST_COMPLETED, listOf(  mTest.getAbsoluteResultFilePath(),
-            mSubjectParcel!!.getAbsoluteSubjectFilePath(),
-            mTest.closeSummary()))
-    }
-
-    // user wanted to interrupt test during a block (ask whether deleting results file and it)
+    // user wanted to interrupt test during a block (ask whether deleting results file)
     // => greetings & mTest.abortTest (unloadStimuli) & NAVIGATEBACK
     private fun onAbortTest(){
 
         mHandler.removeCallbacksAndMessages(null)
-
         if(isBlindUser)     speechManager.speak(requireContext().resources.getString(R.string.test_aborted_blind))
 
         show2ChoisesDialog(requireActivity(),
-            requireContext().resources.getString(R.string.warning),
-            requireContext().resources.getString(R.string.test_aborted),
+            requireContext().resources.getString(R.string.warning), requireContext().resources.getString(R.string.test_aborted),
             requireContext().resources.getString(R.string.keep),         // ok
             requireContext().resources.getString(R.string.delete),       // cancel
-            { /* okClb */
-                mTest.abortTest(false)
-                navigateBack(TestBasic.TEST_ABORTED, listOf(mTest.getAbsoluteResultFilePath(),
-                                                            mSubjectParcel!!.getAbsoluteSubjectFilePath(),
-                                                            mTest.closeSummary()))
-            },
-            { /* cancelClb*/
-                mTest.abortTest(true)
-                navigateBack(TestBasic.TEST_ABORTED, listOf())
-            })
-    }
-
-    // TEST_EVENTS  => alert & NAVIGATEBACK
-    private fun onTestError(msg: String){
-        mHandler.removeCallbacksAndMessages(null)
-
-        if(isBlindUser)     speechManager.speak(resources.getString(R.string.critical_error))
-
-        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
-        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, listOf( mTest.getAbsoluteResultFilePath(),
-                                                                mSubjectParcel!!.getAbsoluteSubjectFilePath(),
-                                                                mTest.closeSummary()))
+            {   mTest.terminateTest(TestBasic.TEST_ABORTED_KEEP_RESULT)     /* okClb */ },
+            {   mTest.terminateTest(TestBasic.TEST_ABORTED_DEL_RESULT)      /* cancelClb*/}
+        )
     }
 
     // called when user ended a planned block= > mTest.startNewBlock() OR onStoppedAfterBlock (result file is renamed "*_blkX")
@@ -515,23 +458,27 @@ class TestFragment : BaseFragment(
             resources.getString(R.string.continue_label),
             resources.getString(R.string.stop),
             { /* okClb */       mTest.startNewBlock() },
-            { /* cancelClb*/    onStoppedAfterBlock() })
+            { /* cancelClb*/
+                mHandler.removeCallbacksAndMessages(null)
+                mTest.terminateTest(TestBasic.BLOCK_COMPLETED)
+            })
     }
 
-    // user wanted to interrupt test after an end block (send data)
-    // => mTest.stopTestAfterBlock (unloadStimuli + rename current res & subject files) & NAVIGATEBACK
-    private fun onStoppedAfterBlock(){
-        val newfilenames = mTest.stopTestAfterBlock()
+    // TEST_ERROR  => alert & NAVIGATEBACK
+    private fun onTestError(msg: String, files:List<String>){
         mHandler.removeCallbacksAndMessages(null)
-        navigateBack(TestBasic.BLOCK_COMPLETED, listOf( getAbsoluteFilePath(newfilenames.first).second,
-                                                        getAbsoluteFilePath(newfilenames.second).second,
-                                                        mTest.closeSummary(newfilenames.third))) // closeSummary return absolute path or ""
+
+        if(isBlindUser)     speechManager.speak(resources.getString(R.string.critical_error))
+
+        showAlert(requireActivity(), resources.getString(R.string.critical_error), msg)
+        navigateBack(TestBasic.TEST_ABORTED_WITH_ERROR, files)
     }
+
 
     /* called by:
+     - onTestError                  TEST_ABORTED_WITH_ERROR
      - onTestEnded                  TEST_COMPLETED
      - onAbortTest -> OK/cancel     TEST_ABORTED
-     - onTestError                  TEST_ABORTED_WITH_ERROR
      - onStoppedAfterBlock          BLOCK_COMPLETED
     results_file can be empty. it can have only the first (result) file not empty or having both results and summary
      */
@@ -542,73 +489,31 @@ class TestFragment : BaseFragment(
             if(it.isNotEmpty()) files_list.add(it)
         }
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel!!.composeSubjectFileName(requireContext()),
-                            files_list, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name),
+                            TestBasic.TEST_BUNDLE_RESULT_LABEL)
         Navigation.findNavController(requireView()).popBackStack()
-    }
-
-    //---------------------------------------------------------------------------------------------------------------------------------------
-    // ELEMENT VISIBILITY
-    //---------------------------------------------------------------------------------------------------------------------------------------
-    // called by TestBasic.EVENT_SHOW_NEXT_BUTTON
-    private fun showNext() {
-        binding.btNext.visibility = View.VISIBLE
-
-        if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS || mTest.abortMode == TestBasic.TEST_ABORT_TRIALEND)
-            binding.btAbort.visibility = View.VISIBLE
-    }
-
-    private fun showShortAbort(remove: Long = 1000L){
-        binding.btAbort.visibility = View.VISIBLE
-        binding.btPause.visibility = View.VISIBLE
-
-        if(remove > 0){
-
-            mRunnable = Runnable {
-                binding.btAbort.visibility = View.INVISIBLE
-                binding.btPause.visibility = View.INVISIBLE
-                onTrialEnded()
-            }
-
-            mHandler.postDelayed(mRunnable!!, remove)
-        }
-    }
-
-    private fun showTrialId(remove: Long = 0){
-        binding.txtTrialId.visibility   = View.VISIBLE
-        binding.txtTrialId.text         = resources.getString(
-            R.string.trial_id,
-            (mTest.currTrial + 1).toString()
-        )
-        if(remove > 0)
-            mHandler.postDelayed({  binding.txtTrialId.visibility = View.INVISIBLE  }, remove)
-    }
-
-    private fun showDebugInfo(msg: String, remove: Long = 0){
-        currDebugInfo           = msg
-        binding.txtDebugInfo.visibility = View.VISIBLE
-        binding.txtDebugInfo.text       = currDebugInfo
-
-        if(remove > 0)
-            mHandler.postDelayed({    binding.txtDebugInfo.visibility = View.INVISIBLE    }, remove)
     }
 
     //=======================================================================================================================================
     // ANSWERS
     //=======================================================================================================================================
-    // create answer dialog and process response (repeat same trial or show next one
+    // called by mTest.testEvent listener (when test trial stimulus and user response is needed) & onTestSetupComplete (for blind users)
+    // PURE UI: create answer dialog
     private fun showAnswerDialog(trg_req_code: Int){
 
         val b = Bundle()
         b.putInt("trial_id", mTest.currTrial)
         b.putInt("tot_trials", mTest.nTrials)
+
         b.putString("question", mTest.mQuestion)
         b.putStringArrayList("answers", mTest.validAnswers as ArrayList<String>)
-        b.putString("debugInfo", currDebugInfo)
-        b.putBoolean("isDebug", mSubjectParcel?.isDebug ?: false)
-
-        b.putBoolean("show_result", mTest.showResult)
+        b.putInt("show_result", mSubjectParcel.showResult)
         b.putInt("correct_answer", mTest.getTrialCorrectAnswer())
+
+        b.putInt("can_repeat_trial", mSubjectParcel.canRepeat)
+
+        b.putString("debugInfo", currDebugInfo)
+        b.putBoolean("isDebug", mSubjectParcel.isDebug)
 
         answerDialogFragment = answerDialogRef.first?.call(answerDialogRef.second, "", speechManager) as DialogFragment
         if(answerDialogFragment == null){
@@ -622,6 +527,7 @@ class TestFragment : BaseFragment(
         isAnswerDialogOn = true
     }
 
+    // PURE UI: called by onAnswerGiven
     private fun closeAnswerDialog(){
         if(isAnswerDialogOn) {
             answerDialogFragment?.dismiss() //        val dialogFragment:DialogFragment? = parentFragmentManager.findFragmentByTag(ANSWER_DIALOG_TAG) as DialogFragment
@@ -629,7 +535,7 @@ class TestFragment : BaseFragment(
         }
     }
 
-    // answer given !
+    // answer given or instruction given
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // Make sure fragment codes match up
         when(requestCode) {
@@ -640,7 +546,7 @@ class TestFragment : BaseFragment(
                         val result      = data.getIntExtra(EVENT_ANSWER_RESULT, -1)
                         val elapsedTime = data.getIntExtra(EVENT_TIME_TO_ANSWER, -1)
                         val result_extra= data.getStringExtra(EVENT_ANSWER_RESULT_EXTRA) ?: ""
-                        onAnswer(result, elapsedTime, result_extra)
+                        onAnswerGiven(result, elapsedTime, result_extra)
                     }
                     TestBasic.EVENT_TRIAL_REPEAT -> mTest.repeatTrial()
                     TestBasic.EVENT_TRIAL_ABORT -> onAbortTest()
@@ -668,7 +574,7 @@ class TestFragment : BaseFragment(
 
                             if (valid_results.isEmpty()) {      // free answer, collect spoken word and send it as results
                                 binding.btAbort.visibility = View.INVISIBLE
-                                onAnswer(-1, elapsedTime, rec_word)
+                                onAnswerGiven(-1, elapsedTime, rec_word)
                             }
                             else{                                // check whether given response is allowed
                                 val answer_id = valid_results.indexOf(rec_word)
@@ -686,7 +592,7 @@ class TestFragment : BaseFragment(
                                 }
                                 else{
                                     binding.btAbort.visibility = View.INVISIBLE
-                                    onAnswer(answer_id, elapsedTime, rec_word)
+                                    onAnswerGiven(answer_id, elapsedTime, rec_word)
                                 }
                             }
                         }
@@ -705,5 +611,93 @@ class TestFragment : BaseFragment(
             )
             .addTo(disposable)
     }
+
+    // called by: 1) onActivityResult after answer, 2) speechrecognition result
+    private fun onAnswerGiven(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
+
+        // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
+        abortRecognition = true
+        mHandler.post {
+            speechRecognitionManager.stop()
+            speechManager.stop()
+        }
+        closeAnswerDialog()
+
+        // close trial (e.g. set answer) & check whether it was the last => test ended
+        mTest.onEndTrial(prev_result, elapsed, extra_text)
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------------------------
+    // ELEMENT VISIBILITY
+    //---------------------------------------------------------------------------------------------------------------------------------------
+    // manage TrialID text and abort button, called after mTest.nextTrial if test is not finished
+    // PURE UI
+    private fun onBeforeTrialShow(){
+
+        binding.txtTrialId.visibility   = View.INVISIBLE
+        binding.btAbort.visibility     = View.INVISIBLE
+
+        when(mTest.showTrialsID) {
+            TestBasic.TEST_SHOWTRIALS_ALWAYS    -> showTrialId()
+            TestBasic.TEST_SHOWTRIALS_TRIALEND  -> showTrialId(1000L)
+        }
+        if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS)  binding.btAbort.visibility = View.VISIBLE
+    }
+
+    // called by TestBasic.EVENT_SHOW_NEXT_BUTTON
+    // PURE UI: just show btNext and btAbort
+    private fun showNext() {
+        binding.btNext.visibility = View.VISIBLE
+
+        if(mTest.abortMode == TestBasic.TEST_ABORT_ALWAYS || mTest.abortMode == TestBasic.TEST_ABORT_TRIALEND)
+            binding.btAbort.visibility = View.VISIBLE
+    }
+
+    // PURE UI: just show trial id info
+    private fun showTrialId(remove: Long = 0){
+        binding.txtTrialId.visibility   = View.VISIBLE
+        binding.txtTrialId.text         = resources.getString(
+            R.string.trial_id,
+            (mTest.currTrial + 1).toString()
+        )
+        if(remove > 0)
+            mHandler.postDelayed({  binding.txtTrialId.visibility = View.INVISIBLE  }, remove)
+    }
+
+    // PURE UI: just show debug info
+    private fun showDebugInfo(msg: String, remove: Long = 0){
+        currDebugInfo           = msg
+        binding.txtDebugInfo.visibility = View.VISIBLE
+        binding.txtDebugInfo.text       = currDebugInfo
+
+        if(remove > 0)
+            mHandler.postDelayed({    binding.txtDebugInfo.visibility = View.INVISIBLE    }, remove)
+    }
+
+    // show abort button for remove-ms and then call onTrialEnded
+    private fun showShortAbort(remove: Long = 1000L){
+        binding.btAbort.visibility = View.VISIBLE
+        binding.btPause.visibility = View.VISIBLE
+
+        if(remove > 0){
+
+            mRunnable = Runnable {
+                binding.btAbort.visibility = View.INVISIBLE
+                binding.btPause.visibility = View.INVISIBLE
+                mTest.onEndTrial()
+            }
+
+            mHandler.postDelayed(mRunnable!!, remove)
+        }
+    }
+    // => greetings & mTest.unloadStimuli()
+    // PURE UI
+    private fun onTestEnded(){
+        val msg = getText(R.string.test_ended).toString()
+
+        if(isBlindUser) speechManager.speak(msg)
+        else            showToast(msg, requireContext())
+    }
+
     // ========================================================================================================================================
 }

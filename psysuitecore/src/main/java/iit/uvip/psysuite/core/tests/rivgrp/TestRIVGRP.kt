@@ -18,11 +18,11 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
-import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.tests.tfi.TFIBISummary
 import iit.uvip.psysuite.core.tests.tfi.TFISummary
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -56,22 +56,22 @@ class TestRIVGRP(ctx: Context,
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(
         R.drawable.rivalry_chouse_rface,
-        R.drawable.rivalry_chouse_rface,
+        R.drawable.rivalry_rhouse_cface,
         R.drawable.grouping_house_face_1,
         R.drawable.grouping_house_face_2,
         R.drawable.rivalry_chouse_rcar,
-        R.drawable.rivalry_chouse_rcar,
+        R.drawable.rivalry_rhouse_ccar,
         R.drawable.grouping_house_car_1,
         R.drawable.grouping_house_car_2
     )
 
     private var imagesNames: MutableList<String> = mutableListOf(
         "rivalry_chouse_rface",
-        "rivalry_chouse_rface",
+        "rivalry_rhouse_cface",
         "grouping_house_face_1",
         "grouping_house_face_2",
         "rivalry_chouse_rcar",
-        "rivalry_chouse_rcar",
+        "rivalry_rhouse_ccar",
         "grouping_house_car_1",
         "grouping_house_car_2"
     )
@@ -170,7 +170,7 @@ class TestRIVGRP(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialRIVGRP.LOG_HEADER)
+        createResultFile(TrialRIVGRP.LOG_HEADER)
         currVisual = VisualManager(STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialRIVGRP).img_res, duration = currStimulusDuration, handler = mStimuliHandler)
         mStimuliManager = StimuliManager(
             null, //AudioManager(StimuliManager.STIM_TYPE_A2, "",  duration = currStimulusDuration, ctx = ctx, handler = mStimuliHandler),
@@ -178,7 +178,7 @@ class TestRIVGRP(ctx: Context,
             currVisual,
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     override fun initSummary() {
@@ -198,7 +198,7 @@ class TestRIVGRP(ctx: Context,
         when(subject.type){
             TEST_RIVGRP_RIV_HF  -> {
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_1_LOG}"
-                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0], imagesNames[0], resp_type))
+                trials.add(TrialRIVGRP(1,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
                 trials.add(TrialRIVGRP(2,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
                 trials.add(TrialRIVGRP(3,1, currImageName, mDrawablesResource[0],imagesNames[0], resp_type))
                 trials.add(TrialRIVGRP(4,1, currImageName, mDrawablesResource[1],imagesNames[1], resp_type))
@@ -207,7 +207,7 @@ class TestRIVGRP(ctx: Context,
                 currImageName = "${STIMULUS_TYPE_1_LOG}${EFFECT_TYPE_2_LOG}"
                 trials.add(TrialRIVGRP(1,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
                 trials.add(TrialRIVGRP(2,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
-                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[1], resp_type))
+                trials.add(TrialRIVGRP(3,2, currImageName, mDrawablesResource[2],imagesNames[2], resp_type))
                 trials.add(TrialRIVGRP(4,2, currImageName, mDrawablesResource[3],imagesNames[3], resp_type))
             }
             TEST_RIVGRP_RIVGRP_HF  -> {
@@ -279,13 +279,13 @@ class TestRIVGRP(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
 
         // if !last trial && !block end => doNextTrial
-        return when {
+        when {
             currTrial == (nTrials - 1) -> {
                 saveText("", notifyDm = true)
-                EVENT_TEST_END            // END !
+                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
             }
             mListBlocks.contains(currTrial) -> {
                 EVENT_BLOCK_END
@@ -310,7 +310,7 @@ class TestRIVGRP(ctx: Context,
         currMP?.stop()
         currVisual?.stop()
 
-        mStimuliHandler.postDelayed({ testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null)) }, 2000L)
+        mStimuliHandler.postDelayed({ testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf())) }, 2000L)
     }
 
     // =============================================================================================================================
@@ -522,7 +522,7 @@ class TestRIVGRP(ctx: Context,
                                 else if(!isLeftPressed && isRightPressed)   2
                                 else                                        0
                             }
-//        testEvent.accept(Pair(EVENT_SHOW_DEBUGINFO, "pressed button: $response"))
+//        testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, "pressed button: $response"))
 
         saveText("$elapsed\t$response\n", notifyDm = false)
     }

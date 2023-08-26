@@ -8,7 +8,8 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T_A
 
 
-class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answers:List<String>):TrialBindings3latencies(id, type, 0,0,0, -1) {
+class TrialBindingsBalanced(id:Int=-1, type:Int=0, override var magnitude:Float, private val correct_answers:List<String>, isADA:Boolean=false)
+     :TrialBindings3latencies(id, type, 0L,0L,0L, isADA=isADA) {
 
     companion object {
         @JvmStatic
@@ -16,58 +17,65 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_an
     }
 
     init {
+        updateTrial(magnitude)
+    }
+
+    override fun updateTrial(newvalue: Float):Long{
+        magnitude       = newvalue
+
         when(type){
             TYPE_T_A_V -> {
                 t = 0
-                a = delay
-                v = delay*2
+                a = stim_value
+                v = stim_value*2
                 correct_answer = 0
             }
             TYPE_V_A_T ->{
                 v = 0
-                a = delay
-                t = delay*2
+                a = stim_value
+                t = stim_value*2
                 correct_answer = 0
             }
             TYPE_A_T_V ->{
                 a = 0
-                t = delay
-                v = delay*2
+                t = stim_value
+                v = stim_value*2
                 correct_answer = 1
             }
             TYPE_V_T_A ->{
                 v = 0
-                t = delay
-                a = delay*2
+                t = stim_value
+                a = stim_value*2
                 correct_answer = 1
             }
 
             TYPE_A_V_T -> {
                 a = 0
-                v = delay
-                t = delay*2
+                v = stim_value
+                t = stim_value*2
                 correct_answer = 2
             }
             TYPE_T_V_A -> {
                 t = 0
-                v = delay
-                a = delay*2
+                v = stim_value
+                a = stim_value*2
                 correct_answer = 2
             }
         }
+        return stim_value
     }
 
     // all class exported as string
-    override fun toString(): String {
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + delay.toString() + "\n"
+    override fun toString():String {
+        return "$id\t$type\t$label\t$stim_value\n"
     }
 
     // data exported to log file
-    override fun Log(): String {
-        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() +"\n"
+    override fun Log():String {
+        return "$id\t$type\t$stim_value\t${correct_answers[user_answer]}\t$success\t$elapsed\n"
     }
 
     override fun debugInfo():String{
-        return "${super.debugInfo()}, label=$label, delay=$delay"
+        return "${super.debugInfo()}, label=$label, delay=$stim_value"
     }
 }

@@ -1,10 +1,10 @@
 package iit.uvip.psysuite.core.tests.fgi
 
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
 
 //                trial_id    0/1      fig_res
 class TrialFGI(id: Int = -1, type: Int, label: String, var audio_name:String) :
-    TrialBasic(id, type, label, -1) {
+    TrialBasic(id, type, label) {
 
     companion object {
         @JvmStatic val LOG_HEADER           = "id\ttype\tfig\taudio\n"
@@ -12,17 +12,17 @@ class TrialFGI(id: Int = -1, type: Int, label: String, var audio_name:String) :
 
     // all class exported as string
     override fun toString():String{
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + audio_name + "\t" + "n.a." + "\n"
+        return "$id\t$type\t$label\t$audio_name\tn.a.\n"
     }
 
     // only to validate Class
     override fun Log():String{
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + audio_name + "\n"
+        return "$id\t$type\t$label\t$audio_name\n"
     }
 
     // data exported to log file
     fun Log(res:Int):String{
-        return id.toString() +  "\t" + type.toString() + "\t" + label + "\t" + audio_name + "\t" + res.toString() + "\n"
+        return "$id\t$type\t$label\t$audio_name\t$res\n"
     }
 
     override fun debugInfo():String{

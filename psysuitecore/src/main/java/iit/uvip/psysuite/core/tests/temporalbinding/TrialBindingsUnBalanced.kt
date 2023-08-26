@@ -1,28 +1,38 @@
 package iit.uvip.psysuite.core.tests.temporalbinding
 
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, val delay:Long=0L, correct_answer:Int=-1):
-    TrialBasic(id, type, "", correct_answer) {
+class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, final override var magnitude:Float, isADA:Boolean=false):
+    TrialBasic(id, type, "", isADA=isADA) {
 
     companion object {
-        @JvmStatic
-        val LOG_HEADER = "id\ttype\tdelay\tanswer\tsuccess\telapsed\n"
+        @JvmStatic val LOG_HEADER = "id\ttype\tdelay\tanswer\tsuccess\telapsed\n"
+    }
+
+    init {
+        updateTrial(magnitude)
     }
 
     // all class exported as string
-    override fun toString(): String {
-        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\n"
+    override fun toString():String {
+        return "$id\t$type\t$stim_value\n"
     }
 
     // data exported to log file
-    override fun Log(): String {
-        return id.toString() + "\t" + type.toString() + "\t" + delay.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() +"\n"
+    override fun Log():String {
+        return "$id\t$type\t$stim_value\t$user_answer\t$success\t$elapsed\n"
     }
 
     override fun debugInfo():String{
-        return "${super.debugInfo()}, delay=$delay"
+        return "${super.debugInfo()}, delay=$stim_value"
+    }
+
+    override fun updateTrial(newvalue: Float): Long {
+        magnitude       = newvalue
+        correct_answer  =   if(magnitude == 0.0F)   0
+                            else                    1
+        return stim_value
     }
 }

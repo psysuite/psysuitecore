@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -18,10 +19,11 @@ import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
-import iit.uvip.psysuite.core.tests.FixedTrialsManager
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import iit.uvip.psysuite.core.utility.ConditionData
 
 import org.albaspazio.core.accessory.VibrationManager
@@ -47,7 +49,7 @@ class TestBeads(ctx: Context,
 
     private var STIM_V  = StimuliManager.STIM_TYPE_V1
 
-    private lateinit var binding: FragmentTestBinding
+    private val binding: FragmentTestBinding =  (hostfragment as TestFragment).binding
 
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(
@@ -84,7 +86,7 @@ class TestBeads(ctx: Context,
     private var currVisual: VisualManager?  = null
 
     private var trialStartMs:Long               = 0L
-    private var parent_layout_width:Int         = 0
+    private var parent_layout_width:Int         = binding.root.width
 
 
     companion object {
@@ -139,11 +141,11 @@ class TestBeads(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        createResultFile(subject, TrialBeads.LOG_HEADER)
+        createResultFile(TrialBeads.LOG_HEADER)
         currVisual      = VisualManager(TestTFI.STIM_V, mImageView!!, (mTrialsManager.mTrials[0] as TrialBeads).img_res, duration = POSITIVE_INFINITY.toLong(), handler = mStimuliHandler)
         mStimuliManager = StimuliManager(null, null, currVisual, delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // =============================================================================================================================
@@ -166,13 +168,13 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
 
         // if !last trial && !block end => doNextTrial
-        return when {
+        when {
             currTrial == (nTrials - 1) -> {
                 saveText("", notifyDm = true)
-                EVENT_TEST_END            // END !
+                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))           // END !
             }
             mListBlocks.contains(currTrial) -> {
                 EVENT_BLOCK_END
@@ -189,7 +191,7 @@ class TestBeads(ctx: Context,
         for(b in 0 until nbeadsXtrial)  beads_images[b].visibility = View.INVISIBLE
         currVisual?.stop()
 
-        mStimuliHandler.postDelayed({ testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null)) }, 2000L)
+        mStimuliHandler.postDelayed({ testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf())) }, 2000L)
     }
 
     override fun initSummary(){}
@@ -278,10 +280,10 @@ class TestBeads(ctx: Context,
     // =============================================================================================================================
     private fun setUI() {
 
-        binding             = FragmentTestBinding.inflate(activity.layoutInflater)
-
-        parent_layout_width = binding.fragmentTestLayout.width
-        val mainlayout      = binding.fragmentTestLayout
+        val mainlayout = binding.root
+//        binding             = FragmentTestBinding.inflate(activity.layoutInflater)
+//        val mainlayout      = binding.root
+//        parent_layout_width = mainlayout.width
 
         val constraintSet = ConstraintSet()
         constraintSet.clone(mainlayout)
@@ -293,7 +295,7 @@ class TestBeads(ctx: Context,
     }
 
     private fun createBottomButton(txt:String, parent_layout:ConstraintLayout, constr_set:ConstraintSet, hconstr:Int, hconstr_margin:Int, vconstr_margin:Int):Button{
-        val bt = Button(ctx).apply {
+        val bt = AppCompatButton(ctx).apply {
             id              = View.generateViewId()
             text            = txt
             textAlignment   = TextView.TEXT_ALIGNMENT_CENTER

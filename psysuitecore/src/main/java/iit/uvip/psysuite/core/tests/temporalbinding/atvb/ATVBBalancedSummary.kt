@@ -4,7 +4,7 @@ import android.content.Context
 import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.model.summary.SummaryCondition
 import iit.uvip.psysuite.core.model.summary.SummaryRow
-import iit.uvip.psysuite.core.tests.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.balshSD
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryCondition
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsSummaryRow
@@ -52,11 +52,11 @@ class ATVBBalancedSummary(ctx:Context) : Summary(ctx){
                 ATVBsummaryRow(type, cond_label, balshSD[2].second))
 
         override fun add(trial: TrialBasic){
-                when((trial as TrialBindingsBalanced).delay){
+                when((trial as TrialBindingsBalanced).magnitude){
                     balshSD[2].first    -> rows[3].add(trial)
                     balshSD[1].first    -> rows[2].add(trial)
                     balshSD[0].first    -> rows[1].add(trial)
-                    0L                  -> rows[0].add(trial)
+                    0.0F                -> rows[0].add(trial)
                 }
             }
     }

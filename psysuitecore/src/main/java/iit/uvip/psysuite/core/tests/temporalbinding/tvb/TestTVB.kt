@@ -4,29 +4,38 @@ import android.app.Activity
 import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import iit.uvip.psysuite.adaptive.AdaptiveWrapper
+import iit.uvip.psysuite.adaptive.TaskADAParams
+import iit.uvip.psysuite.adaptive.ado.ADOParams
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
-import iit.uvip.psysuite.core.stimuli.*
-import iit.uvip.psysuite.core.tests.FixedTrialsManager
+import iit.uvip.psysuite.core.stimuli.AudioManager
+import iit.uvip.psysuite.core.stimuli.ImageViewDefinedException
+import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.stimuli.TactileManager
+import iit.uvip.psysuite.core.stimuli.VibratorNotDefinedException
+import iit.uvip.psysuite.core.stimuli.VisualManager
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.TrialBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_INF
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION_TOD
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
-import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T_V800
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T800_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_TYPE_TIME_T_V800
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_TV
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_T_V
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.TYPE_V_T
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.WN_FIRSTSTIM_INTERVAL
+import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
+import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusATBInfants
@@ -132,6 +141,11 @@ class TestTVB(ctx: Context,
 
     private val amplitude = 100
 
+    private val nQuestTrials                = 30
+    private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
+    private val taskADAParams               = TaskADAParams(1200.0F, nQuestTrials+10)
+    private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
+
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
     private var vibration_trains_amplitudes: MutableList<IntArray>  = mutableListOf()
 
@@ -179,36 +193,56 @@ class TestTVB(ctx: Context,
             }
         }
 
-        val trials = if(!subject.isDebug) {
-                        // create trials/summary
-                        when (subject.type) {
-                            TEST_TVB_TIME_DOUBLESTIM_TOD,
-                            TEST_TVB_TIME_DOUBLESTIM ->{
-                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                                initSummary()
-                                createTrialsTimeDouble()
-                            }
-                            TEST_TVB_TIME_SINGLESTIM_TOD,
-                            TEST_TVB_TIME_SINGLESTIM       -> {
-                                createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                                initSummary()
-                                createTrialsTimeSingle()
-                            }
-                            TEST_TVB_TIME_INF   -> {
-                                initTimeArrays()
-                                createResultFile(subject, TrialBindingsInfants.LOG_HEADER)
-                                createTrialsTimeInfants()
-                            }
-                            else -> throw Exception("ERROR in TESTTVB")
+        mTrialsManager =
+            if(subject.trman_type == TEST_TRMAN_FIXED){
+                val trials = if(!subject.isDebug) {
+                    // create trials/summary
+                    when (subject.type) {
+                        TEST_TVB_TIME_DOUBLESTIM_TOD,
+                        TEST_TVB_TIME_DOUBLESTIM ->{
+                            createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
+                            initSummary()
+                            createTrialsTimeDouble()
                         }
+                        TEST_TVB_TIME_SINGLESTIM_TOD,
+                        TEST_TVB_TIME_SINGLESTIM       -> {
+                            createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
+                            initSummary()
+                            createTrialsTimeSingle()
+                        }
+                        TEST_TVB_TIME_INF   -> {
+                            initTimeArrays()
+                            createResultFile(TrialBindingsInfants.LOG_HEADER)
+                            createTrialsTimeInfants()
+                        }
+                        else -> throw Exception("ERROR in TEST TVB")
                     }
-                    else{
-                        createResultFile(subject, TrialBindingsUnBalanced.LOG_HEADER)
-                        createTrialsDebug()
-                    }
-        mTrialsManager = FixedTrialsManager(trials as MutableList<TrialBasic>)
+                }
+                else{
+                    createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
+                    createTrialsDebug()
+                }
+                val ntr = trials.size
+                mListBlocks = mutableListOf((ntr *0.2F).roundToInt(), (ntr * 0.4F).roundToInt(), (ntr * 0.6F).roundToInt(), (ntr * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+                FixedTrialsManager(trials as MutableList<TrialBasic>)
+            }
+            else{
+                createResultFile(TrialBindingsUnBalanced.LOG_HEADER)
+                initSummary()
 
-        mListBlocks = mutableListOf((nTrials *0.2F).roundToInt(), (nTrials * 0.4F).roundToInt(), (nTrials * 0.6F).roundToInt(), (nTrials * 0.8F).roundToInt())    // define 5 blocks, at the end of the first a window ask use whether continuing or ending (to be later continued)
+                val trials = when (subject.type) {
+                    TEST_TVB_TIME_DOUBLESTIM_TOD,
+                    TEST_TVB_TIME_DOUBLESTIM    -> createTrialsAdaptiveDouble()
+
+                    TEST_TVB_TIME_SINGLESTIM_TOD,
+                    TEST_TVB_TIME_SINGLESTIM    -> createTrialsAdaptiveSingle()
+                    else                        -> throw Exception("ERROR in TEST AVB")
+                }
+                val trman = AdaptiveTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
+                trman.getStimulus()
+                trman
+            }            
+
 
         mTestLabel = ""
         getConditionsInfo(ctx).map {
@@ -216,14 +250,14 @@ class TestTVB(ctx: Context,
         }
         if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
 
-        if (subject.whitenoise > TEST_WNOISE_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
+        if (subject.whitenoise > TEST_SWITCH_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
         mStimuliManager = StimuliManager(null,
             TactileManager(vibrator!!, duration = currStimulusDuration, handler = mStimuliHandler),
             VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], duration = currStimulusDuration, handler = mStimuliHandler),
             delaysAligner, ctx, mStimuliHandler)
 
-        testEvent.accept(Pair(EVENT_TEST_SETUP_COMPLETED, null))
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
     //              _   _   _   _   _
     // 9 segments  | |_| |_| |_| |_| |
@@ -277,16 +311,16 @@ class TestTVB(ctx: Context,
             for (j in 0 until 2) {
 
                 // 6
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0, 0))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0, 0))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, 1))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0, 1))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, 1))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0, 1))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0.0F))
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.magnitude))
                 }
             }
             rtrials.shuffle()
@@ -304,12 +338,12 @@ class TestTVB(ctx: Context,
             for (j in 0 until 2) {
 
                 // 2
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0, 0))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0, 0))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
 
                 // 26
                 lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.delay, 1))
+                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.magnitude))
                 }
             }
             rtrials.shuffle()
@@ -318,14 +352,93 @@ class TestTVB(ctx: Context,
         return trials
     }
 
+    // 22 fixed + 28 adaptive
+    private fun createTrialsAdaptiveDouble():List<TrialBasic>{
+        var cnt = -1
+        val trials:MutableList<TrialBasic> = mutableListOf()
+
+        // static part
+        // 10
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V, 0.0F))
+
+        // 12
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 50.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 50.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 100.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 100.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 200.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 200.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 300.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 300.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 400.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 400.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 800.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 800.0F))
+
+        // 28
+        for (j in 0 until 28) {
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 0.0F, isADA = true))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 0.0F, isADA = true))
+        }
+        trials.shuffle()
+        return trials
+    }
+
+    // 18 fixed + 32 adaptive
+    private fun createTrialsAdaptiveSingle():List<TrialBasic>{
+        var cnt = -1
+        val trials:MutableList<TrialBasic> = mutableListOf()
+
+        // static part
+        // 6
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+
+        // 12
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 50.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 50.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 100.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 100.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 200.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 200.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 300.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 300.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 400.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 400.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 800.0F))
+        trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 800.0F))
+
+        // 32
+        for (j in 0 until 32) {
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 0.0F, isADA = true))
+            trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 0.0F, isADA = true))
+        }
+        trials.shuffle()
+        return trials
+    }
+
     private fun createTrialsDebug():List<TrialBasic>{
         var cnt = -1
         val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until 100000) {
             for (j in 0 until 2) {
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0, 0))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 50, 0))
-                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 50, 0))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_TV, 0.0F))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_T_V, 50.0F))
+                trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_T, 50.0F))
             }
         }
         return trials
@@ -333,9 +446,9 @@ class TestTVB(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String): Int {
-        testEvent.accept(Pair(EVENT_UPDATE_TRIAL_ID, 0L))
-        return super.onEndTrial(prev_result, elapsed, extra_text)
+    override fun onEndTrial(prev_result: Int, elapsed: Int, extra_text:String){
+        testEvent.accept(Triple(EVENT_UPDATE_TRIAL_ID, 0L, listOf()))
+        super.onEndTrial(prev_result, elapsed, extra_text)
     }
 
     // called by secondTrain
@@ -345,20 +458,11 @@ class TestTVB(ctx: Context,
         mNoise?.prepare()
 
         when (nextTrailModality) {
-            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Pair(EVENT_SHOW_NEXT_BUTTON, null))
-            TEST_NEXTTRIAL_AUTO         ->  {
-                // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
-                mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SHOW_ABORT, 1000L))
-                }, currStimulusDuration)
-            }
+            TEST_NEXTTRIAL_BUTTON       ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_BUTTON, null, listOf()))
+            TEST_NEXTTRIAL_AUTO         ->  // create a ITI=2sec pause by waiting for 1sec and invoking a 1sec wait in TestFragment
+                mStimuliHandler.postDelayed({   testEvent.accept(Triple(EVENT_SHOW_ABORT, 1000L, listOf()))     }, currStimulusDuration)
 
-            TEST_NEXTTRIAL_VOICE_ANSWER ->  testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
-            TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER -> {
-                testEvent.accept(Pair(EVENT_GIVE_VOCAL_ANSWER, null))
-                testEvent.accept(Pair(EVENT_GIVE_ANSWER, null))
-            }
+            TEST_NEXTTRIAL_ANSWER       ->  testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf()))
         }
     }
 
@@ -393,7 +497,7 @@ class TestTVB(ctx: Context,
             TEST_TVB_TIME_SINGLESTIM,
             TEST_TVB_TIME_SINGLESTIM_TOD -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     deliverUnBalancedStimuli(trial as TrialBindingsUnBalanced)
                 }, WN_FIRSTSTIM_INTERVAL)
             }
@@ -406,7 +510,7 @@ class TestTVB(ctx: Context,
                 val shift       = WN_FIRSTSTIM_INTERVAL - corr_delays.shift
 
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                    testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
                     mStimuliManager.deliverShiftedStimulus(
                         BIMODAL_CODE,
                         corr_delays.a,
@@ -442,12 +546,12 @@ class TestTVB(ctx: Context,
         if(V_delay > 0L){
             mStimuliHandler.postDelayed({
                 mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                testEvent.accept(Pair(EVENT_STIMULI_START, null))
+                testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
             }, V_delay)
         }
         else {
             mStimuliManager.deliverUnimodalStimulus(STIM_V)
-            testEvent.accept(Pair(EVENT_STIMULI_START, null))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }
 
         mStimuliHandler.postDelayed({   mStimuliManager.deliverUnimodalStimulus(STIM_V)    }, curISI + V_delay)
@@ -469,7 +573,7 @@ class TestTVB(ctx: Context,
             STIM_TYPE_TIME_T_V800   -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI + A_delay)
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
@@ -481,7 +585,7 @@ class TestTVB(ctx: Context,
 
             STIM_T -> {
                 mStimuliHandler.postDelayed({
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, 3 * curISI)
                 mStimuliHandler.postDelayed({
                     onTrialEnd()
@@ -491,11 +595,11 @@ class TestTVB(ctx: Context,
             STIM_TYPE_TIME_T800_V -> {
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (3 * curISI + 800L + A_delay))
                 mStimuliHandler.postDelayed({
                     mStimuliManager.deliverUnimodalStimulus(STIM_V)
-                    testEvent.accept(Pair(EVENT_SECOND_TRAIN, null))
+                    testEvent.accept(Triple(EVENT_SECOND_TRAIN, null, listOf()))
                 }, (4 * curISI + 800 + A_delay))
                 mStimuliHandler.postDelayed({
                     onTrialEnd()
@@ -522,11 +626,11 @@ class TestTVB(ctx: Context,
             }
             TYPE_T_V    -> {
                 type = mStimuliManager.typeTV
-                delaysAligner.arrangeDelays(type, -1, 0, trial.delay)
+                delaysAligner.arrangeDelays(type, -1, 0, trial.stim_value)
             }
             TYPE_V_T    -> {
                 type = mStimuliManager.typeTV
-                delaysAligner.arrangeDelays(type, -1, trial.delay,0)
+                delaysAligner.arrangeDelays(type, -1, trial.stim_value,0)
             }
             else        -> {
                 type = mStimuliManager.typeTV
