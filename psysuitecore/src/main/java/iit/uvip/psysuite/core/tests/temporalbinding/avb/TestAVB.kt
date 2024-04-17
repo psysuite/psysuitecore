@@ -122,11 +122,11 @@ class TestAVB(ctx: Context,
         StimulusDelay( TYPE_V_A, unbalSD[6].first)
     )
 
-    private val EVENT_SECOND_TRAIN      = 1201
+    private val EVENT_SECOND_TRAIN          = 1201
 
-    private val nQuestTrials                = 30
+    private val nAdaptiveTrials             = 40
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
-    private val taskADAParams               = TaskADAParams(1200.0F, nQuestTrials+10)
+    private val taskADAParams               = TaskADAParams(1200.0F, nAdaptiveTrials)
     private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
     // =============================================================================================================================

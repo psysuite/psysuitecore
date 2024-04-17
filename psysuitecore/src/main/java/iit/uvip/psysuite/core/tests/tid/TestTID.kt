@@ -5,18 +5,23 @@ import android.content.Context
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.adaptive.AdaptiveWrapper
+import iit.uvip.psysuite.adaptive.TaskADAParams
 import iit.uvip.psysuite.adaptive.ado.ADOParams
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.Populations
-import iit.uvip.psysuite.core.stimuli.*
+import iit.uvip.psysuite.core.stimuli.AudioManager
+import iit.uvip.psysuite.core.stimuli.ImageViewDefinedException
+import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_A4
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_T1
 import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_V1
-import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.stimuli.TactileManager
+import iit.uvip.psysuite.core.stimuli.VibratorNotDefinedException
+import iit.uvip.psysuite.core.stimuli.VisualManager
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
-import iit.uvip.psysuite.adaptive.TaskADAParams
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.trials.TrialsManager
 import iit.uvip.psysuite.core.utility.ConditionData
 import org.albaspazio.core.accessory.VibrationManager
@@ -146,13 +151,13 @@ class TestTID(ctx: Context,
         fun getEmailRecipients():Array<String> = recipients
     }
 
-    private val shortLatencies:List<Float>       = listOf(100.0F, 72.0F, 43.0F, 15.0F)
-    private val shortTrainLatencies:List<Float>  = listOf(150.0F)
-    private val longLatencies:List<Float>        = listOf(1000.0F, 720.0F, 430.0F, 150.0F)
-    private var currLatencies:List<Float>        = listOf()
+    private val shortLatencies:List<Float>      = listOf(100.0F, 72.0F, 43.0F, 15.0F)
+    private val shortTrainLatencies:List<Float> = listOf(150.0F)
+    private val longLatencies:List<Float>       = listOf(1000.0F, 720.0F, 430.0F, 150.0F)
+    private var currLatencies:List<Float>       = listOf()
 
-    private val nQuestTrials                = 30
-    private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
+    private val nAdaptiveTrials                 = 40
+    private val adoParams                       = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
     private lateinit var taskADAParams: TaskADAParams
     private lateinit var adoWrapper:AdaptiveWrapper
 
@@ -186,20 +191,19 @@ class TestTID(ctx: Context,
                 currISI             = ISI_LONG
                 currREP_X_BLOCK     = NUM_REP_X_LATENCY_X_BLOCK_LONG
                 currNTRIALS_X_BLOCK = NUM_TRIALS_X_BLOCK_LONG
-                NLATENCIES   = longLatencies.size
-                taskADAParams       = TaskADAParams(ADO_RANGE_DUR_LONG, nQuestTrials+10)
+                NLATENCIES          = longLatencies.size
+                taskADAParams       = TaskADAParams(ADO_RANGE_DUR_LONG, nAdaptiveTrials)
                 currLatencies       = longLatencies
             }
             else -> {
                 currISI             = ISI_SHORT
                 currREP_X_BLOCK     = NUM_REP_X_LATENCY_X_BLOCK_SHORT
                 currNTRIALS_X_BLOCK = NUM_TRIALS_X_BLOCK_SHORT
-                NLATENCIES   = shortLatencies.size
-                taskADAParams       = TaskADAParams(ADO_RANGE_DUR_SHORT, nQuestTrials+10)
+                NLATENCIES          = shortLatencies.size
+                taskADAParams       = TaskADAParams(ADO_RANGE_DUR_SHORT, nAdaptiveTrials)
                 currLatencies       = shortLatencies
             }
         }
-        adoWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
         refDelta = when(subject.type) {
             TEST_TID_LONG_AUDIO, TEST_TID_LONG_TACTILE, TEST_TID_LONG_VISUAL -> REF_STIM_DUR_LONG
@@ -214,6 +218,7 @@ class TestTID(ctx: Context,
                     FixedTrialsManager(trials as MutableList<TrialBasic>)
                 }
                 else -> {
+                    adoWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
                     val trials = createQuestTrials(currStimulusDuration)
                     val trman = AdaptiveTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
                     trman.getStimulus()

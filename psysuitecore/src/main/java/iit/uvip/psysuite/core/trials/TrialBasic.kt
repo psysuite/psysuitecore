@@ -10,7 +10,7 @@ open class TrialBasic(var id:Int=-1, val type:Int, protected val label:String=""
     var repetitions:Int             =  1
     var elapsed:Int                 = -1
     var user_answer_extra:String    = ""
-    open var correct_answer:Int          = 0
+    open var correct_answer:Int     = 0
     var success:Boolean             =  false    // result of comparison between correct and user answer
 
     // value actually given to the subject

@@ -246,8 +246,9 @@ class TestFragment : BaseFragment(
                     TestBasic.TEST_MOTPRE_VV_CUE_ARROW,
                     TestBasic.TEST_MOTPRE_VH_CUE_ARROW,
                     TestBasic.TEST_MOTPRE_VV_CUE_WEIGHT,
-                    TestBasic.TEST_MOTPRE_VH_FACTOR_SPACE,
-                    TestBasic.TEST_MOTPRE_VH_FACTOR_SPEED
+                    TestBasic.TEST_MOTPRE_VH_FIXSPEED,
+                    TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT,
+                    TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL
                                                     ->  mTest = TestTTC(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
 
                     else    -> {

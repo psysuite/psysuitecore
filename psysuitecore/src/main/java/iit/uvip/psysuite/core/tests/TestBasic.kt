@@ -30,7 +30,7 @@ import org.albaspazio.core.ui.showAlert
 /*
 must contain all the possible codes
 
-TestFragment (instanciate correct TestBasic derived class and call its -> test.initTest
+TestFragment (instantiate correct TestBasic derived class and call its -> test.initTest
  */
 
 abstract class TestBasic(protected val ctx: Context,
@@ -361,8 +361,9 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_MOTPRE_VV_CUE_ARROW     = 223
         @JvmStatic val TEST_MOTPRE_VH_CUE_ARROW     = 224
         @JvmStatic val TEST_MOTPRE_VV_CUE_WEIGHT    = 225
-        @JvmStatic val TEST_MOTPRE_VH_FACTOR_SPACE  = 226
-        @JvmStatic val TEST_MOTPRE_VH_FACTOR_SPEED  = 227
+        @JvmStatic val TEST_MOTPRE_VH_FIXSPEED      = 226
+        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVT= 227
+        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVPL= 228
 
 
         //-----------------------------------------------------------------------------------------

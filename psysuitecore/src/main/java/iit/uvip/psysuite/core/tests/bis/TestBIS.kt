@@ -202,9 +202,9 @@ class TestBIS(
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
 
-    private val nQuestTrials                = 30
+    private val nAdaptiveTrials             = 40
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
-    private val taskADAParams               = TaskADAParams(400.0F, nQuestTrials+10)
+    private val taskADAParams               = TaskADAParams(400.0F, nAdaptiveTrials)
     private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
     // =============================================================================================================================
@@ -346,7 +346,7 @@ class TestBIS(
     private fun createTrialsAdaptive():List<TrialBasic>{
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
-        for (i in 0 until nQuestTrials/2){
+        for (i in 0 until (nAdaptiveTrials-10)/2){
             trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, true , CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, isADA=true))
             trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, false, CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, isADA=true))
         }

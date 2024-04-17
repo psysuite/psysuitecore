@@ -94,9 +94,9 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
         createResponseButton("press", layout, onPress)
         createEndPoint()
-        createTarget(trial.imageId, trial.distance)
+        createTarget(trial.imageId, trial.TPL)
 
-        Log.d("PARAMS", "ishoriz=${isHorizontal}, dist=${trial.distance}, speed=${trial.pxPerMs}, targetx=${mViewTarget.x}, targety=${mViewTarget.y}, endx=${mViewEnd.x}, endy=${mViewEnd.y}")
+        Log.d("PARAMS", "ishoriz=${isHorizontal}, dist=${trial.TPL}, speed=${trial.SP}, targetx=${mViewTarget.x}, targety=${mViewTarget.y}, endx=${mViewEnd.x}, endy=${mViewEnd.y}")
 //        createFrame()
     }
 
@@ -129,8 +129,8 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
 
     fun movePoint(elapsed:Long) {
 
-        val step =  if(isDownRight) round(mTargetStartPos + mTrial.pxPerMs*elapsed).toFloat()
-                    else            round(mTargetStartPos - mTrial.pxPerMs*elapsed).toFloat()
+        val step =  if(isDownRight) round(mTargetStartPos + mTrial.SP*elapsed).toFloat()
+                    else            round(mTargetStartPos - mTrial.SP*elapsed).toFloat()
 
         if(isHorizontal)    mViewTarget.x = step
         else                mViewTarget.y = step
@@ -169,7 +169,7 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
             }
 
             setBackgroundColor(context.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+            setTextAppearance(R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(context.resources.getColor(R.color.colorPrimary))
         }
         mRespButton.setOnClickListener {

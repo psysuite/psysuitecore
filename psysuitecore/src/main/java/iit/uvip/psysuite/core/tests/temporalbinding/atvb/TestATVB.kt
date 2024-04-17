@@ -252,9 +252,9 @@ class TestATVB(
     private var allQuestions:MutableList<String> = mutableListOf()
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.blue_circle)
 
-    private val nQuestTrials                = 30
+    private val nAdaptiveTrials             = 40
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
-    private val taskADAParams               = TaskADAParams(1200.0F, nQuestTrials+10)
+    private val taskADAParams               = TaskADAParams(1200.0F, nAdaptiveTrials)
     private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
     // =============================================================================================================================

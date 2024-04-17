@@ -15,7 +15,6 @@ import iit.uvip.psysuite.core.stimuli.StimuliManager.Companion.STIM_TYPE_T1
 import iit.uvip.psysuite.core.stimuli.TactileManager
 import iit.uvip.psysuite.core.stimuli.VibratorNotDefinedException
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.ISI_INF
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.STIM_DURATION
@@ -30,17 +29,16 @@ import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.
 import iit.uvip.psysuite.core.tests.temporalbinding.BindingsConstants.Companion.unbalSD
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsInfants
 import iit.uvip.psysuite.core.tests.temporalbinding.TrialBindingsUnBalanced
-import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
+import iit.uvip.psysuite.core.trials.FixedTrialsManager
+import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.CorrectedStimuliDelay
 import iit.uvip.psysuite.core.utility.StimulusATBInfants
 import iit.uvip.psysuite.core.utility.StimulusDelay
-
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
-
 import kotlin.math.roundToInt
 
 
@@ -139,9 +137,9 @@ class TestATB(ctx: Context,
 
     private val amplitude = 100
 
-    private val nQuestTrials                = 30
+    private val nAdaptiveTrials             = 40
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
-    private val taskADAParams               = TaskADAParams(1200.0F, nQuestTrials+10)
+    private val taskADAParams               = TaskADAParams(1200.0F, nAdaptiveTrials)
     private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
     private var vibration_trains_timings: MutableList<LongArray>    = mutableListOf()
