@@ -21,6 +21,7 @@ import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.trials.TrialBasic
+import iit.uvip.psysuite.core.trials.TrialsManager
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import iit.uvip.psysuite.core.utility.ConditionData
 import io.reactivex.Observable
@@ -56,7 +57,8 @@ class TestTTC(ctx: Context,
                 else                    -> true
             }
         } else {
-            TODO("VERSION.SDK_INT < R")
+//            TODO("VERSION.SDK_INT < R")
+            true
         }
     }
 
@@ -93,10 +95,6 @@ class TestTTC(ctx: Context,
             listOf(TEST_NEXTTRIAL_NOCHOOSE),
             listOf(TEST_NEXTTRIAL_NOCHOOSE),
             listOf(TEST_NEXTTRIAL_NOCHOOSE),
-//            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-//            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-//            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-//            listOf(TEST_NEXTTRIAL_NOCHOOSE)
         )
     }
 
@@ -127,10 +125,15 @@ class TestTTC(ctx: Context,
     // TASK CONSTANT SPEED
     private var fixedDistance:Int               = round(parent_layout_height*0.75).toInt()
     private var fixedDuration:Long              = 2250L     // default motion time
-    private val mPercInvisibility:List<Float>   = listOf(0.6F, 0.4F, 0.25F, 0F)     // percentage of invisible trajectory (at costant speed, we have constant distance)
+    private val mPercVisibility:List<Float>     = listOf(0.0F, 0.2F, 0.35F, 0.6F)     // percentage of visible trajectory (at costant speed, we have constant distance)
+    private val mMinVisibility:Float            = 0.4F
+    private val mRangeVisibilityFSP:Float       = 0.6F
+
 
     // TASK VARYING SPEED
-    private val mSpeeds:List<Float>             = listOf(0.36F, 0.4F, 0.45F, 0.51F)
+    private val mSpeeds:List<Float>             = listOf(0F, 0.04F, 0.09F, 0.15F)
+    private val mMinSpeed:Float                 = 0.36F
+    private val mRangeSpeed:Float               = 0.15F
 
     // ========> fixed VT & IPL
     // reference movement : 900 px in 2250 ms (0.4 px/ms)
@@ -180,6 +183,7 @@ class TestTTC(ctx: Context,
     private var disposableTimer: Disposable?    = null
 
     private val nAdaptiveTrials                 = 30
+    private val nMinMagnitude:Float             = 0.01F
     private val adoParams                       = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
     private lateinit var taskADAParams: TaskADAParams
     private lateinit var adoWrapper:AdaptiveWrapper
@@ -216,12 +220,13 @@ class TestTTC(ctx: Context,
                         else -> {
 
                             val range:Float = when(subject.type){
-                                TEST_MOTPRE_VH_VARSPEED_FIXVT -> 1.0F
-                                TEST_MOTPRE_VH_VARSPEED_FIXVPL -> 1.0F
-                                else -> fixedDuration*mPercInvisibility[0]    // TEST_MOTPRE_VH_FIXSPEED
+                                TEST_MOTPRE_VH_VARSPEED_FIXVT,
+                                TEST_MOTPRE_VH_VARSPEED_FIXVPL  -> mRangeSpeed
+                                TEST_MOTPRE_VH_FIXSPEED         -> mRangeVisibilityFSP    //
+                                else -> throw Exception("TestTTC:initTest. unrecognized subject.type")
                             }
                             
-                            taskADAParams = TaskADAParams(range, nAdaptiveTrials)
+                            taskADAParams = TaskADAParams(range, nAdaptiveTrials, nMinMagnitude)
                             adoWrapper    = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
 
                             val trman = AdaptiveTrialsManager(createAdaptiveTrials() as MutableList<TrialBasic>, adoWrapper)
@@ -263,56 +268,98 @@ class TestTTC(ctx: Context,
         }
     }
 
+    private fun createAdaptiveTrials():List<TrialBasic> {
+        return when (subject.type) {
+            TEST_MOTPRE_VH_FIXSPEED         -> createFT_adaptive_VH_FIXSPEED()
+            TEST_MOTPRE_VH_VARSPEED_FIXVT   -> createFT_adaptive_VH_VARSPEED_VT_IPL(fixedVT, fixedIPL) //mDurationsVT_IPL, mDistancesVT_IPL)
+            TEST_MOTPRE_VH_VARSPEED_FIXVPL  -> createFT_adaptive_VH_VARSPEED_VPL_IT(fixedIT, fixedVPL) //mDurationsVPL_IT, mDistancesVPL_IT)
+            else                            -> throw IllegalArgumentException("Should not happen. given test code was not recognized")
+        }
+    }
+
     // VISUAL - HORIZONTAL -> RIGHT - CHANGE INVISIBILITY ONSET
     // 2 x 1direction x 4lat x 8rep + 8 test@zero + 3 test = 75  -> 17 trials for one direction, for each (4) latencies + 7 at 0-latency
     private fun createFT_VH_FIXSPEED():List<TrialBasic> {
 
         val alltrials:MutableList<TrialBasic> = mutableListOf()
 
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
 
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercInvisibility[2], fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercInvisibility[1], fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercInvisibility[0], fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[2], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[1], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[0], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
 
         val trials: MutableList<TrialBasic> = mutableListOf()
 
         for (i in 0 until TRIALS_BLOCK_NREP) {
             trials.clear()
-            for(l in mPercInvisibility){
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, l, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, l, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
+            for(l in mPercVisibility){
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, l, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, l, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
             }
             trials.shuffle()
             alltrials.addAll(trials)
         }
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+
+        return alltrials
+    }
+
+    // VISUAL - HORIZONTAL -> RIGHT - CHANGE INVISIBILITY ONSET
+    // 4(start) + 4(end) catch + 3 fixed + 40 adaptive
+    private fun createFT_adaptive_VH_FIXSPEED():List<TrialBasic> {
+
+        val alltrials:MutableList<TrialBasic> = mutableListOf()
+
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[2], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[1], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[2], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[1], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mPercVisibility[0], fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+
+        val trials: MutableList<TrialBasic> = mutableListOf()
+
+        trials.clear()
+        for (i in 0 until nAdaptiveTrials)
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true, isADA=true))
+
+        trials.shuffle()
+        alltrials.addAll(trials)
+
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        alltrials.add(TrialTTC(-1, subject.type, mTestLabel, mRangeVisibilityFSP, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
 
         return alltrials
     }
 
     // VISUAL - HORIZONTAL -> RIGHT - CHANGE TARGET SPEED, FIXED VT and IPL
-    // 2 x 1direction x 4lat x 8rep + 16 test@zero with different speed = 80  -> 16 trials for one direction, for each (4) speed + 16 at 0-latency
+    // 4 catch + 8*(8+1catch) + 4catch = 16 catch + 16 per each of 4 speeds = 80
     // catches have IPL=0 e VT == TT = mDurationsVT_IPL[i-th]
     private fun createFT_VH_VARSPEED_VT_IPL(vt:Long, ipl:Int):List<TrialBasic> { //durations:List<Long>, distances:List<Int>):List<TrialBasic> {
 
-        // these trials are inserted within valid trials
+        // these 8 trials are inserted within valid trials
         val catchtrials:MutableList<TrialBasic> = mutableListOf()
         mSpeeds.mapIndexed{ i, speed ->
-            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, mDurationsVT_IPL[i], 0, mDrawablesResource[0], true, true))
-            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, mDurationsVT_IPL[i], 0, mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))
         }
         catchtrials.shuffle()
 
         // first 4 trials are catch trials
         val alltrials:MutableList<TrialBasic> = mutableListOf()
-        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, mDurationsVT_IPL[i], 0, mDrawablesResource[0], true, true))}
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))}
         alltrials.shuffle()
 
         val trials: MutableList<TrialBasic> = mutableListOf()
@@ -321,8 +368,8 @@ class TestTTC(ctx: Context,
             trials.clear()
 
             mSpeeds.map{
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, it, vt, ipl, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, it, vt, ipl, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, it + mMinSpeed, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, it + mMinSpeed, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true))
             }
             trials.add(catchtrials.removeFirst())
             trials.shuffle()
@@ -332,13 +379,53 @@ class TestTTC(ctx: Context,
 
         // last 4 trials are catch trials
         trials.clear()
-        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, mDurationsVT_IPL[i], 0, mDrawablesResource[0], true, true))}
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))}
         trials.shuffle()
 
         alltrials.addAll(trials)
         return alltrials
     }
 
+    // 4 catch + 8*(5+1catch) + 4catch = 16 catch + 40 adaptive = 56
+    private fun createFT_adaptive_VH_VARSPEED_VT_IPL(vt:Long, ipl:Int):List<TrialBasic> { //durations:List<Long>, distances:List<Int>):List<TrialBasic> {
+
+        // these trials are inserted within valid trials
+        val catchtrials:MutableList<TrialBasic> = mutableListOf()
+        mSpeeds.mapIndexed{ i, speed ->
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))
+        }
+        catchtrials.shuffle()
+
+        // first 4 trials are catch trials
+        val alltrials:MutableList<TrialBasic> = mutableListOf()
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))}
+        alltrials.shuffle()
+
+        val trials: MutableList<TrialBasic> = mutableListOf()
+
+        // 8 blocks of 5+1 trials each
+        for (i in 0 until nAdaptiveTrials/5) {
+            trials.clear()
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true, isADA=true))
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true, isADA=true))
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true, isADA=true))
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true, isADA=true))
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, vt, ipl, mMinSpeed, mDrawablesResource[0], true, true, isADA=true))
+            trials.add(catchtrials.removeFirst())
+            trials.shuffle()
+
+            alltrials.addAll(trials)
+        }
+
+        // last 4 trials are catch trials
+        trials.clear()
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, mDurationsVT_IPL[i], 0, mMinSpeed, mDrawablesResource[0], true, true))}
+        trials.shuffle()
+
+        alltrials.addAll(trials)
+        return alltrials
+    }
 
     // catches have IT=0 e VPL == TPL = mDistancesVPL_IT[i-th]
     private fun createFT_VH_VARSPEED_VPL_IT(_it:Long, vpl:Int):List<TrialBasic> { //durations:List<Long>, distances:List<Int>):List<TrialBasic> {
@@ -346,14 +433,14 @@ class TestTTC(ctx: Context,
         // these trials are inserted within valid trials
         val catchtrials:MutableList<TrialBasic> = mutableListOf()
         mSpeeds.mapIndexed{ i, speed -> 
-            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, 0, mDistancesVPL_IT[i], mDrawablesResource[0], true, true))
-            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, 0, mDistancesVPL_IT[i], mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))
         }
         catchtrials.shuffle()
 
         // first 4 trials are catch trials
         val alltrials:MutableList<TrialBasic> = mutableListOf()
-        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, 0, mDistancesVPL_IT[i], mDrawablesResource[0], true, true))}
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))}
         alltrials.shuffle()
 
         val trials: MutableList<TrialBasic> = mutableListOf()
@@ -362,8 +449,8 @@ class TestTTC(ctx: Context,
             trials.clear()
 
             mSpeeds.map{
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, it, _it, vpl, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, it, _it, vpl, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, it + mMinSpeed, _it, vpl, mMinSpeed, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, it + mMinSpeed, _it, vpl, mMinSpeed, mDrawablesResource[0], true, true))
             }
             trials.add(catchtrials.removeFirst())
             trials.shuffle()
@@ -373,84 +460,114 @@ class TestTTC(ctx: Context,
 
         // last 4 trials are catch trials
         trials.clear()
-        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed, 0, mDistancesVPL_IT[i], mDrawablesResource[0], true, true))}
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))}
         trials.shuffle()
 
         alltrials.addAll(trials)
         return alltrials
     }
 
+    // catches have IT=0 e VPL == TPL = mDistancesVPL_IT[i-th]
+    private fun createFT_adaptive_VH_VARSPEED_VPL_IT(_it:Long, vpl:Int):List<TrialBasic> { //durations:List<Long>, distances:List<Int>):List<TrialBasic> {
 
+        // these trials are inserted within valid trials
+        val catchtrials:MutableList<TrialBasic> = mutableListOf()
+        mSpeeds.mapIndexed{ i, speed ->
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))
+            catchtrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))
+        }
+        catchtrials.shuffle()
 
-    private fun createAdaptiveTrials():List<TrialBasic>{
-        val trials:MutableList<TrialBasic> = mutableListOf()
-        return trials
+        // first 4 trials are catch trials
+        val alltrials:MutableList<TrialBasic> = mutableListOf()
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))}
+        alltrials.shuffle()
+
+        val trials: MutableList<TrialBasic> = mutableListOf()
+            // 8 blocks of 5+1 trials each
+        for (i in 0 until nAdaptiveTrials/5) {
+            trials.clear()
+            trials.add(TrialTTC(-1, subject.type, mTestLabel, TrialsManager.ADAPTIVE_VALUE, _it, vpl, mMinSpeed, mDrawablesResource[0], true, true, isADA = true))
+
+            trials.add(catchtrials.removeFirst())
+            trials.shuffle()
+
+            alltrials.addAll(trials)
+        }
+
+        // last 4 trials are catch trials
+        trials.clear()
+        mSpeeds.mapIndexed{ i, speed -> alltrials.add(TrialTTC(-1, subject.type, mTestLabel, speed + mMinSpeed, 0, mDistancesVPL_IT[i], mMinSpeed, mDrawablesResource[0], true, true))}
+        trials.shuffle()
+
+        alltrials.addAll(trials)
+        return alltrials
     }
 
     private fun createTrialsDebug():List<TrialBasic>{
         val trials:MutableList<TrialBasic> = mutableListOf()
 
         // no cue
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[3], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[4], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[5], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[6], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[5], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[6], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[3], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[4], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[7], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[7], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[7], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[7], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[7], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[7], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[7], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[7], false, false))
 
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[0], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[1], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[2], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[3], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[4], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[5], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[6], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[5], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[6], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[3], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[4], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, false))
 
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[4], true, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[5], false, true))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[6], true, false))
-        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), fixedDuration, fixedDistance, mDrawablesResource[3], false, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], true, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], false, true))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], true, false))
+        trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, fixedDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], false, false))
 
         return trials
     }
@@ -464,11 +581,11 @@ class TestTTC(ctx: Context,
             val trials: MutableList<TrialBasic> = mutableListOf()
 
             for(l in mPercInvisibility){
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
 
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
             }
             trials.shuffle()
             alltrials.addAll(trials)
@@ -484,11 +601,11 @@ class TestTTC(ctx: Context,
             val trials: MutableList<TrialBasic> = mutableListOf()
 
             for(l in mPercInvisibility){
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
 
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
             }
 
             trials.shuffle()
@@ -502,12 +619,12 @@ class TestTTC(ctx: Context,
 
         val catch_trials = mutableListOf<TrialBasic>()
         for (i in 0 until 2) {
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[4], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[6], false, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[6], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[4], false, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[4], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[6], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[4], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
         }
         catch_trials.shuffle()
 
@@ -517,17 +634,17 @@ class TestTTC(ctx: Context,
             val trials: MutableList<TrialBasic> = mutableListOf()
 
             for(l in mPercInvisibility){
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
 
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], true, false))
 
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
 
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
 
             }
 
@@ -543,12 +660,12 @@ class TestTTC(ctx: Context,
 
         val catch_trials = mutableListOf<TrialBasic>()
         for (i in 0 until 2) {
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[3], true, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[5], true, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[5], true, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[3], true, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[7], true, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[7], true, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[7], true, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[7], true, false))
         }
         catch_trials.shuffle()
 
@@ -563,12 +680,12 @@ class TestTTC(ctx: Context,
             for(l in mPercInvisibility){
 
                 // congruent
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[3], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[5], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, false))
 
                 // incongruent
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[5], true, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[3], true, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, false))
 
                 // neutral
                 trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[7], true, true))
@@ -579,12 +696,12 @@ class TestTTC(ctx: Context,
             trials.shuffle()
             alltrials.addAll(trials)
         }
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[3], true, true))
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[5], true, false))
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[3], true, false))
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[5], true, true))
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[7], true, false))
-        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[7], true, true))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, true))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, false))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[3], true, false))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[5], true, true))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[7], true, false))
+        alltrials.add(0, TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mDrawablesResource[7], true, true))
 
         return alltrials
     }
@@ -595,12 +712,12 @@ class TestTTC(ctx: Context,
 
         val catch_trials = mutableListOf<TrialBasic>()
         for (i in 0 until 2) {
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[4], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[6], false, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[6], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[4], false, false))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0.toFloat(), movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, false))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+            catch_trials.add(TrialTTC(-1, subject.type, mTestLabel, 0F, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
         }
         catch_trials.shuffle()
         
@@ -615,12 +732,12 @@ class TestTTC(ctx: Context,
             for(l in mPercInvisibility){
 
                 // congruent
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[4], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[6], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, false))
 
                 // incongruent
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[6], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[4], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[6], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[4], false, false))
 
                 // neutral
                 trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[7], false, true))
@@ -640,16 +757,16 @@ class TestTTC(ctx: Context,
             val trials: MutableList<TrialBasic> = mutableListOf()
             for(l in mPercInvisibility){
                 // light
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[1], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[1], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[1], false, false))
 
                 // heavy
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[2], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[2], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[2], false, false))
 
                 // neutral
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, true))
-                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mDrawablesResource[0], false, false))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, true))
+                trials.add(TrialTTC(-1, subject.type, mTestLabel, movementDuration*l, movementDuration, fixedDistance, mMinVisibility, mDrawablesResource[0], false, false))
             }
             trials.shuffle()
             alltrials.addAll(trials)
@@ -669,7 +786,7 @@ class TestTTC(ctx: Context,
     override fun onTrialEnd(){
 
         stopPolling()
-        onAnswerGiven(trialEndMs.toInt(), trialEndMs.toInt())
+        onAnswerGiven(trialEndMs.toInt(), trialEndMs)
 
         mStimuliHandler.removeCallbacksAndMessages(null)
         mScenario.clearScenario()
@@ -696,7 +813,7 @@ class TestTTC(ctx: Context,
             }, waitInterval)   // after waitInterval, start moving
 
             mStimuliHandler.postDelayed({
-                if(trial.magnitude == 0F)   {
+                if(trial.isCatch)   {
                         mScenario.setToEnd()
                         stopPolling()
                         mStimuliHandler.postDelayed({ mScenario.hidePoint() },200L)
@@ -720,15 +837,12 @@ class TestTTC(ctx: Context,
 
         disposableTimer = Observable.interval(iti, iti, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    run {
-                        val elapsed = uptimeMillis() - trialStartMs
-                        mScenario.movePoint(elapsed)
-                    }
+            .subscribe {
+                run {
+                    val elapsed = uptimeMillis() - trialStartMs
+                    mScenario.movePoint(elapsed)
                 }
-//                , { _: Throwable  -> {} }
-            )
+            }
     }
 
     private fun stopPolling() {

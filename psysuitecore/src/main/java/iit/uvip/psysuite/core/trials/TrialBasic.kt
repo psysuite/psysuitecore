@@ -8,10 +8,11 @@ open class TrialBasic(var id:Int=-1, val type:Int, protected val label:String=""
 
     var user_answer:Int             = -1
     var repetitions:Int             =  1
-    var elapsed:Int                 = -1
+    var elapsed:Long                = -1
+    var prev_trial: TrialBasic?     = null
     var user_answer_extra:String    = ""
     open var correct_answer:Int     = 0
-    var success:Boolean             =  false    // result of comparison between correct and user answer
+    var success:Boolean             = false    // result of comparison between correct and user answer
 
     // value actually given to the subject
     // this properties shall be overridden in all the tasks that need to manipulate magnitude (e.g. temporal bisection)
@@ -27,11 +28,12 @@ open class TrialBasic(var id:Int=-1, val type:Int, protected val label:String=""
         return "lab=$label, type=$type, stim_value=$stim_value, corr_answ=$correct_answer"
     }
 
-    open fun setResponse(result: Int, elapsedms: Int, extra_text:String = "") {
+    open fun setResponse(result: Int, elapsedms: Long, prev_tr: TrialBasic? = null, extra_text:String="") {
         user_answer         = result
         elapsed             = elapsedms
-        user_answer_extra   = extra_text
+        prev_trial          = prev_tr
         success             = (result == correct_answer)
+        user_answer_extra   = extra_text
     }
 
     // update the magnitude value and return the value actually given to the subject

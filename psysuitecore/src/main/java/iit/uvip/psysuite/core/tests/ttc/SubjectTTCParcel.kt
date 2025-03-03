@@ -25,10 +25,10 @@ class SubjectTTCParcel(
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
 
     override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
-    override var whitenoise: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
-    override var showResult: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var canRepeat:Int = TestBasic.TEST_SWITCH_CHOOSE_OFF
+    override var whitenoise: Int = TestBasic.TEST_SWITCH_DISABLED,
+    override var trman_type: Int = TestBasic.TEST_TRMAN_CHOOSE_FIXED,
+    override var showResult: Int = TestBasic.TEST_SWITCH_DISABLED,
+    override var canRepeat:Int = TestBasic.TEST_SWITCH_DISABLED
 ) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat)
 
 

@@ -2,17 +2,18 @@ package iit.uvip.psysuite.core.model.summary
 
 import iit.uvip.psysuite.core.trials.TrialBasic
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 open class SummaryRow(val type:Int, val label:String, val sub_label:String = ""){
 
     protected var ntrial:Int              = 0
-    protected var rt:Int                  = 0
+    protected var rt:Long                 = 0
     protected var perc_succ:Int           = 0
 
     open fun close(){
 
         if(ntrial > 0){
-            rt                  = ((rt*1F)/ntrial).roundToInt()
+            rt                  = ((rt*1F)/ntrial).roundToLong()
             perc_succ           = (((perc_succ*1F)/ntrial)*100F).roundToInt()
         }
     }

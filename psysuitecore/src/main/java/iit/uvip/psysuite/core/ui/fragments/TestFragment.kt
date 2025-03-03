@@ -12,14 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.Navigation
-
-import java.util.*
-import kotlin.reflect.KFunction
-
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentTestBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
@@ -28,7 +20,6 @@ import iit.uvip.psysuite.core.tests.beads.TestBeads
 import iit.uvip.psysuite.core.tests.bis.TestBIS
 import iit.uvip.psysuite.core.tests.fgi.TestFGI
 import iit.uvip.psysuite.core.tests.mmd.TestMMD
-import iit.uvip.psysuite.core.tests.ttc.TestTTC
 import iit.uvip.psysuite.core.tests.rivgrp.TestRIVGRP
 import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
 import iit.uvip.psysuite.core.tests.sample.TestSample
@@ -39,8 +30,11 @@ import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
+import iit.uvip.psysuite.core.tests.ttc.TestTTC
 import iit.uvip.psysuite.core.utility.TestResult
-
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import org.albaspazio.core.accessory.*
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
@@ -49,6 +43,8 @@ import org.albaspazio.core.speech.SpeechRecognitionManager
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.ui.showToast
+import java.util.*
+import kotlin.reflect.KFunction
 
 /*
 Three operative modalities (mSubjectParcel.nextTrailModality):
@@ -114,7 +110,7 @@ class TestFragment : BaseFragment(
         @JvmStatic val EVENT_TIME_TO_ANSWER:String      = "answer_time"
         @JvmStatic val EVENT_ANSWER_RESULT_EXTRA:String = "answer_result_extra"
 
-        fun newIntent(resp:Int, elapsedTime:Int, resp_id:Int, resp_extra:String=""): Intent {
+        fun newIntent(resp:Int, elapsedTime:Long, resp_id:Int, resp_extra:String=""): Intent {
             val intent = Intent()
             intent.putExtra(EVENT_ANSWER_RESULT, resp)
             intent.putExtra(EVENT_TIME_TO_ANSWER, elapsedTime)
@@ -556,7 +552,7 @@ class TestFragment : BaseFragment(
                 when (data?.getIntExtra(EVENT_ANSWER_CODE, 0)) {
                     TestBasic.EVENT_ANSWER_GIVEN -> {
                         val result      = data.getIntExtra(EVENT_ANSWER_RESULT, -1)
-                        val elapsedTime = data.getIntExtra(EVENT_TIME_TO_ANSWER, -1)
+                        val elapsedTime = data.getLongExtra(EVENT_TIME_TO_ANSWER, -1)
                         val result_extra= data.getStringExtra(EVENT_ANSWER_RESULT_EXTRA) ?: ""
                         onAnswerGiven(result, elapsedTime, result_extra)
                     }
@@ -625,7 +621,7 @@ class TestFragment : BaseFragment(
     }
 
     // called by: 1) onActivityResult after answer, 2) speechrecognition result
-    private fun onAnswerGiven(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
+    private fun onAnswerGiven(result:Int = -1, elapsed:Long = -1, extra_text:String=""){
 
         // dont' know whether an answer dialog was present or it was listening for vocal response or it was playbacking something. stop all!
         abortRecognition = true
@@ -635,7 +631,7 @@ class TestFragment : BaseFragment(
         }
         closeAnswerDialog()
 
-        mTest.onAnswerGiven(prev_result, elapsed, extra_text)
+        mTest.onAnswerGiven(result, elapsed, extra_text)
         // close trial (e.g. set answer) & check whether it was the last => test ended
         mTest.onNextTrial()
     }

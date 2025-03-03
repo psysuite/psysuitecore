@@ -169,7 +169,7 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
             }
 
             setBackgroundColor(context.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(context.resources.getColor(R.color.colorPrimary))
         }
         mRespButton.setOnClickListener {

@@ -164,7 +164,7 @@ class AnswerDialogFragmentTFI: DialogFragment()
         else    sendResult(curr_answer, elapsedms, TestBasic.EVENT_ANSWER_GIVEN)
     }
 
-    private fun sendResult(response: Int, elapsedTime: Int, response_id: Int) {
+    private fun sendResult(response: Int, elapsedTime:Long, response_id: Int) {
         if (targetFragment == null) return
 
         tts?.stop()

@@ -34,16 +34,17 @@ abstract class TrialsManager(val type:Int = 0, val mTrials:MutableList<TrialBasi
             mTrials[currTrial] = value
         }
 
-    open val mPrevTrial:TrialBasic
-        get() = mTrials[prevTrial]
+    open val mPrevTrial:TrialBasic?
+        get() = if(currTrial == 0)  null
+                else                mTrials[currTrial - 1]
 
-    // used in Quest managers to set the first value
+    // used in Adaptive managers to set the first value
     open fun getStimulus():Long{
         return mTrial.stim_value
     }
 
-    open fun setResponse(result:Int, elapsedms:Int, extra_text:String = ""){
-        mTrial.setResponse(result, elapsedms, extra_text)
+    open fun setResponse(result:Int, elapsedms:Long, extra_text:String=""){
+        mTrial.setResponse(result, elapsedms, mPrevTrial, extra_text)
     }
 
     protected fun setTrialsID(){  mTrials.mapIndexed { index, trialBasic -> trialBasic.id = index } }

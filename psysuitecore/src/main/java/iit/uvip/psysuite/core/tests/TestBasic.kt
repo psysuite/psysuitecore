@@ -93,9 +93,9 @@ abstract class TestBasic(protected val ctx: Context,
         show(mTrial, true)
     }
 
-    open fun onAnswerGiven(prev_result: Int = -1, elapsed: Int = -1, extra_text:String = ""){
-        if (prev_result != -1 || extra_text != ""){
-            mTrialsManager.setResponse(prev_result, elapsed, extra_text)
+    open fun onAnswerGiven(result: Int = -1, elapsed: Long = -1, extra_text: String = ""){
+        if (result != -1 || extra_text.isNotEmpty()){
+            mTrialsManager.setResponse(result, elapsed, extra_text)
             mSummary?.add(mTrial)
         }
     }

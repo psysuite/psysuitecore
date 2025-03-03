@@ -129,8 +129,10 @@
 
     <string name="label_bindings" translatable="false">Temporal Bindings</string>
     <string name="label_temporal_tests">Temporal Tests</string>
+    <string name="label_various_tests">Various Tests</string>
     <string name="label_decision_tests">Decisions Tests</string>
     <string name="label_illusion_tests">Illusions Tests</string>
+    <string name="label_prediction_tests">Prediction Tests</string>
 
     <!-- ATB -->
     <string name="start_atb" translatable="false">AT Binding (AT-B)</string>

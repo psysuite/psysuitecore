@@ -3,8 +3,8 @@ object Configs {
     const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
 
-    const val compileSdkVersion = 32
-    const val minSdkVersion     = 30
+    const val compileSdkVersion = 34
+    const val minSdkVersion     = 26
     const val targetSdkVersion  = 26
 }
 
@@ -31,7 +31,7 @@ object Versions {
 
 
     // iit.uvip.psysuite.core
-    const val chaquopy          = "14.0.2"
+    const val chaquopy          = "16.0.0"
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
     const val recycleView       = "1.2.1"
@@ -59,7 +59,7 @@ object Versions {
 
 object Dependencies {
 
-    const val permissions       = "com.intentfilter:android-permissions:${Versions.permissions}"
+    const val permissions       = "io.github.nishkarsh:android-permissions:${Versions.permissions}"
 
     object AndroidX {
 

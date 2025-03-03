@@ -156,7 +156,7 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
     }
 
     // last point of the exit/dismiss procedure
-    protected fun sendResult(response: Int, elapsedTime: Int, response_id: Int) {
+    protected fun sendResult(response:Int, elapsedTime:Long, response_id:Int) {
         if (targetFragment == null) return
 
         tts?.stop()

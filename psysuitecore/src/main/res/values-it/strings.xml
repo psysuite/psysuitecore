@@ -328,5 +328,7 @@
     <string name="trials_fixed">fissi</string>
     <string name="trials_adaptive">adattativi</string>
     <string name="sequence">sequenza</string>
+    <string name="label_prediction_tests">Test di Predizione</string>
+    <string name="label_various_tests">Test Vari</string>
 
 </resources>

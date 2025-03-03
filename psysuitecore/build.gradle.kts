@@ -59,5 +59,6 @@ dependencies {
     implementation(Dependencies.Moshi.moshiKt)
 
 
-
+    implementation("androidx.test.ext:junit-ktx:1.2.1")
+    testImplementation("junit:junit:4.13.2")
 }

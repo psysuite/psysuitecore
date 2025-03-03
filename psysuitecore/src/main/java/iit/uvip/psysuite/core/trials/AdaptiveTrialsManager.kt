@@ -21,13 +21,10 @@ import iit.uvip.psysuite.python.SPython
 open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper: AdaptiveWrapper):TrialsManager(TestBasic.TEST_TRMAN_ADAPTIVE, trials) {
 
     private val sPy:SPython = SPython.getInstance(null)     // singleton already initialized in TestFragment, here I dont'need a Context
-
-    protected val wrapperClass:PyObject
-
-    val range:Float
+    private val wrapperClass:PyObject
+    private val range:Float
 
     init {
-
         range                   = adaptiveWrapper.params.range
 
         val adaptparams_dict    = sPy.class2dict(adaptiveWrapper.qparams)
@@ -36,21 +33,41 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
         wrapperClass            = sPy.instanciate(adaptiveWrapper.module, adaptiveWrapper.classname, adaptparams_dict, taskparams_dict)
     }
 
-    // increment trial, get new value, update with new value and return it
-    override fun getNewTrial():TrialBasic {
+        /**
+     * Sets the response for the current trial. Even If the trial is not adaptive, it  updates the model with the response / magnitude pair.
+     * TestBasic::OnAnswerGiven ->TrialsManager::setResponse
+     * @param result The result of the trial.
+     * @param elapsedms The time taken to complete the trial.
+     * @param prev_res result of previous trial.
+     */
+    override fun setResponse(result: Int, elapsedms: Long, extra_text: String): Unit {
+        mTrial.setResponse(result, elapsedms, mPrevTrial, extra_text)
+//        if (mTrial.isADA)
+        wrapperClass.callAttr("set", mTrial.success, mTrial.magnitude)
+    }
+
+    /**
+     * Increment the current trial and get a new stimulus value.
+     * This method is responsible for updating the current trial, retrieving a new stimulus value, and returning the updated trial.
+     *
+     * @return The updated trial with a new stimulus value.
+     */
+    override fun getNewTrial(): TrialBasic {
         val prev_resp = mTrial.user_answer
         val prev_succ = mTrial.success
 
         currTrial++
-
         val newvalue = getStimulus()
-
         Log.d("QUEST_VALUE", "${newvalue} , prev resp: $prev_resp , prev succ: $prev_succ")
 
         return mTrial
     }
 
-    // get next stim value from adaptive model and update current trial
+    /**
+     * Get the next stimulus value. If the trial is adaptive, get it from the adaptive model and update the current trial.
+     *
+     * @return The next stimulus value.
+     */
     override fun getStimulus():Long{
         return  if(mTrial.isADA) {
                     var magn = wrapperClass.callAttr("get").toFloat()
@@ -59,10 +76,5 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
                     mTrial.updateTrial(magn)
                 }
                 else    mTrial.stim_value
-    }
-
-    override fun setResponse(result: Int, elapsedms: Int, extra_text:String){
-        mTrial.setResponse(result, elapsedms)   // it updates mTrial.success
-        if(mTrial.isADA)   wrapperClass.callAttr("set", mTrial.success, mTrial.magnitude)
     }
 }

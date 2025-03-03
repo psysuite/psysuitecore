@@ -1,5 +1,6 @@
 package iit.uvip.psysuite.core.tests.ttc
 
+import android.util.Log
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.trials.TrialBasic
 import org.albaspazio.core.accessory.round
@@ -9,65 +10,93 @@ import kotlin.math.round
 // distance in px
 // magnitude is the distance from correctTime = dist/speed (e.g. 250),
 // stim_value is the temporal distance from start (e.g. 1000-magnitude=750ms) when target must disappear (VT)
-open class TrialTTC(id:Int=-1, type:Int, label:String,
-                    final override var magnitude:Float,
+class TrialTTC(id:Int=-1, type:Int, label:String,
+                    override var magnitude:Float,
                     time:Long,
                     distance:Int,
+                    val minMagnitude:Float,
                     val imageId:Int, val isHoriz:Boolean=true, val isDownRight:Boolean=true, isADA:Boolean=false): TrialBasic(id, type, label, isADA=isADA) {
-    var TT:Long
-    var VT:Long
-    var IT:Long
+    var TT:Long = 0
+    var VT:Long = 0
+    var IT:Long = 0
 
-    var TPL:Int
-    var VPL:Int
-    var IPL:Int
+    var TPL:Int = 0
+    var VPL:Int = 0
+    var IPL:Int = 0
 
-    var SP:Double
-
-    private var error:Int = 0
+    var SP:Double = 0.0
 
     override val stim_value: Long
         get() = VT
 
+    var isCatch:Boolean = false
+
     companion object {
-        @JvmStatic val LOG_HEADER = "id\tlabel\tvis_time\tisHor\tis_dr\tres\terror\tspeed\tdist\ttime\timageid\n"
+        @JvmStatic val LOG_HEADER = "id\tlabel\tvis_time\tisHor\tis_dr\tres\tspeed\tdist\ttime\timageid\n"
     }
 
     init {
         when(type){
             TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT  -> {
-                SP  = magnitude.toDouble()
                 VT  = time
                 IPL = distance
-                VPL = round(SP*VT).toInt()
-                IT  = round(IPL/SP).toLong()
-                TPL = VPL + IPL
-                TT  = VT + IT
             }
             TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL -> {
-                SP  = magnitude.toDouble()
                 IT  = time
                 VPL = distance
-                IPL = round(SP*IT).toInt()
-                VT  = round(VPL/SP).toLong()
-                TPL = VPL + IPL
-                TT  = VT + IT
             }
             else -> {    // TestBasic.TEST_MOTPRE_VH_FIXSPEED
-                TPL = distance
                 TT  = time
-                SP  = TPL/TT.toDouble()
-                IPL = (magnitude*TPL).toInt()
-                IT  = (magnitude*TT).toLong()
-                VPL = TPL - IPL
-                VT  = TT - IT
+                TPL = distance
             }
         }
         updateTrial(magnitude)
     }
+
+    override fun updateTrial(newvalue:Float):Long {
+        magnitude       = newvalue
+
+        when(type){
+            TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT  -> {
+                SP  = (magnitude+minMagnitude).toDouble()
+                VPL = round(SP*VT).toInt()
+                IT  = round(IPL/SP).toLong()
+
+                TPL = VPL + IPL
+                TT  = VT + IT
+            }
+            TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL -> {
+                SP  = (magnitude+minMagnitude).toDouble()
+                IPL = round(SP*IT).toInt()
+                VT  = round(VPL/SP).toLong()
+
+                TPL = VPL + IPL
+                TT  = VT + IT
+            }
+            else -> {    // TestBasic.TEST_MOTPRE_VH_FIXSPEED
+                SP  = TPL/TT.toDouble()
+                VPL = ((magnitude+minMagnitude)*TPL).toInt()
+                VT  = ((magnitude+minMagnitude)*TT).toLong()
+
+                IPL = TPL - VPL
+                IT  = TT - VT
+            }
+        }
+        isCatch = (VPL == TPL)
+
+        correct_answer  = 0
+        return stim_value
+    }
+
+
+
     // all class exported as string
     override fun toString():String{
-        return "$id\t$label\t$stim_value\t$isHoriz\t$isDownRight\t$user_answer\t$error\t${SP.round(3)}\t$TPL\t$TT\t$imageId"
+        return "$id\t$label\t$stim_value\t$isHoriz\t$isDownRight\t$user_answer\t${SP.round(3)}\t$TPL\t$TT\t$imageId"
+    }
+
+    fun toStringShort():String{
+        return "sval=$stim_value\t,error=$user_answer\t, vel=${SP.round(3)}\t, ipl=$IPL"
     }
 
     // data exported to log file
@@ -79,8 +108,36 @@ open class TrialTTC(id:Int=-1, type:Int, label:String,
         return "${super.debugInfo()}, pos=$stim_value, is_oriz=$isHoriz, is_down_right=$isDownRight"
     }
 
-    override fun setResponse(result: Int, elapsedms: Int, extra_text:String) {
-        super.setResponse(result, elapsedms, extra_text)
-        error = (result - TT).toInt()
+    // success is true if the present error is smaller than the previous one
+    // if first trial, success is always true
+    override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
+        user_answer         = (result - TT).toInt()
+        elapsed             = elapsedms
+        prev_trial          = prev_tr
+
+//        var delta           = 0
+        success = if(prev_tr!= null){
+//                    if(prev_tr.isADA && isADA){
+                    val delta = user_answer - prev_tr.user_answer
+                    val succ = (user_answer <= prev_tr.user_answer)
+                    Log.d("TrialTTC", "--------------------------------------------")
+                    Log.d("TrialTTC", "delta=$delta,  success=$succ, curr_error=$user_answer, prev_error=${prev_tr.user_answer}, ")
+                    Log.d("TrialTTC", "magn=${magnitude}, vpl=$VPL,  ipl=$IPL")
+                    succ
+//                    }
+//                    else true
+                  }
+                  else    true
+
+
+//        success             =   if(prev_tr != null) {
+//
+//                                }else{
+//                                    delta = 0
+//                                    true
+//                                }
+
+        user_answer_extra   = extra_text
+
     }
 }
