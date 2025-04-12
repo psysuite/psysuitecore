@@ -286,14 +286,19 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_RT_TACTILE              = 2
         @JvmStatic val TEST_RT_VISUAL               = 3
 
-        @JvmStatic val TEST_BISECTION_AUDIO         = 100
-        @JvmStatic val TEST_BISECTION_TACTILE       = 101
-        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE = 102
-        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL  = 103
-        @JvmStatic val TEST_BISECTION_VISUAL        = 104
-        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE= 105
+        @JvmStatic val TEST_BISECTION_AUDIO                 = 100
+        @JvmStatic val TEST_BISECTION_TACTILE               = 101
+        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE         = 102
+        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL          = 103
+        @JvmStatic val TEST_BISECTION_VISUAL                = 104
+        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE        = 105
+        @JvmStatic val TEST_BISECTION_AUDIO_SUPRA           = 106
+        @JvmStatic val TEST_BISECTION_TACTILE_SUPRA         = 107
+        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE_SUPRA   = 108
+        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL_SUPRA    = 109
+        @JvmStatic val TEST_BISECTION_VISUAL_SUPRA          = 110
+        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE_SUPRA  = 111
 
-        @JvmStatic val TEST_MUSICAL_METERS          = 110
 
         @JvmStatic val TEST_TID_SHORT_AUDIO         = 120
         @JvmStatic val TEST_TID_SHORT_TACTILE       = 121
@@ -365,6 +370,21 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVT= 227
         @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVPL= 228
 
+        @JvmStatic val TEST_TSP_A_SUB               = 230
+        @JvmStatic val TEST_TSP_V_SUB               = 231
+        @JvmStatic val TEST_TSP_T_SUB               = 232
+        @JvmStatic val TEST_TSP_A_SUPRA             = 233
+        @JvmStatic val TEST_TSP_V_SUPRA             = 234
+        @JvmStatic val TEST_TSP_T_SUPRA             = 235
+
+        @JvmStatic val TEST_TIR_A_SUB               = 240
+        @JvmStatic val TEST_TIR_V_SUB               = 241
+        @JvmStatic val TEST_TIR_T_SUB               = 242
+        @JvmStatic val TEST_TIR_A_SUPRA             = 243
+        @JvmStatic val TEST_TIR_V_SUPRA             = 244
+        @JvmStatic val TEST_TIR_T_SUPRA             = 245
+
+        @JvmStatic val TEST_MUSICAL_METERS          = 250
 
         //-----------------------------------------------------------------------------------------
         @JvmStatic val TEST_ABORTED_KEEP_RESULT         = 1000

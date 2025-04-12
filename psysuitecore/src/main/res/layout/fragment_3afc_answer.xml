@@ -7,7 +7,7 @@
         tools:context=".ui.fragments.answers.TwoAFCAnswerDialogFragment">
 
 
-    <ImageButton
+    <Button
         android:id="@+id/bt_clear"
         android:layout_width="95dp"
         android:layout_height="75dp"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline13"
         app:srcCompat="@drawable/repeat_icon" />
 
-    <ImageButton
+    <Button
         android:id="@+id/bt_confirm"
         android:layout_width="96dp"
         android:layout_height="69dp"

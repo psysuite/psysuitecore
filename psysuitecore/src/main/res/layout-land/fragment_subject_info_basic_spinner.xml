@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="185dp" />
+        app:layout_constraintGuide_end="153dp" />
 
     <TextView
         android:id="@+id/labName"
@@ -207,24 +207,27 @@
         app:layout_constraintTop_toTopOf="@+id/guideline20" />
 
 
-    <ImageButton
+    <Button
         android:id="@+id/bt_clear"
+        android:text="@string/reset"
+
         android:layout_width="121dp"
         android:layout_height="63dp"
-        android:layout_marginStart="180dp"
-        android:layout_marginTop="30dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="12dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
+        app:layout_constraintStart_toEndOf="@+id/bt_cancel"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
-    <ImageButton
+    <Button
         android:id="@+id/bt_confirm"
+        android:text="@string/start"
         android:layout_width="130dp"
         android:layout_height="62dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="164dp"
-        android:background="@android:color/transparent"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="172dp"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@drawable/green_tick" />
@@ -232,15 +235,14 @@
     <Button
         android:id="@+id/bt_cancel"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="371dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="120dp"
+        android:background="@color/design_default_color_error"
+        android:layout_width="196dp"
+        android:layout_height="62dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="12dp"
         android:text="@string/cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline18"

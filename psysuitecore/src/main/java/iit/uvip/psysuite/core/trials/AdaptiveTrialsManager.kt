@@ -22,10 +22,9 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
 
     private val sPy:SPython = SPython.getInstance(null)     // singleton already initialized in TestFragment, here I dont'need a Context
     private val wrapperClass:PyObject
-    private val range:Float
+    private val range:Float = adaptiveWrapper.params.range
 
     init {
-        range                   = adaptiveWrapper.params.range
 
         val adaptparams_dict    = sPy.class2dict(adaptiveWrapper.qparams)
         val taskparams_dict     = sPy.class2dict(adaptiveWrapper.params)
@@ -34,7 +33,7 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
     }
 
         /**
-     * Sets the response for the current trial. Even If the trial is not adaptive, it  updates the model with the response / magnitude pair.
+     * Sets the response for the current trial. Even If the trial is not adaptive, it updates the model with the response / magnitude pair.
      * TestBasic::OnAnswerGiven ->TrialsManager::setResponse
      * @param result The result of the trial.
      * @param elapsedms The time taken to complete the trial.

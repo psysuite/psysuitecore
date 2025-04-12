@@ -49,7 +49,7 @@ class TestBIS(
         @JvmStatic val QUESTION_DELAY                   = 1500      // latency
         @JvmStatic val FIRST_STIMULUS_DELAY             = 1000L     // ms to wait before sending the first trial
         @JvmStatic val LAST_STIMULUS_DELAY              = 1000L     // ms of the third stimulus wrt first
-        @JvmStatic val MID_LATENCY                      = 500L      // ms of the mid latecny
+        @JvmStatic val LAST_STIMULUS_DELAY_SUPRA        = 4000L     // ms of the third stimulus wrt first
 
         @JvmStatic val TRIAL_STAGE_1                    = 1
         @JvmStatic val TRIAL_STAGE_2                    = 2
@@ -61,7 +61,7 @@ class TestBIS(
         @JvmStatic val STIMULUS_TYPE_TACTILE            = "TACTILE"
         @JvmStatic val STIMULUS_TYPE_VISUAL             = "VISUAL"
         @JvmStatic val STIMULUS_TYPE_AUDIO_TACTILE      = "AUDIO_TACTILE"
-        @JvmStatic val STIMULUS_TYPE_AUDIO_VISUAL        = "AUDIO_VIDEO"
+        @JvmStatic val STIMULUS_TYPE_AUDIO_VISUAL       = "AUDIO_VIDEO"
         @JvmStatic val STIMULUS_TYPE_VISUAL_TACTILE     = "VIDEO_TACTILE"
 
         @JvmStatic val STIMULUS_TYPE_AUDIO_LOG          = "A"
@@ -74,28 +74,43 @@ class TestBIS(
         @JvmStatic val STIMULUS_TYPE_VISUAL_TACTILE_LOG = "VT"
         @JvmStatic val STIMULUS_TYPE_TACTILE_VISUAL_LOG = "TV"
 
+        @JvmStatic val SUPRA_CONDITION                  = "SUPRA"
         @JvmStatic val CONFLICT_TYPE_NONE               = "none"
 
         fun getConditionsInfo(ctx: Context): List<ConditionData>{
             return if(VibrationManager.sysHasVibrator(ctx))
                 mutableListOf(
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO           , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG"           , Populations.hearing_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_TACTILE         , TEST_BISECTION_TACTILE         , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_TACTILE_LOG"         , Populations.all_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_VISUAL          , TEST_BISECTION_VISUAL          , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG"          , Populations.sighted_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_TACTILE   , TEST_BISECTION_AUDIO_TACTILE   , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_TACTILE_LOG"   , Populations.hearing_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VISUAL     , TEST_BISECTION_AUDIO_VISUAL    , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG"    , Populations.sighted_hearing_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_VISUAL_TACTILE  , TEST_BISECTION_VISUAL_TACTILE  , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_TACTILE_LOG"  , Populations.sighted_populations))
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}"           , TEST_BISECTION_AUDIO           , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG"           , Populations.hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}"         , TEST_BISECTION_TACTILE         , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_TACTILE_LOG"         , Populations.all_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}"          , TEST_BISECTION_VISUAL          , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG"          , Populations.sighted_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_TACTILE}"   , TEST_BISECTION_AUDIO_TACTILE   , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_TACTILE_LOG"   , Populations.hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_VISUAL}"    , TEST_BISECTION_AUDIO_VISUAL    , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG"    , Populations.sighted_hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_TACTILE}"  , TEST_BISECTION_VISUAL_TACTILE  , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_TACTILE_LOG"  , Populations.sighted_populations),
+
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${SUPRA_CONDITION}"           , TEST_BISECTION_AUDIO_SUPRA           , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG${SUPRA_CONDITION}"           , Populations.hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE}_${SUPRA_CONDITION}"         , TEST_BISECTION_TACTILE_SUPRA         , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_TACTILE_LOG${SUPRA_CONDITION}"         , Populations.all_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${SUPRA_CONDITION}"          , TEST_BISECTION_VISUAL_SUPRA          , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG${SUPRA_CONDITION}"          , Populations.sighted_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_TACTILE}_${SUPRA_CONDITION}"   , TEST_BISECTION_AUDIO_TACTILE_SUPRA   , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_TACTILE_LOG${SUPRA_CONDITION}"   , Populations.hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_VISUAL}_${SUPRA_CONDITION}"    , TEST_BISECTION_AUDIO_VISUAL_SUPRA    , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG${SUPRA_CONDITION}"    , Populations.sighted_hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_TACTILE}_${SUPRA_CONDITION}"  , TEST_BISECTION_VISUAL_TACTILE_SUPRA  , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_TACTILE_LOG${SUPRA_CONDITION}"  , Populations.sighted_populations))
+
             else
                 mutableListOf(
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO           , TEST_BISECTION_AUDIO          , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG"           , Populations.hearing_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_VISUAL          , TEST_BISECTION_VISUAL          , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG"          , Populations.sighted_populations),
-                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VISUAL     , TEST_BISECTION_AUDIO_VISUAL    , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG"     , Populations.sighted_hearing_populations))
+                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO                              , TEST_BISECTION_AUDIO                  , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG"                         , Populations.hearing_populations),
+                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_VISUAL                             , TEST_BISECTION_VISUAL                 , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG"                        , Populations.sighted_populations),
+                    ConditionData(TEST_BASIC_LABEL + "_" + STIMULUS_TYPE_AUDIO_VISUAL                       , TEST_BISECTION_AUDIO_VISUAL           , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG"                  , Populations.sighted_hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO}_${SUPRA_CONDITION}"           , TEST_BISECTION_AUDIO_SUPRA            , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_LOG${SUPRA_CONDITION}"       , Populations.hearing_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL}_${SUPRA_CONDITION}"          , TEST_BISECTION_VISUAL_SUPRA           , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_VISUAL_LOG${SUPRA_CONDITION}"      , Populations.sighted_populations),
+                    ConditionData("${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_VISUAL}_${SUPRA_CONDITION}"    , TEST_BISECTION_AUDIO_VISUAL_SUPRA     , "${TEST_BASIC_LABEL}$STIMULUS_TYPE_AUDIO_VISUAL_LOG${SUPRA_CONDITION}", Populations.sighted_hearing_populations))
         }
+
         fun getNextTrialModes(ctx: Context):List<List<Int>>{
             return if(VibrationManager.sysHasVibrator(ctx))
-                listOf(listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
+                listOf( listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),
+                        listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
             else
-                listOf(listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
+                listOf( listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),
+                        listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER),listOf(TEST_NEXTTRIAL_ANSWER))
         }
     }
 
@@ -197,15 +212,19 @@ class TestBIS(
     private var STIM_VT = STIM_V or STIM_T
 
     private var conflictType:String = ""
+    private var lastStimulusDelay:Long = 0L
+    private var midLatency:Long = 0L
+
     private var currStimulus:String = ""
-    private var currStimulusDuration2:Long     = 0L          // default value to be used when second stimulus duration in not given
+    private var currStimulusDuration2:Long     = 0L          // default value to be used when second stimulus duration is not given
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
 
     private val nAdaptiveTrials             = 40
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
-    private val taskADAParams               = TaskADAParams(400.0F, nAdaptiveTrials)
-    private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
+
+    lateinit private var taskADAParams:TaskADAParams
+    lateinit private var adoWrapper:AdaptiveWrapper
 
     // =============================================================================================================================
     // INIT
@@ -218,14 +237,25 @@ class TestBIS(
         }
         validAnswers = mutableListOf(ctx.resources.getString(R.string.bisection_rb1_text), ctx.resources.getString(R.string.bisection_rb3_text))
 
+        lastStimulusDelay = if(subject.type > TEST_BISECTION_AUDIO_VISUAL) {
+                                taskADAParams   = TaskADAParams(600.0F, nAdaptiveTrials)
+                                LAST_STIMULUS_DELAY_SUPRA
+                            }
+                            else {
+                                taskADAParams = TaskADAParams(400.0F, nAdaptiveTrials)
+                                LAST_STIMULUS_DELAY
+                            }
+        midLatency = lastStimulusDelay / 2
+        adoWrapper = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
+
         // set mQuestion/ currStimulusDuration/ currStimulusDuration2/ currStimulusLabel
         when (subject.type) {
-            TEST_BISECTION_AUDIO            -> initBisectionAudio()
-            TEST_BISECTION_TACTILE          -> initBisectionTactile()
-            TEST_BISECTION_VISUAL           -> initBisectionVisual()
-            TEST_BISECTION_AUDIO_TACTILE    -> initBisectionAudioTactile()
-            TEST_BISECTION_AUDIO_VISUAL     -> initBisectionAudioVisual()
-            else                            -> initBisectionVisualTactile()
+            TEST_BISECTION_AUDIO, TEST_BISECTION_AUDIO_SUPRA                    -> initBisectionAudio()
+            TEST_BISECTION_TACTILE, TEST_BISECTION_TACTILE_SUPRA                -> initBisectionTactile()
+            TEST_BISECTION_VISUAL, TEST_BISECTION_VISUAL_SUPRA                  -> initBisectionVisual()
+            TEST_BISECTION_AUDIO_TACTILE, TEST_BISECTION_AUDIO_TACTILE_SUPRA    -> initBisectionAudioTactile()
+            TEST_BISECTION_AUDIO_VISUAL, TEST_BISECTION_AUDIO_VISUAL_SUPRA      -> initBisectionAudioVisual()
+            else                                                                -> initBisectionVisualTactile()
         }
 
         mTrialsManager =
@@ -233,9 +263,10 @@ class TestBIS(
                 TEST_TRMAN_FIXED -> {
                     val trials = if (!subject.isDebug)
                                     when (subject.type) {
-                                        TEST_BISECTION_AUDIO,
-                                        TEST_BISECTION_TACTILE,
-                                        TEST_BISECTION_VISUAL   -> createUnimodalTrials()
+                                        TEST_BISECTION_AUDIO, TEST_BISECTION_AUDIO_SUPRA,
+                                        TEST_BISECTION_TACTILE, TEST_BISECTION_TACTILE_SUPRA,
+                                        TEST_BISECTION_VISUAL, TEST_BISECTION_VISUAL_SUPRA
+                                                                -> createUnimodalTrials()
                                         else                    -> createBimodalTrials(subject.type)
                                     }
                                  else createTrialsDebug()
@@ -245,9 +276,10 @@ class TestBIS(
                 else ->
 
                     when (subject.type) {
-                        TEST_BISECTION_AUDIO,TEST_BISECTION_TACTILE,TEST_BISECTION_VISUAL -> {
+                        TEST_BISECTION_AUDIO,TEST_BISECTION_TACTILE,TEST_BISECTION_VISUAL,
+                        TEST_BISECTION_AUDIO_SUPRA, TEST_BISECTION_TACTILE_SUPRA, TEST_BISECTION_VISUAL_SUPRA-> {
                                 val trials = createTrialsAdaptive()
-                                val trman = AdaptiveTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
+                                val trman  = AdaptiveTrialsManager(trials as MutableList<TrialBasic>, adoWrapper)
                                 trman.getStimulus()
                                 trman
                             }
@@ -337,7 +369,7 @@ class TestBIS(
         for(section in trialsDefaultSchema)
             for(i in 0 until section.ntrials)
                 //                      id   type       label,          corr_answ, stim_value          conflict_type     duration  duration2
-                trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration))
+                trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration, mid_latency = midLatency))
 
         trials.shuffle()
         return trials
@@ -347,20 +379,20 @@ class TestBIS(
         var cnt = -1
         val trials: MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until (nAdaptiveTrials-10)/2){
-            trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, true , CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, isADA=true))
-            trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, false, CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, isADA=true))
+            trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, true , CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, mid_latency = midLatency, isADA=true))
+            trials.add(TrialBIS(++cnt, subject.type, STIMULUS_TYPE_AUDIO, TrialsManager.ADAPTIVE_VALUE, false, CONFLICT_TYPE_NONE,STIMULUS_DURATION_AUDIO, mid_latency = midLatency, isADA=true))
         }
 
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 300F, true, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 200F, true, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 100F, true, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 50F , true, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 15F , true, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 15F , false, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 50F , false, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 100F, false, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 200F, false, conflictType, currStimulusDuration, currStimulusDuration2))
-        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 300F, false, conflictType, currStimulusDuration, currStimulusDuration2))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 300F, true, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 200F, true, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 100F, true, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 50F , true, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 15F , true, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 15F , false, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 50F , false, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 100F, false, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 200F, false, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
+        trials.add(TrialBIS(-1, subject.type, currStimulusLabel, 300F, false, conflictType, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency))
 
         trials.shuffle()
         return trials
@@ -378,8 +410,8 @@ class TestBIS(
                 for(i in 0 until section.ntrials){
                     when(section.conflict == conflictType){
                         //                                 id   type        label,                   corr_answ, stim_value          conflict_type   duration       duration2
-                        true    -> trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration, currStimulusDuration2, conflict_magn=it))
-                        false   -> trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration2, currStimulusDuration, conflict_magn=it))
+                        true    -> trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration, currStimulusDuration2, mid_latency = midLatency, conflict_magn=it))
+                        false   -> trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration2, currStimulusDuration, mid_latency = midLatency, conflict_magn=it))
                     }
                 }
         }
@@ -393,13 +425,13 @@ class TestBIS(
         val trials:MutableList<TrialBasic> = mutableListOf()
         for(i in 0 until 10000){
             //                     id   type                        label,                        corr_answ, stim_value          conflict_type   duration       duration2
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, 400F, true, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_TACTILE))
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, 400F, false, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_TACTILE))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, 400F, true, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_TACTILE, mid_latency = midLatency))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_TACTILE, STIMULUS_TYPE_AUDIO_TACTILE, 400F, false, CONFLICT_TYPE_NONE, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_TACTILE, mid_latency = midLatency))
 
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, true, STIMULUS_TYPE_VISUAL_AUDIO_LOG, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_VISUAL))
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, false, STIMULUS_TYPE_VISUAL_AUDIO_LOG, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_VISUAL))
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, true, STIMULUS_TYPE_AUDIO_VISUAL_LOG, STIMULUS_DURATION_VISUAL, STIMULUS_DURATION_AUDIO))
-            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, false, STIMULUS_TYPE_AUDIO_VISUAL_LOG, STIMULUS_DURATION_VISUAL, STIMULUS_DURATION_AUDIO))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, true, STIMULUS_TYPE_VISUAL_AUDIO_LOG, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_VISUAL, mid_latency = midLatency))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, false, STIMULUS_TYPE_VISUAL_AUDIO_LOG, STIMULUS_DURATION_AUDIO, STIMULUS_DURATION_VISUAL, mid_latency = midLatency))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, true, STIMULUS_TYPE_AUDIO_VISUAL_LOG, STIMULUS_DURATION_VISUAL, STIMULUS_DURATION_AUDIO, mid_latency = midLatency))
+            trials.add(TrialBIS(-1, TEST_BISECTION_AUDIO_VISUAL, STIMULUS_TYPE_AUDIO_VISUAL, 400F, false, STIMULUS_TYPE_AUDIO_VISUAL_LOG, STIMULUS_DURATION_VISUAL, STIMULUS_DURATION_AUDIO, mid_latency = midLatency))
         }
         return trials
     }
@@ -428,7 +460,8 @@ class TestBIS(
     // + (QUESTION_DELAY + FIRST_STIMULUS_DELAY)        => event : show question
     override fun show(trial: TrialBasic, isRepeat:Boolean){
 
-        mNoise?.start()
+        if(subject.whitenoise == TestBasic.TEST_SWITCH_ENABLED) mNoise?.start()
+
         if(isRepeat)    mTrial.repetitions++
 
         // to align bimodal stimuli, I have to delay the fastest modality by time_shift ms.
@@ -436,7 +469,7 @@ class TestBIS(
         // Since this code act for every kind of stimulus combination, I assume a trimodal stim
         val time_shift = when(trial.type){
             TEST_BISECTION_AUDIO_TACTILE    -> delaysAligner.getShift(STIM_AT, 0,0,-1)
-            TEST_BISECTION_AUDIO_VISUAL      -> delaysAligner.getShift(STIM_AV, 0,-1,0)
+            TEST_BISECTION_AUDIO_VISUAL     -> delaysAligner.getShift(STIM_AV, 0,-1,0)
             else                            -> 0
         }
 
@@ -451,7 +484,7 @@ class TestBIS(
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial, TRIAL_STAGE_3)
-        }, (FIRST_STIMULUS_DELAY - time_shift + LAST_STIMULUS_DELAY))
+        }, (FIRST_STIMULUS_DELAY - time_shift + lastStimulusDelay))
 
         mStimuliHandler.postDelayed({
             onTrialEnd()

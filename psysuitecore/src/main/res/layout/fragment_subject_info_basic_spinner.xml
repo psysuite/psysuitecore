@@ -7,25 +7,6 @@
         tools:context=".ui.fragments.answers.TwoAFCAnswerDialogFragment">
 
 
-    <ImageButton
-        android:id="@+id/bt_clear"
-        android:layout_width="121dp"
-        android:layout_height="63dp"
-        android:layout_marginStart="40dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:srcCompat="@android:drawable/ic_menu_revert" />
-
-    <ImageButton
-        android:id="@+id/bt_confirm"
-        android:layout_width="130dp"
-        android:layout_height="62dp"
-        android:layout_marginEnd="24dp"
-        android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline9"
-        app:srcCompat="@drawable/green_tick" />
 
     <TextView
         android:id="@+id/labAge"
@@ -93,17 +74,6 @@
             android:text="@string/tid_rb_female_text" />
     </RadioGroup>
 
-    <Button
-        android:id="@+id/bt_cancel"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="371dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="84dp"
-        android:text="@string/cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
 
     <Spinner
@@ -252,5 +222,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
+
+    <Button
+        android:id="@+id/bt_cancel"
+        android:text="@string/cancel"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:background="@color/design_default_color_error"
+        android:layout_width="109dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline9" />
+
+    <Button
+        android:id="@+id/bt_clear"
+        android:text="@string/reset"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="102dp"
+        android:layout_height="63dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
+        app:layout_constraintStart_toEndOf="@+id/bt_cancel"
+        app:layout_constraintTop_toTopOf="@+id/guideline9"
+        app:srcCompat="@android:drawable/ic_menu_revert" />
+
+    <Button
+        android:id="@+id/bt_confirm"
+        android:text="@string/start"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="130dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline9"
+        app:srcCompat="@drawable/green_tick" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
