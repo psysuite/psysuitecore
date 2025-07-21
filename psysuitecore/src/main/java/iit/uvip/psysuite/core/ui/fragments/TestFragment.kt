@@ -126,6 +126,7 @@ class TestFragment : BaseFragment(
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTestBinding.inflate(inflater, container, false)
         mMainView = binding.root
+        setupFragmentResultListener()
         return mMainView
     }
 
@@ -143,7 +144,6 @@ class TestFragment : BaseFragment(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         super.onActivityCreated(savedInstanceState)
-
         binding.btNext.visibility      = View.INVISIBLE
         binding.btAbort.visibility     = View.INVISIBLE
         binding.btPause.visibility     = View.INVISIBLE
@@ -544,23 +544,24 @@ class TestFragment : BaseFragment(
     }
 
     // answer given or instruction given
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        // Make sure fragment codes match up
-        when(requestCode) {
-            TRG_REQ_CODE_ANSWER -> {
-
-                when (data?.getIntExtra(EVENT_ANSWER_CODE, 0)) {
-                    TestBasic.EVENT_ANSWER_GIVEN -> {
-                        val result      = data.getIntExtra(EVENT_ANSWER_RESULT, -1)
-                        val elapsedTime = data.getLongExtra(EVENT_TIME_TO_ANSWER, -1)
-                        val result_extra= data.getStringExtra(EVENT_ANSWER_RESULT_EXTRA) ?: ""
-                        onAnswerGiven(result, elapsedTime, result_extra)
-                    }
-                    TestBasic.EVENT_TRIAL_REPEAT -> mTest.repeatTrial()
-                    TestBasic.EVENT_TRIAL_ABORT -> onAbortTest()
+    private fun setupFragmentResultListener() {
+        // Listener for answer results
+        parentFragmentManager.setFragmentResultListener(TRG_REQ_CODE_ANSWER.toString(), viewLifecycleOwner) { requestKey, result ->
+            when (result.getInt(EVENT_ANSWER_CODE, 0)) {
+                TestBasic.EVENT_ANSWER_GIVEN -> {
+                    val res         = result.getInt(EVENT_ANSWER_RESULT, -1)
+                    val elapsedTime = result.getLong(EVENT_TIME_TO_ANSWER, -1)
+                    val result_extra= result.getString(EVENT_ANSWER_RESULT_EXTRA) ?: ""
+                    onAnswerGiven(res, elapsedTime, result_extra)
                 }
+                TestBasic.EVENT_TRIAL_REPEAT -> mTest.repeatTrial()
+                TestBasic.EVENT_TRIAL_ABORT -> onAbortTest()
             }
-            TRG_REQ_CODE_INSTRUCTIONS -> startTest()
+        }
+
+        // Listener for instructions
+        parentFragmentManager.setFragmentResultListener(TRG_REQ_CODE_INSTRUCTIONS.toString(), viewLifecycleOwner) { requestKey, _ ->
+            startTest()
         }
     }
 

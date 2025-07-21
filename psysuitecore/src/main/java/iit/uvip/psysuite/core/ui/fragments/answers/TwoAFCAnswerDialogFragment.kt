@@ -16,6 +16,10 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.Fragment2afcAnswerBinding
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_CODE
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_RESULT
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_RESULT_EXTRA
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_TIME_TO_ANSWER
 
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.speech.SpeechManager
@@ -113,15 +117,15 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
         if(canRepeat == TestBasic.TEST_SWITCH_ENABLED){
             binding.btClear.visibility     = View.VISIBLE
-            binding.btClear.setOnClickListener{     sendResult(-1, 0, TestBasic.EVENT_TRIAL_REPEAT) }
+            binding.btClear.setOnClickListener { sendResult(-1, 0, TestBasic.EVENT_TRIAL_REPEAT) }
         }
         else{
             binding.btClear.visibility     = View.INVISIBLE
             binding.btClear.setOnClickListener(null)
         }
 
-        binding.btConfirm.setOnClickListener{   confirm()}
-        binding.btAbortTest.setOnClickListener{ abort() }
+        binding.btConfirm.setOnClickListener {   confirm()}
+        binding.btAbortTest.setOnClickListener { abort() }
     }
 
     protected open fun confirm(){
@@ -157,12 +161,16 @@ open class TwoAFCAnswerDialogFragment: DialogFragment()
 
     // last point of the exit/dismiss procedure
     protected fun sendResult(response:Int, elapsedTime:Long, response_id:Int) {
-        if (targetFragment == null) return
 
         tts?.stop()
 
-        val intent = TestFragment.newIntent(response, elapsedTime, response_id)
-        targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+        val bundle = Bundle().apply {
+            putInt(EVENT_ANSWER_CODE, response_id)
+            putInt(EVENT_ANSWER_RESULT, response)
+            putLong(EVENT_TIME_TO_ANSWER, elapsedTime)
+            putString(EVENT_ANSWER_RESULT_EXTRA, "")
+        }
+        parentFragmentManager.setFragmentResult(targetRequestCode.toString(), bundle)
         dismiss()
     }
 

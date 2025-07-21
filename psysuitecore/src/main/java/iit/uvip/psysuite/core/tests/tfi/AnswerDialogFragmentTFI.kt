@@ -1,6 +1,5 @@
 package iit.uvip.psysuite.core.tests.tfi
 
-import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -12,6 +11,10 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentAnswerTfiBinding
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_CODE
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_RESULT
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_ANSWER_RESULT_EXTRA
+import iit.uvip.psysuite.core.ui.fragments.TestFragment.Companion.EVENT_TIME_TO_ANSWER
 import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -165,12 +168,16 @@ class AnswerDialogFragmentTFI: DialogFragment()
     }
 
     private fun sendResult(response: Int, elapsedTime:Long, response_id: Int) {
-        if (targetFragment == null) return
 
         tts?.stop()
 
-        val intent = TestFragment.newIntent(response, elapsedTime, response_id)
-        targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+        val bundle = Bundle().apply {
+            putInt(EVENT_ANSWER_CODE, response_id)
+            putInt(EVENT_ANSWER_RESULT, response)
+            putLong(EVENT_TIME_TO_ANSWER, elapsedTime)
+            putString(EVENT_ANSWER_RESULT_EXTRA, "")
+        }
+        parentFragmentManager.setFragmentResult(targetRequestCode.toString(), bundle)
         dismiss()
     }
 

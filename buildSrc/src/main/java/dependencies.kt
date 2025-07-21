@@ -40,7 +40,7 @@ object Versions {
     const val kotlin = "1.6.10"
     const val ktxCore = "1.7.0"
     const val appCompat = "1.5.1"
-    const val androidLibrary = "7.2.0"
+    const val androidLibrary = "7.4.2"
     const val kparcelablePlugin = "1.7.0"
     const val constraintLayout = "2.1.4"
     const val material = "1.6.1"

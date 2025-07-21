@@ -124,7 +124,7 @@ class TestAVB(ctx: Context,
 
     private val EVENT_SECOND_TRAIN          = 1201
 
-    private val nAdaptiveTrials             = 40
+    private val nAdaptiveTrials             = 88
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
     private val taskADAParams               = TaskADAParams(1200.0F, nAdaptiveTrials)
     private val adoWrapper:AdaptiveWrapper  = AdaptiveWrapper("adopywrapper.AdopyWrapper", "AdopyWrapper", adoParams, taskADAParams)
@@ -223,7 +223,7 @@ class TestAVB(ctx: Context,
         getConditionsInfo(ctx).map {
             if (it.id == subject.type) mTestLabel = it.label
         }
-        if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx)
+        if(mTestLabel.isEmpty()) showToast("Should not happen. given test code was not recognized", ctx) // TODO: manage this case
 
         if (subject.whitenoise > TEST_SWITCH_CHOOSE_OFF)    mNoise = AudioManager.getAudioResource(ctx, "wnoise_20s", 0.01f)
 
@@ -284,22 +284,23 @@ class TestAVB(ctx: Context,
     }
 
     // only-A & only-T were removed in single stimulus sub-task. 7/8/2020
+    // trials reduced from 280 -> 140 for psysuite 2 paper. 17/7/2025
     private fun createTrialsTimeSingle():List<TrialBasic>{
         var cnt = -1
         val trials:MutableList<TrialBasic> = mutableListOf()
         for (i in 0 until NUM_REPETITIONS) {
             val rtrials: MutableList<TrialBindingsUnBalanced> = mutableListOf()
-            for (j in 0 until 2) {
+//            for (j in 0 until 2) {
 
-                // 2
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0.0F))
-                rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0.0F))
+            // 2
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0.0F))
+            rtrials.add(TrialBindingsUnBalanced(++cnt, TYPE_AV, 0.0F))
 
-                // 26
-                lStimuliUnBalanced.map {
-                    rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.magnitude))
-                }
+            // 26
+            lStimuliUnBalanced.map {
+                rtrials.add(TrialBindingsUnBalanced(++cnt, it.type, it.magnitude))
             }
+//            }
             rtrials.shuffle()
             trials.addAll(rtrials)
         }
@@ -348,7 +349,7 @@ class TestAVB(ctx: Context,
         return trials
     }
 
-    // 18 fixed + 32 adaptive
+    // 18 fixed + 64 adaptive = 82 trials
     private fun createTrialsAdaptiveSingle():List<TrialBasic>{
         var cnt = -1
         val trials:MutableList<TrialBasic> = mutableListOf()
@@ -376,7 +377,7 @@ class TestAVB(ctx: Context,
         trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_V, 800.0F))
         trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_A, 800.0F))
 
-        // 32
+        // 64
         for (j in 0 until 32) {
             trials.add(TrialBindingsUnBalanced(++cnt, TYPE_A_V, 0.0F, isADA = true))
             trials.add(TrialBindingsUnBalanced(++cnt, TYPE_V_A, 0.0F, isADA = true))

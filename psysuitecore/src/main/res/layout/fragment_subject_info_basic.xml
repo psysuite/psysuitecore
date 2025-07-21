@@ -114,8 +114,8 @@
 
     <Spinner
         android:id="@+id/spCondition"
-        android:layout_width="220dp"
-        android:layout_height="28dp"
+        android:layout_width="148dp"
+        android:layout_height="29dp"
         android:layout_marginEnd="20dp"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"
@@ -123,7 +123,7 @@
 
     <TextView
         android:id="@+id/labTrialManager"
-        android:layout_width="150dp"
+        android:layout_width="130dp"
         android:layout_height="27dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="45dp"
@@ -144,7 +144,7 @@
 
     <Switch
         android:id="@+id/swWhiteNoise"
-        android:layout_width="150dp"
+        android:layout_width="130dp"
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="85dp"
@@ -164,7 +164,7 @@
 
     <Switch
         android:id="@+id/swInteractive"
-        android:layout_width="150dp"
+        android:layout_width="130dp"
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="125dp"
@@ -197,37 +197,40 @@
         app:layout_constraintGuide_begin="220dp" />
 
 
-
     <Button
         android:id="@+id/bt_cancel"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_width="101dp"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:background="@color/design_default_color_error"
         android:text="@string/cancel"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
     <Button
         android:id="@+id/bt_confirm"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_width="109dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="16dp"
         android:background="@color/teal_700"
         android:text="@string/start"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
     <Button
         android:id="@+id/bt_clear"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="100dp"
-        android:layout_height="60dp"
+        android:layout_width="73dp"
+        android:layout_height="50dp"
         android:background="@color/colorPrimary"
         android:text="@string/reset"
+        android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
+        app:layout_constraintHorizontal_bias="0.375"
         app:layout_constraintStart_toEndOf="@+id/bt_cancel"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 

@@ -117,14 +117,14 @@ class TestBIS(
     // contains : stimulus type & delay
     private var trialsDefaultSchema:List<StimuliSetBIS> = listOf(
         StimuliSetBIS(4, 300F, true, CONFLICT_TYPE_NONE),
-        StimuliSetBIS(6, 200F, true, CONFLICT_TYPE_NONE),
+        StimuliSetBIS(5, 200F, true, CONFLICT_TYPE_NONE),
         StimuliSetBIS(6, 100F, true, CONFLICT_TYPE_NONE),
-        StimuliSetBIS(4, 50F, true, CONFLICT_TYPE_NONE),
+        StimuliSetBIS(5, 50F, true, CONFLICT_TYPE_NONE),
         StimuliSetBIS(2, 15F, true, CONFLICT_TYPE_NONE),
         StimuliSetBIS(2, 15F, false, CONFLICT_TYPE_NONE),
-        StimuliSetBIS(4, 50F, false, CONFLICT_TYPE_NONE),
+        StimuliSetBIS(5, 50F, false, CONFLICT_TYPE_NONE),
         StimuliSetBIS(6, 100F, false, CONFLICT_TYPE_NONE),
-        StimuliSetBIS(6, 200F, false, CONFLICT_TYPE_NONE),
+        StimuliSetBIS(5, 200F, false, CONFLICT_TYPE_NONE),
         StimuliSetBIS(4, 300F, false, CONFLICT_TYPE_NONE)
     )
 
@@ -220,7 +220,7 @@ class TestBIS(
 
     override var mDrawablesResource: MutableList<Int> = mutableListOf(R.drawable.white_circle, R.drawable.red_circle, R.drawable.grey_circle, R.drawable.blue_circle)
 
-    private val nAdaptiveTrials             = 40
+    private val nAdaptiveTrials             = 88
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
 
     lateinit private var taskADAParams:TaskADAParams
@@ -300,7 +300,8 @@ class TestBIS(
                                 StimuliManager(
                                     AudioManager(STIM_A, audioResources[STIMULUS_DURATION_AUDIO] ?: "t1000hz_50ms.wav",  duration = STIMULUS_DURATION_AUDIO, handler = mStimuliHandler, ctx = ctx),
                                     TactileManager(vibrator, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler),
-                                    VisualManager(STIM_V, mImageView!!, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler),
+                                    VisualManager(STIM_V,
+                                        mImageView!!, mDrawablesResource[1], mDrawablesResource[0], duration = STIMULUS_DURATION_VISUAL, handler = mStimuliHandler),
                                     delaysAligner, ctx, mStimuliHandler)
                             else
                                 StimuliManager(
@@ -363,13 +364,16 @@ class TestBIS(
     // =============================================================================================================================
     // CREATE TRIALS
     // =============================================================================================================================
+    // 88 trials
     private fun createUnimodalTrials():List<TrialBasic>{
 
         val trials:MutableList<TrialBasic> = mutableListOf()
         for(section in trialsDefaultSchema)
-            for(i in 0 until section.ntrials)
+            for(i in 0 until section.ntrials){
                 //                      id   type       label,          corr_answ, stim_value          conflict_type     duration  duration2
                 trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration, mid_latency = midLatency))
+                trials.add(TrialBIS(-1, subject.type, currStimulusLabel, section.magnitude, section.isBefore, section.conflict, currStimulusDuration, mid_latency = midLatency))
+            }
 
         trials.shuffle()
         return trials
@@ -483,7 +487,7 @@ class TestBIS(
         }, (FIRST_STIMULUS_DELAY - time_shift + (trial as TrialBIS).stim_value))
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(trial, TRIAL_STAGE_3)
+            deliverStimulus(trial as TrialBIS, TRIAL_STAGE_3)
         }, (FIRST_STIMULUS_DELAY - time_shift + lastStimulusDelay))
 
         mStimuliHandler.postDelayed({
