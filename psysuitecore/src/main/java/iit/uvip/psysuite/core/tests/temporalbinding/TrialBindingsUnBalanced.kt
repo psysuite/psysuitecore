@@ -4,7 +4,7 @@ import iit.uvip.psysuite.core.trials.TrialBasic
 
 
 //                     trial_id    0-8      "none"
-class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, final override var magnitude:Float, isADA:Boolean=false):
+class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, override var magnitude:Float, isADA:Boolean=false):
     TrialBasic(id, type, "", isADA=isADA) {
 
     companion object {
@@ -12,7 +12,7 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, final override var magnitud
     }
 
     init {
-        updateTrial(magnitude)
+        setupTrial(magnitude)
     }
 
     // all class exported as string
@@ -29,7 +29,7 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, final override var magnitud
         return "${super.debugInfo()}, delay=$stim_value"
     }
 
-    override fun updateTrial(newvalue: Float): Long {
+    override fun setupTrial(newvalue: Float): Long {
         magnitude       = newvalue
         correct_answer  =   if(magnitude == 0.0F)   0
                             else                    1

@@ -107,55 +107,14 @@
     </RadioGroup>
 
 
-
     <Spinner
         android:id="@+id/spCondition"
-        android:layout_width="200dp"
+        android:layout_width="369dp"
         android:layout_height="28dp"
-        android:layout_marginTop="88dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="128dp"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Switch
-        android:id="@+id/swInteractive"
-        android:layout_width="150dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="228dp"
-        android:text="@string/interactivity"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Switch
-        android:id="@+id/swShowResult"
-        android:layout_width="150dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="228dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/show_result"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Switch
-        android:id="@+id/swWhiteNoise"
-        android:layout_width="150dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="188dp"
-        android:text="@string/whitenoise"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Switch
-        android:id="@+id/swRepeatTrial"
-        android:layout_width="150dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="188dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/repeat_trial"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
     <TextView
@@ -218,17 +177,57 @@
         android:layout_width="150dp"
         android:layout_height="27dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="148dp"
+        android:layout_marginTop="176dp"
         android:text="@string/trials_management"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Switch
+        android:id="@+id/swInteractive"
+        android:layout_width="150dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="256dp"
+        android:text="@string/interactivity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Switch
+        android:id="@+id/swRepeatTrial"
+        android:layout_width="150dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="216dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/repeat_trial"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Switch
+        android:id="@+id/swWhiteNoise"
+        android:layout_width="150dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="216dp"
+        android:text="@string/whitenoise"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Switch
+        android:id="@+id/swShowResult"
+        android:layout_width="150dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="256dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/show_result"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
     <Spinner
         android:id="@+id/spTrialManager"
         android:layout_width="150dp"
         android:layout_height="28dp"
-        android:layout_marginTop="148dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="176dp"
+        android:layout_marginEnd="20dp"
         android:gravity="end"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"

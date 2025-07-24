@@ -147,7 +147,7 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
         mRespButton = AppCompatButton(context).apply {
             id              = generateViewId()
             text            = txt
-            textAlignment   = TextView.TEXT_ALIGNMENT_CENTER
+            textAlignment   = TEXT_ALIGNMENT_CENTER
             gravity         = Gravity.CENTER
             visibility      = VISIBLE
 
@@ -169,7 +169,7 @@ class ScenarioView(context: Context?, attrs: AttributeSet?) : View(context, attr
             }
 
             setBackgroundColor(context.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+//            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(context.resources.getColor(R.color.colorPrimary))
         }
         mRespButton.setOnClickListener {

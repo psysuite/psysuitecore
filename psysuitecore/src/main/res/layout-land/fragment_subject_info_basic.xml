@@ -25,14 +25,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="103dp" />
+        app:layout_constraintGuide_begin="57dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="240dp" />
+        app:layout_constraintGuide_begin="179dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline9"
@@ -64,9 +64,9 @@
 
     <RadioGroup
         android:id="@+id/radioGroupGender"
-        android:layout_width="135dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="100dp"
+        android:layout_width="128dp"
+        android:layout_height="51dp"
+        android:layout_marginEnd="84dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline6">
@@ -85,22 +85,15 @@
     </RadioGroup>
 
     <Spinner
-        android:id="@+id/spCondition"
-        android:layout_width="220dp"
-        android:layout_height="48dp"
-        android:textAlignment="textEnd"
-        app:layout_constraintStart_toEndOf="@+id/labCondition"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Spinner
         android:id="@+id/spTrialManager"
         android:layout_width="150dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="100dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginEnd="84dp"
         android:gravity="end"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+        app:layout_constraintTop_toTopOf="@+id/guideline6" />
 
     <Switch
         android:id="@+id/swWhiteNoise"
@@ -170,13 +163,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
+    <Spinner
+        android:id="@+id/spCondition"
+        android:layout_width="587dp"
+        android:layout_height="45dp"
+        android:textAlignment="textEnd"
+        app:layout_constraintStart_toEndOf="@+id/labCondition"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
     <TextView
         android:id="@+id/labTrialManager"
         android:layout_width="150dp"
         android:layout_height="28dp"
+        android:layout_marginTop="76dp"
         android:text="@string/trials_management"
-        app:layout_constraintEnd_toStartOf="@+id/spTrialManager"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+        app:layout_constraintTop_toTopOf="@+id/guideline6"
+        tools:layout_editor_absoluteX="491dp" />
 
     <Switch
         android:id="@+id/swInteractive"

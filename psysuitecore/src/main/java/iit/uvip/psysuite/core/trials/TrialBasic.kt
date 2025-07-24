@@ -11,13 +11,34 @@ open class TrialBasic(var id:Int=-1, val type:Int, protected val label:String=""
     var elapsed:Long                = -1
     var prev_trial: TrialBasic?     = null
     var user_answer_extra:String    = ""
-    open var correct_answer:Int     = 0
+    open var correct_answer:Int     = 0 // TODO: should become Any. so i can store also durations (e.g. TTC e TSP),
+                                        // TODO: must solve the fact that in 2AFC task the int regulates also
     var success:Boolean             = false    // result of comparison between correct and user answer
 
+    // - update the magnitude value
+    // - define, whether applicable (when results depends only on the present trial's user response), the correct answer
+    // - return the value actually given to the subject
+    open fun setupTrial(newvalue:Float):Long {
+        magnitude       = newvalue
+        correct_answer  = 0
+        return stim_value
+    }
+
     // value actually given to the subject
-    // this properties shall be overridden in all the tasks that need to manipulate magnitude (e.g. temporal bisection)
+    // this properties shall be overridden in all the tasks that need to control magnitude-stimulus coupling
     open val stim_value:Long
         get() = magnitude.toLong()
+
+    // - contains user response (result, elapsed, extra)
+    // calculate success
+    // this method shall be overridden in all the tasks where success also depends on previous trial (e.g. TTC, TSP)
+    open fun setResponse(result: Int, elapsedms: Long, prev_tr: TrialBasic? = null, extra_text:String="") {
+        user_answer         = result
+        elapsed             = elapsedms
+        prev_trial          = prev_tr
+        success             = (result == correct_answer)
+        user_answer_extra   = extra_text
+    }
 
     // data exported to log file
     open fun Log():String{
@@ -28,20 +49,6 @@ open class TrialBasic(var id:Int=-1, val type:Int, protected val label:String=""
         return "lab=$label, type=$type, stim_value=$stim_value, corr_answ=$correct_answer"
     }
 
-    open fun setResponse(result: Int, elapsedms: Long, prev_tr: TrialBasic? = null, extra_text:String="") {
-        user_answer         = result
-        elapsed             = elapsedms
-        prev_trial          = prev_tr
-        success             = (result == correct_answer)
-        user_answer_extra   = extra_text
-    }
-
-    // update the magnitude value and return the value actually given to the subject
-    open fun updateTrial(newvalue:Float):Long {
-        magnitude       = newvalue
-        correct_answer  = 0
-        return stim_value
-    }
 }
 
 

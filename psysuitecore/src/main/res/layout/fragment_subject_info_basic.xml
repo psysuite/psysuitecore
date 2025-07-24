@@ -114,20 +114,35 @@
 
     <Spinner
         android:id="@+id/spCondition"
-        android:layout_width="148dp"
+        android:layout_width="295dp"
         android:layout_height="29dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
-    <TextView
-        android:id="@+id/labTrialManager"
+    <Switch
+        android:id="@+id/swInteractive"
         android:layout_width="130dp"
-        android:layout_height="27dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="45dp"
-        android:text="@string/trials_management"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="168dp"
+        android:text="@string/interactivity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Switch
+        android:id="@+id/swWhiteNoise"
+        android:layout_width="130dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="128dp"
+        android:text="@string/whitenoise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
@@ -135,40 +150,30 @@
         android:id="@+id/spTrialManager"
         android:layout_width="150dp"
         android:layout_height="28dp"
-        android:layout_marginTop="39dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="84dp"
+        android:layout_marginEnd="24dp"
         android:gravity="end"
         android:textAlignment="textEnd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
     <Switch
-        android:id="@+id/swWhiteNoise"
-        android:layout_width="130dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="85dp"
-        android:text="@string/whitenoise"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
-
-    <Switch
         android:id="@+id/swRepeatTrial"
         android:layout_width="150dp"
         android:layout_height="24dp"
-        android:layout_marginTop="85dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="128dp"
+        android:layout_marginEnd="24dp"
         android:text="@string/repeat_trial"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
-    <Switch
-        android:id="@+id/swInteractive"
+    <TextView
+        android:id="@+id/labTrialManager"
         android:layout_width="130dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="125dp"
-        android:text="@string/interactivity"
+        android:layout_height="27dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="88dp"
+        android:text="@string/trials_management"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
@@ -176,8 +181,8 @@
         android:id="@+id/swShowResult"
         android:layout_width="150dp"
         android:layout_height="24dp"
-        android:layout_marginTop="125dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="168dp"
+        android:layout_marginEnd="24dp"
         android:text="@string/show_result"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
@@ -194,7 +199,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="220dp" />
+        app:layout_constraintGuide_begin="212dp" />
 
 
     <Button

@@ -26,9 +26,6 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
 
     var SP:Double = 0.0
 
-    override val stim_value: Long
-        get() = VT
-
     var isCatch:Boolean = false
 
     companion object {
@@ -50,10 +47,10 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
                 TPL = distance
             }
         }
-        updateTrial(magnitude)
+        setupTrial(magnitude)
     }
 
-    override fun updateTrial(newvalue:Float):Long {
+    override fun setupTrial(newvalue:Float):Long {
         magnitude       = newvalue
 
         when(type){
@@ -88,6 +85,36 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
         return stim_value
     }
 
+    override val stim_value: Long
+        get() = VT
+
+    // success is true if the present error is smaller than the previous one
+    // if first trial, success is always true
+    override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
+        user_answer         = (result - TT).toInt()
+        elapsed             = elapsedms
+        prev_trial          = prev_tr
+
+//        var delta           = 0
+        success = if(prev_tr!= null){
+//                    if(prev_tr.isADA && isADA){
+            val delta = user_answer - prev_tr.user_answer
+            val succ = (user_answer <= prev_tr.user_answer)
+            Log.d("TrialTTC", "--------------------------------------------")
+            Log.d("TrialTTC", "delta=$delta,  success=$succ, curr_error=$user_answer, prev_error=${prev_tr.user_answer}, ")
+            Log.d("TrialTTC", "magn=${magnitude}, vpl=$VPL,  ipl=$IPL")
+            succ
+//                    }
+//                    else true
+        }
+        else    true
+//        success             =   if(prev_tr != null) {
+//                                }else{
+//                                    delta = 0
+//                                    true
+//                                }
+        user_answer_extra   = extra_text
+    }
 
 
     // all class exported as string
@@ -106,38 +133,5 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
 
     override fun debugInfo():String{
         return "${super.debugInfo()}, pos=$stim_value, is_oriz=$isHoriz, is_down_right=$isDownRight"
-    }
-
-    // success is true if the present error is smaller than the previous one
-    // if first trial, success is always true
-    override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
-        user_answer         = (result - TT).toInt()
-        elapsed             = elapsedms
-        prev_trial          = prev_tr
-
-//        var delta           = 0
-        success = if(prev_tr!= null){
-//                    if(prev_tr.isADA && isADA){
-                    val delta = user_answer - prev_tr.user_answer
-                    val succ = (user_answer <= prev_tr.user_answer)
-                    Log.d("TrialTTC", "--------------------------------------------")
-                    Log.d("TrialTTC", "delta=$delta,  success=$succ, curr_error=$user_answer, prev_error=${prev_tr.user_answer}, ")
-                    Log.d("TrialTTC", "magn=${magnitude}, vpl=$VPL,  ipl=$IPL")
-                    succ
-//                    }
-//                    else true
-                  }
-                  else    true
-
-
-//        success             =   if(prev_tr != null) {
-//
-//                                }else{
-//                                    delta = 0
-//                                    true
-//                                }
-
-        user_answer_extra   = extra_text
-
     }
 }

@@ -17,10 +17,10 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, override var magnitude:Float,
     }
 
     init {
-        updateTrial(magnitude)
+        setupTrial(magnitude)
     }
 
-    override fun updateTrial(newvalue: Float):Long{
+    override fun setupTrial(newvalue: Float):Long{
         magnitude       = newvalue
 
         when(type){

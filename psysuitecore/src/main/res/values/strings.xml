@@ -319,9 +319,11 @@
     <string name="label_new_bead">Nuova pallina</string>
     <string name="label_choose_jar">Scegli Urna</string>
 
-
     <!-- TTC TEST -->
     <string name="label_ttc" translatable="false">TIME TO CONTACT (TTC)</string>
+
+    <!-- TSP TEST -->
+    <string name="label_tsp" translatable="false">SEQUENCE PREDICTION (TSP)</string>
 
     <!-- RT TEST -->
     <string name="RT_label">REACTION TIMES (RT)</string>

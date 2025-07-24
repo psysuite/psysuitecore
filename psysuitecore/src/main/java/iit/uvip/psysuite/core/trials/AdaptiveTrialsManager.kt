@@ -37,9 +37,9 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
      * TestBasic::OnAnswerGiven ->TrialsManager::setResponse
      * @param result The result of the trial.
      * @param elapsedms The time taken to complete the trial.
-     * @param prev_res result of previous trial.
+     * @param extra_text Additional text or information related to the response.
      */
-    override fun setResponse(result: Int, elapsedms: Long, extra_text: String): Unit {
+    override fun setResponse(result: Int, elapsedms: Long, extra_text: String) {
         mTrial.setResponse(result, elapsedms, mPrevTrial, extra_text)
 //        if (mTrial.isADA)
         wrapperClass.callAttr("set", mTrial.success, mTrial.magnitude)
@@ -72,7 +72,7 @@ open class AdaptiveTrialsManager(trials:MutableList<TrialBasic>, adaptiveWrapper
                     var magn = wrapperClass.callAttr("get").toFloat()
                     magn = magn.coerceAtMost(range)
                     magn = magn.coerceAtLeast(0.0F)
-                    mTrial.updateTrial(magn)
+                    mTrial.setupTrial(magn)
                 }
                 else    mTrial.stim_value
     }

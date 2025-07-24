@@ -30,6 +30,8 @@ import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB
 import iit.uvip.psysuite.core.tests.tfi.TestTFI
 import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
 import iit.uvip.psysuite.core.tests.tid.TestTID
+import iit.uvip.psysuite.core.tests.tir.TestTIR
+import iit.uvip.psysuite.core.tests.tsp.TestTSP
 import iit.uvip.psysuite.core.tests.ttc.TestTTC
 import iit.uvip.psysuite.core.utility.TestResult
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -104,6 +106,8 @@ class TestFragment : BaseFragment(
 
         @JvmStatic val TRG_REQ_CODE_ANSWER:Int        = 1
         @JvmStatic val TRG_REQ_CODE_INSTRUCTIONS:Int  = 2
+
+        @JvmStatic val DEFAULT_ABORT_TIME:Long  = 1000L
 
         @JvmStatic val EVENT_ANSWER_CODE:String         = "answer_code"
         @JvmStatic val EVENT_ANSWER_RESULT:String       = "answer_result"
@@ -252,7 +256,21 @@ class TestFragment : BaseFragment(
                     TestBasic.TEST_MOTPRE_VH_FIXSPEED,
                     TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT,
                     TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL
-                                                    ->  mTest = TestTTC(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
+                                                    ->  mTest = TestTTC(requireContext(),requireActivity(), this,mSubjectParcel, vibrator,binding.circleView, speechManager, mMainView)
+
+                    TestBasic.TEST_TSP_A_SUB,
+                    TestBasic.TEST_TSP_V_SUB,
+                    TestBasic.TEST_TSP_T_SUB,
+                    TestBasic.TEST_TSP_A_SUPRA,
+                    TestBasic.TEST_TSP_V_SUPRA,
+                    TestBasic.TEST_TSP_T_SUPRA      ->  mTest = TestTSP(requireContext(),requireActivity(),this,mSubjectParcel,vibrator, binding.circleView, speechManager, mMainView)
+
+                    TestBasic.TEST_TIR_A_SUB,
+                    TestBasic.TEST_TIR_V_SUB,
+                    TestBasic.TEST_TIR_T_SUB,
+                    TestBasic.TEST_TIR_A_SUPRA,
+                    TestBasic.TEST_TIR_V_SUPRA,
+                    TestBasic.TEST_TIR_T_SUPRA      ->  mTest = TestTIR(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
 
                     else    -> {
                         Log.e("TestFragment", "Test non riconosciuto")
@@ -377,32 +395,17 @@ class TestFragment : BaseFragment(
 
                     TestBasic.EVENT_SHOW_NEXT_BUTTON     -> showNext()
                     TestBasic.EVENT_SHOW_ABORT           -> {
-                                                            try {
-                                                                val dur = it.second as Long
+                                                                val dur = (it.second ?: DEFAULT_ABORT_TIME) as Long
                                                                 showShortAbort(dur)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showShortAbort(1000L)
                                                             }
-                    }
                     TestBasic.EVENT_UPDATE_TRIAL_ID      -> {
-                                                            try {
-                                                                val dur = it.second as Long
-                                                                showTrialId(dur)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showTrialId(1000L)
+                                                                val dur = (it.second ?: DEFAULT_ABORT_TIME) as Long
+                                                                showShortAbort(dur)
                                                             }
-                    }
                     TestBasic.EVENT_SHOW_DEBUGINFO       -> {
-                                                            try {
-                                                                val info = it.second as String
+                                                                val info = (it.second ?: "DEBUG_INFO_MISSING") as String
                                                                 showDebugInfo(info)
-                                                            } catch (e: Exception) {
-                                                                e.printStackTrace()
-                                                                showDebugInfo(e.toString())
                                                             }
-                    }
                     TestBasic.EVENT_TEST_ERROR           -> onTestError(it.second as String, it.third)
 
                     // unused

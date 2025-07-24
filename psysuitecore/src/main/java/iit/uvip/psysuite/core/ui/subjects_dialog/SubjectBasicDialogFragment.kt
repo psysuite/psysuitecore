@@ -1,7 +1,5 @@
 package iit.uvip.psysuite.core.ui.subjects_dialog
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +8,12 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
-
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.ConditionData
 import iit.uvip.psysuite.core.utility.IdLabelData
-
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.filesystem.deleteFilesStartingWith
 import org.albaspazio.core.ui.show2ChoisesDialog
@@ -396,11 +392,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     }
 
     private fun sendResult(subj: SubjectBasicParcel?) {
-        if (targetFragment == null)     return
-
-        val intent = Intent()
-        intent.putExtra(EVENT_SUBJECT, subj)
-        targetFragment!!.onActivityResult(targetRequestCode, Activity.RESULT_OK, intent)
+        val bundle = Bundle().apply {
+            putParcelable(EVENT_SUBJECT, subj)
+        }
+        parentFragmentManager.setFragmentResult(targetRequestCode.toString(), bundle)
         dismiss()
     }
     //------------------------------------------------------------------------------------

@@ -6,17 +6,31 @@ import iit.uvip.psysuite.core.trials.TrialBasic
 
 open class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false): TrialBasic(id, type, label, isADA=isADA){
 
-    override val stim_value:Long
-        get() = if(isBefore )   mid_latency - magnitude.toLong()
-                else            mid_latency + magnitude.toLong()
-
     companion object {
         @JvmStatic val LOG_HEADER = "id\tlabel\tlat\tconfl\tres\tcor_ans\tuser_ans\telapsed\trep\tconfl_magn\n"
     }
 
     init {
-        updateTrial(magnitude)
+        setupTrial(magnitude)
     }
+
+    final override fun setupTrial(newvalue: Float):Long{
+        magnitude       = newvalue
+        correct_answer  =   if(isBefore)    0
+        else            1
+        return stim_value
+    }
+
+    override val stim_value:Long
+        get() = if(isBefore )   mid_latency - magnitude.toLong()
+                else            mid_latency + magnitude.toLong()
+
+    protected fun stimvalue2magnitude():Long{
+        return  if(isBefore)  mid_latency - stim_value
+        else          stim_value - mid_latency
+    }
+
+
     // all class exported as string
     override fun toString():String{
         return "$id\t$type\t$label\t$conflict_type\t$stim_value\t$duration\t$success\t$duration2\n"
@@ -31,15 +45,5 @@ open class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnit
         return "${super.debugInfo()}, pos=$stim_value, conf_type=$conflict_type"
     }
 
-    final override fun updateTrial(newvalue: Float):Long{
-        magnitude       = newvalue
-        correct_answer  =   if(isBefore)    0
-                            else            1
-        return stim_value
-    }
 
-    protected fun stimvalue2magnitude():Long{
-        return  if(isBefore)  mid_latency - stim_value
-                else          stim_value - mid_latency
-    }
 }
