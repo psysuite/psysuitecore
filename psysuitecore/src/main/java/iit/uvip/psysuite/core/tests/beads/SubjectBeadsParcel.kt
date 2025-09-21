@@ -33,7 +33,27 @@ class SubjectBeadsParcel(
     
     override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
     override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode)
+) : SubjectBasicParcel(
+    classes = classes,
+    label = label,
+    age = age,
+    gender = gender,
+    population = population,
+    type = type,
+    block = block,
+    isDebug = isDebug,
+    device = device,
+    vercode = vercode,
+    stimuliDelays = stimuliDelays,
+    nextTrailModality = nextTrailModality,
+    whitenoise = whitenoise,
+    trman_type = trman_type,
+    showResult = showResult,
+    canRepeat = canRepeat,
+    doTraining = doTraining,
+    showTrialID = showTrialID,
+    abortMode = abortMode
+)
 
 
 

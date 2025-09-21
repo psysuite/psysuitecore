@@ -57,8 +57,8 @@ abstract class TestBasic(protected val ctx: Context,
                          protected val vibrator: VibrationManager? = null,
                          protected val mImageView: ImageView? = null,
                          protected val speechManager: SpeechManager? = null,
-                         protected val outResultsDir:String= Environment.DIRECTORY_DOWNLOADS
-                         ) {
+                         protected val outResultsDir:String= Environment.DIRECTORY_DOWNLOADS)
+{
 
     /**
      * The log tag used for logging messages from this test instance.

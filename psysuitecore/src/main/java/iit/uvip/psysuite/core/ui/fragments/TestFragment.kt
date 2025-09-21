@@ -11,32 +11,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.findNavController
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentTestBinding
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.tests.beads.TestBeads
-import iit.uvip.psysuite.core.tests.bis.TestBIS
-import iit.uvip.psysuite.core.tests.fgi.TestFGI
-import iit.uvip.psysuite.core.tests.mmd.TestMMD
-import iit.uvip.psysuite.core.tests.rivgrp.TestRIVGRP
-import iit.uvip.psysuite.core.tests.sample.SubjectSampleParcel
-import iit.uvip.psysuite.core.tests.sample.TestSample
-import iit.uvip.psysuite.core.tests.temporalbinding.atb.TestATB
-import iit.uvip.psysuite.core.tests.temporalbinding.atvb.TestATVB
-import iit.uvip.psysuite.core.tests.temporalbinding.avb.TestAVB
-import iit.uvip.psysuite.core.tests.temporalbinding.tvb.TestTVB
-import iit.uvip.psysuite.core.tests.tfi.TestTFI
-import iit.uvip.psysuite.core.tests.tid.SubjectTIDParcel
-import iit.uvip.psysuite.core.tests.tid.TestTID
-import iit.uvip.psysuite.core.tests.tir.TestTIR
-import iit.uvip.psysuite.core.tests.tsp.TestTSP
-import iit.uvip.psysuite.core.tests.ttc.TestTTC
 import iit.uvip.psysuite.core.utility.TestResult
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import org.albaspazio.core.accessory.*
+import org.albaspazio.core.accessory.VibrationManager
+import org.albaspazio.core.accessory.getCompanionObjectMethod
+import org.albaspazio.core.accessory.getTimeDifference
 import org.albaspazio.core.fragments.BaseFragment
 import org.albaspazio.core.fragments.setNavigationResult
 import org.albaspazio.core.speech.SpeechManager
@@ -44,9 +30,9 @@ import org.albaspazio.core.speech.SpeechRecognitionManager
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.core.ui.showToast
-import java.util.*
+import java.lang.reflect.Constructor
+import java.util.Date
 import kotlin.reflect.KFunction
-import androidx.navigation.findNavController
 
 /*
 Three operative modalities (mSubjectParcel.nextTrailModality):
@@ -148,168 +134,60 @@ class TestFragment : BaseFragment(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         super.onActivityCreated(savedInstanceState)
-        binding.btNext.visibility      = View.INVISIBLE
-        binding.btAbort.visibility     = View.INVISIBLE
-        binding.btPause.visibility     = View.INVISIBLE
+        binding.btNext.visibility = View.INVISIBLE
+        binding.btAbort.visibility = View.INVISIBLE
+        binding.btPause.visibility = View.INVISIBLE
         binding.txtDebugInfo.visibility = View.INVISIBLE
 
-        val subj:SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL)
-        if(subj == null){
+        val subj: SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL)
+        if (subj == null) {
             showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
             showAlert(requireActivity(), resources.getString(R.string.critical_error), "Subject Info is null")
             requireView().findNavController().popBackStack()
-        }
-        else mSubjectParcel = subj
+        } else mSubjectParcel = subj
 
-        speechManager           = SpeechManager(requireContext()){
-            try{
+        speechManager = SpeechManager(requireContext()) {
+            try {
+                vibrator = VibrationManager(requireContext()).init()
+                speechRecognitionManager = SpeechRecognitionManager(requireContext())
 
-                vibrator                    = VibrationManager(requireContext()).init()
-                speechRecognitionManager    = SpeechRecognitionManager(requireContext())
-
-                when(mSubjectParcel.type){
-
-                    TestBasic.TEST_BISECTION_AUDIO,
-                    TestBasic.TEST_BISECTION_TACTILE,
-                    TestBasic.TEST_BISECTION_VISUAL,
-                    TestBasic.TEST_BISECTION_AUDIO_TACTILE,
-                    TestBasic.TEST_BISECTION_VISUAL_TACTILE,
-                    TestBasic.TEST_BISECTION_AUDIO_VISUAL,
-                    TestBasic.TEST_BISECTION_AUDIO_SUPRA,
-                    TestBasic.TEST_BISECTION_TACTILE_SUPRA,
-                    TestBasic.TEST_BISECTION_VISUAL_SUPRA,
-                    TestBasic.TEST_BISECTION_AUDIO_TACTILE_SUPRA,
-                    TestBasic.TEST_BISECTION_VISUAL_TACTILE_SUPRA,
-                    TestBasic.TEST_BISECTION_AUDIO_VISUAL_SUPRA
-                                                            -> mTest = TestBIS(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_MUSICAL_METERS           -> mTest = TestMMD(requireContext(), requireActivity(), this, mSubjectParcel, speechManager)
-
-                    TestBasic.TEST_TID_SHORT_AUDIO,
-                    TestBasic.TEST_TID_SHORT_TACTILE,
-                    TestBasic.TEST_TID_SHORT_VISUAL,
-                    TestBasic.TEST_TID_LONG_AUDIO,
-                    TestBasic.TEST_TID_LONG_TACTILE,
-                    TestBasic.TEST_TID_LONG_VISUAL,
-                    TestBasic.TEST_TID_SHORT_AUDIO_TRAIN,
-                    TestBasic.TEST_TID_SHORT_TACTILE_TRAIN,
-                    TestBasic.TEST_TID_SHORT_VISUAL_TRAIN   ->  mTest = TestTID(requireContext(), requireActivity(), this, mSubjectParcel as SubjectTIDParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_ATB_TIME_SINGLESTIM,
-                    TestBasic.TEST_ATB_TIME_DOUBLESTIM,
-                    TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
-                    TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_ATB_TIME_INF      -> mTest = TestATB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, speechManager)
-
-                    TestBasic.TEST_AVB_TIME_SINGLESTIM,
-                    TestBasic.TEST_AVB_TIME_DOUBLESTIM,
-                    TestBasic.TEST_AVB_TIME_SINGLESTIM_TOD,
-                    TestBasic.TEST_AVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_AVB_TIME_INF      -> mTest = TestAVB(requireContext(), requireActivity(), this, mSubjectParcel, binding.circleView, speechManager)
-
-                    TestBasic.TEST_TVB_TIME_SINGLESTIM,
-                    TestBasic.TEST_TVB_TIME_DOUBLESTIM,
-                    TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
-                    TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
-                    TestBasic.TEST_TVB_TIME_INF      -> mTest = TestTVB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_ATVB_TIME_S_UNBAL,
-                    TestBasic.TEST_ATVB_TIME_S_BAL,
-                    TestBasic.TEST_ATVB_TIME_S_BAL2,
-                    TestBasic.TEST_ATVB_TIME_D_UNBAL,
-                    TestBasic.TEST_ATVB_TIME_D_BAL   -> mTest = TestATVB(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_SAMPLE_ALIGNED,
-                    TestBasic.TEST_SAMPLE_SHIFTED,
-                    TestBasic.TEST_SAMPLE_PAIR ->       mTest = TestSample(requireContext(), requireActivity(), this, mSubjectParcel as SubjectSampleParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_TFI,
-                    TestBasic.TEST_TFI_BIMODAL,
-                    TestBasic.TEST_TFI_AV,
-                    TestBasic.TEST_TFI_TODDLERS
-                                                    ->  mTest = TestTFI(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager)
-
-                    TestBasic.TEST_FGI_1_UNSCRAMBLED,
-                    TestBasic.TEST_FGI_1_SCRAMBLED,
-                    TestBasic.TEST_FGI_2_UNSCRAMBLED,
-                    TestBasic.TEST_FGI_2_SCRAMBLED,
-                    TestBasic.TEST_FGI_3_UNSCRAMBLED,
-                    TestBasic.TEST_FGI_3_SCRAMBLED
-                                                    ->   mTest = TestFGI(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
-
-                    TestBasic.TEST_RIVGRP_RIV_HF,
-                    TestBasic.TEST_RIVGRP_GRP_HF,
-                    TestBasic.TEST_RIVGRP_RIVGRP_HF,
-                    TestBasic.TEST_RIVGRP_RIV_HC,
-                    TestBasic.TEST_RIVGRP_GRP_HC,
-                    TestBasic.TEST_RIVGRP_RIVGRP_HC ->  mTest = TestRIVGRP(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
-
-                    TestBasic.TEST_BEADS_LOWUNCERT,
-                    TestBasic.TEST_BEADS_MIDUNCERT  ->   mTest = TestBeads(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
-
-                    TestBasic.TEST_MOTPRE_VH,
-                    TestBasic.TEST_MOTPRE_VV,
-                    TestBasic.TEST_MOTPRE_VHV,
-                    TestBasic.TEST_MOTPRE_VV_CUE_ARROW,
-                    TestBasic.TEST_MOTPRE_VH_CUE_ARROW,
-                    TestBasic.TEST_MOTPRE_VV_CUE_WEIGHT,
-                    TestBasic.TEST_MOTPRE_VH_FIXSPEED,
-                    TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT,
-                    TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL
-                                                    ->  mTest = TestTTC(requireContext(),requireActivity(), this,mSubjectParcel, vibrator,binding.circleView, speechManager, mMainView)
-
-                    TestBasic.TEST_TSP_A_SUB,
-                    TestBasic.TEST_TSP_V_SUB,
-                    TestBasic.TEST_TSP_T_SUB,
-                    TestBasic.TEST_TSP_A_SUPRA,
-                    TestBasic.TEST_TSP_V_SUPRA,
-                    TestBasic.TEST_TSP_T_SUPRA      ->  mTest = TestTSP(requireContext(),requireActivity(),this,mSubjectParcel,vibrator, binding.circleView, speechManager, mMainView)
-
-                    TestBasic.TEST_TIR_A_SUB,
-                    TestBasic.TEST_TIR_V_SUB,
-                    TestBasic.TEST_TIR_T_SUB,
-                    TestBasic.TEST_TIR_A_SUPRA,
-                    TestBasic.TEST_TIR_V_SUPRA,
-                    TestBasic.TEST_TIR_T_SUPRA      ->  mTest = TestTIR(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager, mMainView)
-
-                    else    -> {
-                        Log.e("TestFragment", "Test non riconosciuto")
-                        showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
-                        requireView().findNavController().popBackStack()
-                        return@SpeechManager
-                    }
+                if (mSubjectParcel.classes[0].isNotBlank()) {
+                    val testClass                   = Class.forName(mSubjectParcel.classes[0])
+                    val constructor: Constructor<*> = testClass.constructors[0]
+                    mTest                           = constructor.newInstance(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager) as TestBasic
                 }
-
-                isBlindUser     = mSubjectParcel.isBlindUser
-                isDeafUser      = mSubjectParcel.isDeafUser
-
-                if(isBlindUser && !speechManager.isValid){
-                    showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
-                    return@SpeechManager
-                }
-
-                // get a reference to the AnswerDialogFragment
-                val answerDialogClass = if(isBlindUser)
-                                            // population is visually impaired. use AnswerGestureDF
-                                            "iit.uvip.psysuite.core.ui.fragments.answers.AnswerGestureDialogFragment"
-                                        else {
-                                            if (mSubjectParcel.classes.size > 1 && mSubjectParcel.classes[1].isNotEmpty())
-                                                mSubjectParcel.classes[1]
-                                            else "iit.uvip.psysuite.core.ui.fragments.answers.TwoAFCAnswerDialogFragment"
-                                        }
-                answerDialogRef       = getCompanionObjectMethod(answerDialogClass, "newInstance")
-
-                setTestEventsObservable()
-
-                mTest.initTest()    // then wait for EVENT_TEST_SETUP_COMPLETED. while the Test asynchronously load the needed resources
+                else throw Exception("mSubjectParcel.classes[0] is empty")
             }
-            catch (e: Exception){
-                e.logLastTwo(LOG_TAG)
+            catch (e: Exception) {
+                Log.e("TestFragment", e.message.toString())
                 showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
-                showAlert(requireActivity(), resources.getString(R.string.critical_error), e.toString())
                 requireView().findNavController().popBackStack()
                 return@SpeechManager
             }
+
+            isBlindUser = mSubjectParcel.isBlindUser
+            isDeafUser  = mSubjectParcel.isDeafUser
+
+            if (isBlindUser && !speechManager.isValid) {
+                showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
+                return@SpeechManager
+            }
+
+            // get a reference to the AnswerDialogFragment
+            val answerDialogClass = if (isBlindUser) {
+                                        // population is visually impaired. use AnswerGestureDF
+                                        "iit.uvip.psysuite.core.ui.fragments.answers.AnswerGestureDialogFragment"
+                                    }
+                                    else {
+                                        if (mSubjectParcel.classes.size > 1 && mSubjectParcel.classes[1].isNotEmpty())
+                                            mSubjectParcel.classes[1]
+                                        else "iit.uvip.psysuite.core.ui.fragments.answers.TwoAFCAnswerDialogFragment"
+                                    }
+            answerDialogRef = getCompanionObjectMethod(answerDialogClass, "newInstance")
+
+            setTestEventsObservable()
+
+            mTest.initTest()    // then wait for EVENT_TEST_SETUP_COMPLETED. while the Test asynchronously load the needed resources
         }
     }
 
@@ -753,3 +631,335 @@ class TestFragment : BaseFragment(
     //#endregion
     // ========================================================================================================================================
 }
+
+
+
+/*
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+
+        super.onActivityCreated(savedInstanceState)
+        binding.btNext.visibility = View.INVISIBLE
+        binding.btAbort.visibility = View.INVISIBLE
+        binding.btPause.visibility = View.INVISIBLE
+        binding.txtDebugInfo.visibility = View.INVISIBLE
+
+        val subj: SubjectBasicParcel? = arguments?.getParcelable(TestBasic.TESTINFO_BUNDLE_LABEL)
+        if (subj == null) {
+            showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
+            showAlert(requireActivity(), resources.getString(R.string.critical_error), "Subject Info is null")
+            requireView().findNavController().popBackStack()
+        } else mSubjectParcel = subj
+
+        speechManager = SpeechManager(requireContext()) {
+            try {
+                vibrator = VibrationManager(requireContext()).init()
+                speechRecognitionManager = SpeechRecognitionManager(requireContext())
+
+                try {
+                    if (mSubjectParcel.classes[0].isNotBlank()) {
+                        val testClass = Class.forName(mSubjectParcel.classes[0])
+
+                        // Try to find a matching constructor
+                        val constructors = testClass.constructors
+                        var constructor: Constructor<*>? = null
+
+                        // Look for the most specific constructor first
+                        for (ctor in constructors) {
+                            val paramTypes = ctor.parameterTypes
+                            if (paramTypes.size == 7 &&
+                                Context::class.java.isAssignableFrom(paramTypes[0]) &&
+                                Activity::class.java.isAssignableFrom(paramTypes[1]) &&
+                                Fragment::class.java.isAssignableFrom(paramTypes[2]) &&
+                                SubjectBasicParcel::class.java.isAssignableFrom(paramTypes[3]) &&
+                                VibrationManager::class.java.isAssignableFrom(paramTypes[4]) &&
+                                View::class.java.isAssignableFrom(paramTypes[5]) &&
+                                SpeechManager::class.java.isAssignableFrom(paramTypes[6])
+                            ) {
+                                constructor = ctor
+                                break
+                            }
+                        }
+
+                        if (constructor != null) {
+                            mTest = constructor.newInstance(
+                                requireContext(),
+                                requireActivity(),
+                                this,
+                                mSubjectParcel,
+                                vibrator,
+                                binding.circleView,
+                                speechManager
+                            ) as TestBasic
+                        } else {
+                            throw NoSuchMethodException("No suitable constructor found for ${mSubjectParcel.classes[0]}")
+                        }
+                    } else {
+                        throw IllegalStateException("No test class name provided in SubjectBasicParcel")
+                    }
+                } catch (e: Exception) {
+                    // Fallback to old method if reflection fails
+                    Log.e("TestFragment", "Failed to create test instance via reflection: ${e.message}", e)
+                    when (mSubjectParcel.type) {
+                        TestBasic.TEST_BISECTION_AUDIO,
+                        TestBasic.TEST_BISECTION_TACTILE,
+                        TestBasic.TEST_BISECTION_VISUAL,
+                        TestBasic.TEST_BISECTION_AUDIO_TACTILE,
+                        TestBasic.TEST_BISECTION_VISUAL_TACTILE,
+                        TestBasic.TEST_BISECTION_AUDIO_VISUAL,
+                        TestBasic.TEST_BISECTION_AUDIO_SUPRA,
+                        TestBasic.TEST_BISECTION_TACTILE_SUPRA,
+                        TestBasic.TEST_BISECTION_VISUAL_SUPRA,
+                        TestBasic.TEST_BISECTION_AUDIO_TACTILE_SUPRA,
+                        TestBasic.TEST_BISECTION_VISUAL_TACTILE_SUPRA,
+                        TestBasic.TEST_BISECTION_AUDIO_VISUAL_SUPRA -> mTest = TestBIS(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_MUSICAL_METERS -> mTest = TestMMD(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_TID_SHORT_AUDIO,
+                        TestBasic.TEST_TID_SHORT_TACTILE,
+                        TestBasic.TEST_TID_SHORT_VISUAL,
+                        TestBasic.TEST_TID_LONG_AUDIO,
+                        TestBasic.TEST_TID_LONG_TACTILE,
+                        TestBasic.TEST_TID_LONG_VISUAL,
+                        TestBasic.TEST_TID_SHORT_AUDIO_TRAIN,
+                        TestBasic.TEST_TID_SHORT_TACTILE_TRAIN,
+                        TestBasic.TEST_TID_SHORT_VISUAL_TRAIN -> mTest = TestTID(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel as SubjectTIDParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_ATB_TIME_SINGLESTIM,
+                        TestBasic.TEST_ATB_TIME_DOUBLESTIM,
+                        TestBasic.TEST_ATB_TIME_SINGLESTIM_TOD,
+                        TestBasic.TEST_ATB_TIME_DOUBLESTIM_TOD,
+                        TestBasic.TEST_ATB_TIME_INF -> mTest = TestATB(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_AVB_TIME_SINGLESTIM,
+                        TestBasic.TEST_AVB_TIME_DOUBLESTIM,
+                        TestBasic.TEST_AVB_TIME_SINGLESTIM_TOD,
+                        TestBasic.TEST_AVB_TIME_DOUBLESTIM_TOD,
+                        TestBasic.TEST_AVB_TIME_INF -> mTest = TestAVB(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_TVB_TIME_SINGLESTIM,
+                        TestBasic.TEST_TVB_TIME_DOUBLESTIM,
+                        TestBasic.TEST_TVB_TIME_SINGLESTIM_TOD,
+                        TestBasic.TEST_TVB_TIME_DOUBLESTIM_TOD,
+                        TestBasic.TEST_TVB_TIME_INF -> mTest = TestTVB(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_ATVB_TIME_S_UNBAL,
+                        TestBasic.TEST_ATVB_TIME_S_BAL,
+                        TestBasic.TEST_ATVB_TIME_S_BAL2,
+                        TestBasic.TEST_ATVB_TIME_D_UNBAL,
+                        TestBasic.TEST_ATVB_TIME_D_BAL -> mTest = TestATVB(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_SAMPLE_ALIGNED,
+                        TestBasic.TEST_SAMPLE_SHIFTED,
+                        TestBasic.TEST_SAMPLE_PAIR -> mTest = TestSample(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel as SubjectSampleParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+                        TestBasic.TEST_TFI,
+                        TestBasic.TEST_TFI_BIMODAL,
+                        TestBasic.TEST_TFI_AV,
+                        TestBasic.TEST_TFI_TODDLERS -> mTest = TestTFI(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager
+                        )
+
+
+                        TestBasic.TEST_FGI_1_UNSCRAMBLED,
+                        TestBasic.TEST_FGI_1_SCRAMBLED,
+                        TestBasic.TEST_FGI_2_UNSCRAMBLED,
+                        TestBasic.TEST_FGI_2_SCRAMBLED,
+                        TestBasic.TEST_FGI_3_UNSCRAMBLED,
+                        TestBasic.TEST_FGI_3_SCRAMBLED -> mTest = TestFGI(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+
+                        TestBasic.TEST_RIVGRP_RIV_HF,
+                        TestBasic.TEST_RIVGRP_GRP_HF,
+                        TestBasic.TEST_RIVGRP_RIVGRP_HF,
+                        TestBasic.TEST_RIVGRP_RIV_HC,
+                        TestBasic.TEST_RIVGRP_GRP_HC,
+                        TestBasic.TEST_RIVGRP_RIVGRP_HC -> mTest = TestRIVGRP(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+                        TestBasic.TEST_BEADS_LOWUNCERT,
+                        TestBasic.TEST_BEADS_MIDUNCERT -> mTest = TestBeads(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+                        TestBasic.TEST_MOTPRE_VH,
+                        TestBasic.TEST_MOTPRE_VV,
+                        TestBasic.TEST_MOTPRE_VHV,
+                        TestBasic.TEST_MOTPRE_VV_CUE_ARROW,
+                        TestBasic.TEST_MOTPRE_VH_CUE_ARROW,
+                        TestBasic.TEST_MOTPRE_VV_CUE_WEIGHT,
+                        TestBasic.TEST_MOTPRE_VH_FIXSPEED,
+                        TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVT,
+                        TestBasic.TEST_MOTPRE_VH_VARSPEED_FIXVPL -> mTest = TestTTC(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+
+                        TestBasic.TEST_TSP_A_SUB,
+                        TestBasic.TEST_TSP_V_SUB,
+                        TestBasic.TEST_TSP_T_SUB,
+                        TestBasic.TEST_TSP_A_SUPRA,
+                        TestBasic.TEST_TSP_V_SUPRA,
+                        TestBasic.TEST_TSP_T_SUPRA -> mTest = TestTSP(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+                        TestBasic.TEST_TIR_A_SUB,
+                        TestBasic.TEST_TIR_V_SUB,
+                        TestBasic.TEST_TIR_T_SUB,
+                        TestBasic.TEST_TIR_A_SUPRA,
+                        TestBasic.TEST_TIR_V_SUPRA,
+                        TestBasic.TEST_TIR_T_SUPRA -> mTest = TestTIR(
+                            requireContext(),
+                            requireActivity(),
+                            this,
+                            mSubjectParcel,
+                            vibrator,
+                            binding.circleView,
+                            speechManager,
+                            mMainView
+                        )
+
+                        else -> {
+                            throw IllegalStateException("Test non riconosciuto")
+                        }
+                    }
+                }
+            }
+            catch (e: Exception) {
+                Log.e("TestFragment", e.message.toString())
+                showAlert(requireActivity(), resources.getString(R.string.critical_error), resources.getString(R.string.contact_developer))
+                requireView().findNavController().popBackStack()
+                return@SpeechManager
+            }
+
+            isBlindUser = mSubjectParcel.isBlindUser
+            isDeafUser  = mSubjectParcel.isDeafUser
+
+            if (isBlindUser && !speechManager.isValid) {
+                showAlert(requireActivity(), resources.getString(R.string.error), resources.getString(R.string.contact_developer))
+                return@SpeechManager
+            }
+
+            // get a reference to the AnswerDialogFragment
+            val answerDialogClass = if (isBlindUser) {
+                                        // population is visually impaired. use AnswerGestureDF
+                                        "iit.uvip.psysuite.core.ui.fragments.answers.AnswerGestureDialogFragment"
+                                    }
+                                    else {
+                                        if (mSubjectParcel.classes.size > 1 && mSubjectParcel.classes[1].isNotEmpty())
+                                            mSubjectParcel.classes[1]
+                                        else "iit.uvip.psysuite.core.ui.fragments.answers.TwoAFCAnswerDialogFragment"
+                                    }
+            answerDialogRef = getCompanionObjectMethod(answerDialogClass, "newInstance")
+
+            setTestEventsObservable()
+
+            mTest.initTest()    // then wait for EVENT_TEST_SETUP_COMPLETED. while the Test asynchronously load the needed resources
+        }
+    }
+ */

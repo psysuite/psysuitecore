@@ -51,6 +51,8 @@ import org.albaspazio.core.filesystem.*
  * @param showResult Configuration for showing results after a trial/test. Defaults to [TestBasic.TEST_SWITCH_DISABLED].
  * @param canRepeat Configuration for allowing trial repetition. Defaults to [TestBasic.TEST_SWITCH_CHOOSE_OFF].
  * @param doTraining Configuration for enabling a training phase. Defaults to [TestBasic.TEST_SWITCH_DISABLED].
+ * @param showTrialID Configuration for showing trial IDs. Defaults to [TestBasic.TEST_SHOWTRIALS_NEVER].
+ * @param abortMode Configuration for aborting the test. Defaults to [TestBasic.TEST_ABORT_TRIALEND].
  */
 abstract class SubjectBasicParcel(
     open var classes: List<String> = listOf(),
