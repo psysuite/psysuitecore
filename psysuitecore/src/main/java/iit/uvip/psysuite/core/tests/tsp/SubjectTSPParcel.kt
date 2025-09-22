@@ -24,7 +24,7 @@ class SubjectTSPParcel(
     override var vercode: Int = -1,
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
 
-    override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
+    override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_AUTO,
     override var whitenoise: Int = TestBasic.TEST_SWITCH_DISABLED,
     override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
     override var showResult: Int = TestBasic.TEST_SWITCH_DISABLED,

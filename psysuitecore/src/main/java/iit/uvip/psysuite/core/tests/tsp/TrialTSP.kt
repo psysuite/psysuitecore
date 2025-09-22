@@ -18,7 +18,8 @@ class TrialTSP (id:Int=-1, type:Int, label:String,
                 val isBefore: Boolean,
                 val nCues:Int,
                 val duration:Long,
-                isADA:Boolean=false): TrialBasic(id, type, label, isADA=isADA) {
+                isADA:Boolean=false,
+                isTraining: Boolean=false): TrialBasic(id, type, label, isADA=isADA, isTraining = isTraining) {
 
     companion object {
         @JvmStatic val LOG_HEADER = "id\tlabel\tisi\tonset\terror\tsuccess\telapsed\tmagnitude\n"

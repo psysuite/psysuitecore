@@ -124,6 +124,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 binding.swInteractive.isChecked = false
             }
             TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
+            TestBasic.TEST_NEXTTRIAL_AUTO,
             TestBasic.TEST_NEXTTRIAL_VOICE_ANSWER,
             TestBasic.TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER,
             TestBasic.TEST_NEXTTRIAL_ANSWER -> binding.swInteractive.visibility   = View.GONE

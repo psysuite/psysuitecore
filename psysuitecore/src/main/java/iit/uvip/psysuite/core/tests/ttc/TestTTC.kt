@@ -15,6 +15,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentTestBinding
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
+import iit.uvip.psysuite.core.stimuli.ImageViewDefinedException
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.stimuli.VisualManager
 import iit.uvip.psysuite.core.tests.TestBasic
@@ -64,8 +65,8 @@ class TestTTC(ctx: Context,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               speechManager: SpeechManager?,
-              private val mainView: View
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView) {
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView) {
 
     override var LOG_TAG: String = TestTTC::class.java.simpleName
 
@@ -108,9 +109,9 @@ class TestTTC(ctx: Context,
         )
 
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
         )
     }
 
@@ -208,6 +209,11 @@ class TestTTC(ctx: Context,
     // INIT
     // =============================================================================================================================
     override fun initTest(){
+
+        // sanity checks
+        when {
+            mainView == null -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
+        }
 
         // set question & create mTrials list
         validAnswers    = mutableListOf()

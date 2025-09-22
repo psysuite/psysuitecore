@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
@@ -57,6 +58,7 @@ abstract class TestBasic(protected val ctx: Context,
                          protected val vibrator: VibrationManager? = null,
                          protected val mImageView: ImageView? = null,
                          protected val speechManager: SpeechManager? = null,
+                         protected val mainView: View? = null,
                          protected val outResultsDir:String= Environment.DIRECTORY_DOWNLOADS)
 {
 
@@ -95,6 +97,7 @@ abstract class TestBasic(protected val ctx: Context,
             50L     to "t1000hz_50ms.wav",
             100L    to "t1000hz_100ms.wav",
             1000L   to "t1000hz_1000ms.wav",
+            2000L   to "t300hz_2000ms.wav",
         )
 
         //-----------------------------------------------------------------------------------------
@@ -311,7 +314,7 @@ abstract class TestBasic(protected val ctx: Context,
 
         /** Constant indicating that the test proceeds directly to the next trial without user choice. */
         @JvmStatic val TEST_NEXTTRIAL_NOCHOOSE          = -1
-        /** Constant indicating that the user can choose to proceed automatically to the next trial. */
+        /** Constant indicating that the user can only choose to abort/pause the test after each trial end */
         @JvmStatic val TEST_NEXTTRIAL_AUTO              = 0
         /** Constant indicating that the user can choose to wait and then press a 'NEXT' button. */
         @JvmStatic val TEST_NEXTTRIAL_BUTTON            = 1
@@ -806,6 +809,7 @@ abstract class TestBasic(protected val ctx: Context,
         mStimuliHandler.postDelayed({
             when (subject.nextTrailModality) {
                 TEST_NEXTTRIAL_BUTTON               ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_ABORT, null, listOf()))
+                TEST_NEXTTRIAL_NOCHOOSE             ->  testEvent.accept(Triple(EVENT_SHOW_PAUSE_ABORT, 0L, listOf()))
                 TEST_NEXTTRIAL_AUTO                 ->  testEvent.accept(Triple(EVENT_SHOW_PAUSE_ABORT, 1000L, listOf()))
 
                 TEST_NEXTTRIAL_VOICE_ANSWER         ->  testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))

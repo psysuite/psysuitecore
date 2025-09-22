@@ -58,8 +58,8 @@ class TestRIVGRP(ctx: Context,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               speechManager: SpeechManager?,
-              private val mainView: View
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView) {
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView) {
 
     /**
      * Tag used for logging purposes.
@@ -229,12 +229,12 @@ class TestRIVGRP(ctx: Context,
          * @return A list of lists, where each inner list specifies trial progression options.
          */
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE)
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
 
@@ -516,7 +516,7 @@ class TestRIVGRP(ctx: Context,
      */
     private fun setUI(labels:Pair<String, String>) {
 
-        val mainlayout = mainView.findViewById(R.id.fragment_test_layout) as ConstraintLayout
+        val mainlayout: ConstraintLayout = mainView!!.findViewById(R.id.fragment_test_layout)
         // Ensure parent_layout_width and parent_layout_height are captured after layout inflation.
         // If they are 0, it means the view hasn't been measured yet. Consider using View.post { ... }
         if (mainlayout.width == 0 || mainlayout.height == 0) {

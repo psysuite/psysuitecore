@@ -114,6 +114,8 @@
     <string name="error_visualmanager">the visual manager is not valid</string>
     <string name="internal_error">The code generated the following error %1$s</string>
 
+    <string name="run_test">Running test</string>
+
 
     <string name="label_temporal_tests">Temporal Tests</string>
     <string name="label_decision_tests">Decisions Tests</string>
@@ -333,7 +335,7 @@
     <string name="trials_adaptive">adaptive</string>
     <string name="sequence">sequence</string>
     <string name="label_prediction_tests">Prediction Tests</string>
-    <string name="label_various_tests">Various Tests</string>
+    <string name="label_miscellaneous_tests">Miscellaneous Tests</string>
     <string name="condition_not_allowed">sub-test code not allowed</string>
     <string name="error_test_code_not_recognized">Test not recognized</string>
     <string name="start_test">start test</string>

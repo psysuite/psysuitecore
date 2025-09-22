@@ -3,6 +3,7 @@ package iit.uvip.psysuite.core.tests.tfi
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.core.R
@@ -27,8 +28,9 @@ class TestTFI(ctx: Context,
               subject: SubjectBasicParcel,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
-              speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView)
+              speechManager: SpeechManager?,
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView)
 {
     override var LOG_TAG:String = TestTFI::class.java.simpleName
 

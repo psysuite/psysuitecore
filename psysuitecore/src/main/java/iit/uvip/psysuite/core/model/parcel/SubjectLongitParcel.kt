@@ -21,7 +21,7 @@ import org.albaspazio.core.accessory.Device
  * @param device Information about the device running the test. Defaults to `null`.
  * @param vercode Version code of the application or test suite. Defaults to -1.
  * @param stimuliDelays Configuration for aligning stimuli delays. Defaults to a new [DelaysAligner] instance.
- * @param nextTrailModality How the test proceeds to the next trial. Defaults to [TestBasic.TEST_NEXTTRIAL_NOCHOOSE].
+ * @param nextTrailModality How the test proceeds to the next trial. Defaults to [TestBasic.TEST_NEXTTRIAL_AUTO].
  * @param whitenoise Configuration for white noise. Defaults to [TestBasic.TEST_SWITCH_CHOOSE_ON].
  * @param trman_type Trial management type. Defaults to [TestBasic.TEST_TRMAN_FIXED].
  * @param showResult Configuration for showing results. Defaults to [TestBasic.TEST_SWITCH_DISABLED].
@@ -45,7 +45,7 @@ abstract class SubjectLongitParcel(
     override var vercode: Int = -1,
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
 
-    override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_NOCHOOSE,
+    override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_AUTO,
     override var whitenoise: Int = TestBasic.TEST_SWITCH_CHOOSE_ON,
     override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
     override var showResult: Int = TestBasic.TEST_SWITCH_DISABLED,

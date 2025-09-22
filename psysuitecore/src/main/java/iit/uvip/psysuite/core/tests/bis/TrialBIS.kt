@@ -23,7 +23,7 @@ import iit.uvip.psysuite.core.trials.TrialBasic
  * @param type The type identifier for the trial.
  * @param label A descriptive label for the trial.
  */
-open class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false): TrialBasic(
+class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false): TrialBasic(
     id,
     type,
     label,
@@ -67,7 +67,7 @@ open class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnit
     final override fun setupTrial(newvalue: Float):Long{
         magnitude       = newvalue
         correct_answer  =   if(isBefore)    0
-        else            1
+                            else            1
         return stim_value
     }
 
@@ -89,7 +89,7 @@ open class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnit
      */
     protected fun stimvalue2magnitude():Long{
         return  if(isBefore)  mid_latency - stim_value
-        else          stim_value - mid_latency
+                else          stim_value - mid_latency
     }
 
 

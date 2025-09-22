@@ -81,7 +81,7 @@ data class Stimulus3delay(val type: Int, val a:Float, val t:Float, val v:Float)
 data class StimulusDelay (val type: Int, val magnitude:Float)
 data class StimuliSetBIS(val ntrials:Int, val magnitude:Float, val isBefore:Boolean, var conflict:String = CONFLICT_TYPE_NONE)
 data class StimuliSetTSP(val ntrials:Int, val magnitude:Float, val isBefore:Boolean)
-data class StimuliSetTIR(val ntrials:Int, val magnitude:Float, val isBefore:Boolean)
+data class StimuliSetTIR(val ntrials:Int, val magnitude:Float)
 
 
 fun VibrationManager.vibrateSingle(paramsT: TactileManager) {

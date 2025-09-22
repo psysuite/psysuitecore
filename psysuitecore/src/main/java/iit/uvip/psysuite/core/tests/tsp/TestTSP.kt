@@ -65,8 +65,8 @@ class TestTSP(ctx: Context,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               speechManager: SpeechManager?,
-              private val mainView: View
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView)  {
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView)  {
 
     override var LOG_TAG: String = TestTSP::class.java.simpleName
 
@@ -91,12 +91,12 @@ class TestTSP(ctx: Context,
         )
 
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE)
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
 
@@ -137,14 +137,13 @@ class TestTSP(ctx: Context,
     private val isLandscape: Boolean = false
     // endregion
 
-    private var curr_trial_stimvalue:Long             = 0L     // isi within the cue sequence and base target
+//    private var curr_trial_stimvalue:Long             = 0L     // isi within the cue sequence and base target
     private var main_isi:Long                   = 0L     // isi within the cue sequence and base target
     private var nCueStimuli:Int                 = 3      // num of cue stimuli
 
     private val isSupra: Boolean = (subject.type == TEST_TSP_V_SUPRA || subject.type == TEST_TSP_A_SUPRA || subject.type == TEST_TSP_T_SUPRA)
 
-    private val trialAbortTime:Long
-        get()       = (nCueStimuli+2)*curr_trial_stimvalue    // allowed number of ms to wait for user response. after this interval the trial ends
+    private var trialAbortTime:Long = 0L
 
     private var trialStartMs:Long               = 0L                    // trial onset
     private var trialEndMs:Long                 = trialAbortTime        // user press latency
@@ -179,6 +178,7 @@ class TestTSP(ctx: Context,
         when {
             mImageView == null && (subject.type == TEST_TSP_V_SUB || subject.type == TEST_TSP_V_SUPRA)  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
             vibrator == null && (subject.type == TEST_TSP_T_SUB || subject.type == TEST_TSP_T_SUPRA)    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mainView == null                                                                            -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
         }
         // set question & create mTrials list
         validAnswers    = mutableListOf()
@@ -230,8 +230,11 @@ class TestTSP(ctx: Context,
             else -> StimuliManager(null, TactileManager(vibrator!!, duration = STIMULUS_DURATION_TACTILE, handler = mStimuliHandler), null,
                 subject.stimuliDelays, ctx, mStimuliHandler)
         }
-        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
 
+        mRespButton             = createResponseButton("press", mLayout, ::onPress)
+        mRespButton.visibility  = View.INVISIBLE
+
+        testEvent.accept(Triple(EVENT_TEST_SETUP_COMPLETED, null, listOf()))
     }
 
     // ===================================================================================
@@ -270,12 +273,11 @@ class TestTSP(ctx: Context,
     // =============================================================================================================================
     override fun show(trial: TrialBasic, isRepeat:Boolean){
 
-        mRespButton = createResponseButton("press", mLayout, ::onPress)
+        trialAbortTime = (nCueStimuli+2)*trial.stim_value    // allowed number of ms to wait for user response. after this interval the trial ends
+
         if(subject.whitenoise == TEST_SWITCH_ENABLED) mNoise?.start()
 
         if(isRepeat)    mTrial.repetitions++
-
-        curr_trial_stimvalue = trial.stim_value
 
         mStimuliHandler.postDelayed({
             trialStartMs = uptimeMillis()
@@ -285,11 +287,15 @@ class TestTSP(ctx: Context,
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
-        }, (FIRST_STIMULUS_DELAY + curr_trial_stimvalue))
+        }, (FIRST_STIMULUS_DELAY + trial.stim_value))
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
-        }, (FIRST_STIMULUS_DELAY + 2*curr_trial_stimvalue))
+        }, (FIRST_STIMULUS_DELAY + 2*trial.stim_value))
+
+        mStimuliHandler.postDelayed({
+            mRespButton.visibility = View.VISIBLE
+        }, FIRST_STIMULUS_DELAY + 2*trial.stim_value + 100L)
 
         mStimuliHandler.postDelayed({
             onStimuliEnd()
@@ -329,10 +335,13 @@ class TestTSP(ctx: Context,
 //            setTextAppearance(TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(context.resources.getColor(R.color.colorPrimary))
         }
-        mRespButton.setOnClickListener {
-            onPress()
-        }
+        mRespButton.setOnClickListener {  onPress()  }
         return mRespButton
+    }
+
+    private fun onPress(){
+        trialEndMs = uptimeMillis() - trialStartMs      // behavioral result
+        onStimuliEnd()
     }
 
     private fun deliverStimulus(trial: TrialTSP){
@@ -343,16 +352,11 @@ class TestTSP(ctx: Context,
         }
     }
 
-    private fun onPress(){
-        trialEndMs = uptimeMillis() - trialStartMs      // behavioral result
-        onStimuliEnd()
-    }
-
     // called by button press or timeout
     override fun onStimuliEnd(){
 
         mStimuliHandler.removeCallbacksAndMessages(null)
-        mLayout.removeView(mRespButton)
+        mRespButton.visibility = View.INVISIBLE
         setAnswer(trialEndMs.toInt(), trialEndMs)
 
         super.onStimuliEnd()

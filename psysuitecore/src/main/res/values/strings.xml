@@ -115,6 +115,8 @@
     <string name="contact_developer">E\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
     <string name="test_failure">Questo test appare corrotto.\nE\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
 
+    <string name="run_test">Eseguendo il test</string>
+
     <string name="error">Errore</string>
 
     <string name="error_audiomanager">gestore dell\'audio non valido</string>
@@ -134,7 +136,7 @@
 
     <string name="label_bindings" translatable="false">Temporal Bindings</string>
     <string name="label_temporal_tests">Temporal Tests</string>
-    <string name="label_various_tests">Various Tests</string>
+    <string name="label_miscellaneous_tests">Various Tests</string>
     <string name="label_decision_tests">Decisions Tests</string>
     <string name="label_illusion_tests">Illusions Tests</string>
     <string name="label_prediction_tests">Prediction Tests</string>

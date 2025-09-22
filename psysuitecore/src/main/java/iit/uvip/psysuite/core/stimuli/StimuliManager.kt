@@ -234,7 +234,7 @@ class StimuliManager(
     }
 
     fun show(){
-        (getValidVisualManager(null) as VisualManager).hide()
+        (getValidVisualManager(null) as VisualManager).show()
     }
 
     fun hide(){
@@ -357,7 +357,9 @@ class StimuliManager(
             val dur = if(duration > 0) duration else mAudioManager.duration
 
             mAudioManager.deliver()
-            mStimuliHandler.postDelayed({ onEnd() }, dur)
+            mStimuliHandler.postDelayed({
+                mAudioManager.stop()
+                onEnd() }, dur)
         }
         catch (e:Exception){
             throw Exception(e.message)
@@ -372,7 +374,10 @@ class StimuliManager(
             val dur = if(duration > 0) duration else mTactileManager.duration
 
             mTactileManager.deliver()
-            mStimuliHandler.postDelayed({ onEnd() }, dur)
+            mStimuliHandler.postDelayed({
+                mTactileManager.stop()
+                onEnd()
+            }, dur)
         }
         catch (e:Exception){
             throw Exception(e.message)
@@ -388,7 +393,10 @@ class StimuliManager(
             val dur = if(duration > 0) duration else mVisualManager.duration
 
             mVisualManager.deliver()
-            mStimuliHandler.postDelayed({ onEnd() }, dur)
+            mStimuliHandler.postDelayed({
+                mVisualManager.stop()
+                onEnd()
+            }, dur)
         }
         catch (e:Exception){
             throw Exception(e.message)

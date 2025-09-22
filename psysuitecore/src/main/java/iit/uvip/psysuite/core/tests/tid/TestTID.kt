@@ -2,6 +2,7 @@ package iit.uvip.psysuite.core.tests.tid
 
 import android.app.Activity
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.adaptive.AdaptiveWrapper
@@ -42,8 +43,9 @@ class TestTID(ctx: Context,
               subject: SubjectTIDParcel,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
-              speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView)
+              speechManager: SpeechManager?,
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView)
 {
     override var LOG_TAG:String = TestTID::class.java.simpleName
 

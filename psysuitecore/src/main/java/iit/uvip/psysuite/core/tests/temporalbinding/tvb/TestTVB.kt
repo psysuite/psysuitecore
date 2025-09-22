@@ -2,6 +2,7 @@ package iit.uvip.psysuite.core.tests.temporalbinding.tvb
 
 import android.app.Activity
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.adaptive.AdaptiveWrapper
@@ -67,8 +68,9 @@ class TestTVB(ctx: Context,
               subject: SubjectBasicParcel,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
-              speechManager: SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager)
+              speechManager: SpeechManager?,
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView)
 {
     /**
      * Tag for logging purposes, specific to this class.

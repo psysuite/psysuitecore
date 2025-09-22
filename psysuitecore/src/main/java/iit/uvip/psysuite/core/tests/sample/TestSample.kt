@@ -31,8 +31,8 @@ unimodal precision: (Audio-Vibration-Visual)
 
 */
 
-class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subject: SubjectSampleParcel, vibrator: VibrationManager?, mImageView: ImageView?, speechManager: SpeechManager?)
-    : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager)
+class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subject: SubjectSampleParcel, vibrator: VibrationManager?, mImageView: ImageView?, speechManager: SpeechManager?, mainView: View?)
+    : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView)
 {
     private var curStimDuration: Long = 0L
     override var LOG_TAG:String = TestSample::class.java.simpleName

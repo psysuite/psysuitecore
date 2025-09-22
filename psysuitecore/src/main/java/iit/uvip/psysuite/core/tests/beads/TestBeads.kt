@@ -59,8 +59,8 @@ class TestBeads(ctx: Context,
                 vibrator: VibrationManager?,
                 mImageView: ImageView?,
                 speechManager: SpeechManager?,
-                private val mainView: View
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView) {
+                mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView) {
 
     /**
      * Tag for logging purposes, specific to this class.
@@ -187,15 +187,15 @@ class TestBeads(ctx: Context,
 
         /**
          * Defines the available modes for advancing to the next trial for each condition.
-         * For the Beads test, it's set to [TEST_NEXTTRIAL_NOCHOOSE], implying progression is handled internally
+         * For the Beads test, it's set to [TEST_NEXTTRIAL_AUTO], implying progression is handled internally
          * or via specific UI elements rather than a generic "next trial" button after each bead/choice.
          *
          * @param ctx The application context.
          * @return A list of lists, where each inner list contains allowed next trial modes.
          */
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE)
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
 

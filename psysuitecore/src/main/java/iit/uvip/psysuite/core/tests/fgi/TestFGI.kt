@@ -32,6 +32,7 @@ import io.reactivex.disposables.Disposable
 import org.albaspazio.core.accessory.toDp
 import java.util.concurrent.TimeUnit
 import android.widget.TextView
+import iit.uvip.psysuite.core.stimuli.ImageViewDefinedException
 import iit.uvip.psysuite.core.trials.FixedTrialsManager
 
 
@@ -47,8 +48,8 @@ class TestFGI(ctx: Context,
               vibrator: VibrationManager?,
               mImageView: ImageView?,
               speechManager: SpeechManager?,
-              private val mainView: View
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView) {
+              mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView) {
 
     override var LOG_TAG: String = TestFGI::class.java.simpleName
 
@@ -121,19 +122,25 @@ class TestFGI(ctx: Context,
         )
 
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE),
-            listOf(TEST_NEXTTRIAL_NOCHOOSE)
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
 
     // =============================================================================================================================
     // INIT
     // =============================================================================================================================
-    override fun initTest(){ // GEMINI_FGI_MIDDLE_FILE_TEST
+    override fun initTest(){
+
+        // sanity checks
+        when {
+            mainView == null -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
+        }
+
         // set question & create mTrials list
         validAnswers    = mutableListOf()
         mQuestion       = ""
@@ -285,7 +292,7 @@ class TestFGI(ctx: Context,
     // =============================================================================================================================
     private fun setUI(labels:Pair<String, String>){
 
-        val mainlayout          = mainView.findViewById(R.id.fragment_test_layout) as ConstraintLayout
+        val mainlayout: ConstraintLayout = mainView!!.findViewById(R.id.fragment_test_layout)
         parent_layout_width     = mainlayout.width
 
         val params              = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)

@@ -3,6 +3,7 @@ package iit.uvip.psysuite.core.tests.bis
 
 import android.app.Activity
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import iit.uvip.psysuite.adaptive.AdaptiveWrapper
@@ -62,8 +63,9 @@ class TestBIS(
     subject: SubjectBasicParcel,
     vibrator: VibrationManager?,
     mImageView: ImageView?,
-    speechManager:SpeechManager?
-) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager){
+    speechManager:SpeechManager?,
+    mainView: View?
+) : TestBasic(ctx, activity, hostfragment, subject, vibrator, mImageView, speechManager, mainView){
 
     // Log tag used for logging messages from this [TestBIS] class. Defaults to the simple name of the class.
     override var LOG_TAG:String = TestBIS::class.java.simpleName

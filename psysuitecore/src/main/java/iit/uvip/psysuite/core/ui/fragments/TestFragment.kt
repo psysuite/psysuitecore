@@ -39,6 +39,9 @@ Three operative modalities (mSubjectParcel.nextTrailModality):
 
 - trial have an answer dialog, where user can also abort                                    // TEST_NEXTTRIAL_ANSWER, TEST_NEXTTRIAL_VOICE_ANSWER, TEST_NEXTTRIAL_VOICE_NORMAL_ANSWER
 - trial have no answer dialog, at the end of the trial, the following trial is displayed    // TEST_NEXTTRIAL_NOCHOOSE
+- trial have no answer dialog, at the end of the trial, the following trial is displayed
+  but a abort and pause buttons are displayed                                               // TEST_NEXTTRIAL_AUTO
+
 - trial have no answer dialog, at the end of the trial, test stops and wait for user press. // TEST_NEXTTRIAL_BUTTON
 
 normal trial-by-trial flow is:
@@ -154,7 +157,14 @@ class TestFragment : BaseFragment(
                 if (mSubjectParcel.classes[0].isNotBlank()) {
                     val testClass                   = Class.forName(mSubjectParcel.classes[0])
                     val constructor: Constructor<*> = testClass.constructors[0]
-                    mTest                           = constructor.newInstance(requireContext(), requireActivity(), this, mSubjectParcel, vibrator, binding.circleView, speechManager) as TestBasic
+                    mTest                           = constructor.newInstance(requireContext(),
+                                                                                requireActivity(),
+                                                                                this,
+                                                                                mSubjectParcel,
+                                                                                vibrator,
+                                                                                binding.circleView,
+                                                                                speechManager,
+                                                                                mMainView) as TestBasic
                 }
                 else throw Exception("mSubjectParcel.classes[0] is empty")
             }
@@ -213,7 +223,7 @@ class TestFragment : BaseFragment(
         // - at the end of each trial, to let user abort the whole test
         binding.btAbort.setOnClickListener{
 
-            mRunnable?.let{ mHandler.removeCallbacks(it) }  // to stop the automatic move to next trial
+            mHandler.removeCallbacksAndMessages(null)  // to stop the automatic move to next trial
 
             show2ChoisesDialog(requireActivity(),
                 requireContext().resources.getString(R.string.warning),

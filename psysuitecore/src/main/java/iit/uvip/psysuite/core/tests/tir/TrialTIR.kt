@@ -1,5 +1,6 @@
 package iit.uvip.psysuite.core.tests.tir
 
+import iit.uvip.psysuite.core.stimuli.iStimulusManager
 import iit.uvip.psysuite.core.trials.TrialBasic
 
 /*
@@ -11,8 +12,7 @@ import iit.uvip.psysuite.core.trials.TrialBasic
 
 class TrialTIR (id:Int=-1, type:Int, label:String,
                 override var magnitude:Float,
-                val isBefore:Boolean,
-                isADA:Boolean=false): TrialBasic(id, type, label) {
+                isADA:Boolean=false, isTraining: Boolean=false): TrialBasic(id, type, label, isADA= isADA, isTraining = isTraining) {
 
     companion object {
         @JvmStatic val LOG_HEADER = "id\tlabel\tisi\tonset\terror\tsuccess\telapsed\tmagnitude\n"
