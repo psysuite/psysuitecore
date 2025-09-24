@@ -174,6 +174,12 @@
     <string name="avb_rb3_text">different</string>
     <string name="avb_question">Are they similar?</string>
 
+
+    <!-- TIR -->
+
+    <string name="tir_label">Temporal Interval Reproduction (TIR)</string>
+    <string name="tir_label_short" translatable="false">TIR</string>
+
     <!-- TID -->
 
     <string name="tid_label">Temporal Interval Discrimination (TID)</string>

@@ -215,6 +215,11 @@
     <string name="avb_rb3_text">diversi</string>
     <string name="avb_question">Sono uguali?</string>
 
+    <!-- TIR -->
+
+    <string name="tir_label">Temporal Interval Reproduction (TIR)</string>
+    <string name="tir_label_short" translatable="false">TIR</string>
+
     <!-- TID -->
 
     <string name="tid_label">Temporal Interval Discrimination (TID)</string>

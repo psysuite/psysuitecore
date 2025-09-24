@@ -468,7 +468,7 @@ abstract class TestBasic(protected val ctx: Context,
 
         // Common durations
         /** Default duration for visual stimuli in milliseconds. */
-        @JvmStatic val STIMULUS_DURATION_VISUAL     = 50L
+        @JvmStatic val STIMULUS_DURATION_VISUAL     = 75L
         /** Default duration for tactile stimuli in milliseconds. */
         @JvmStatic val STIMULUS_DURATION_TACTILE    = 50L
         /** Default duration for audio stimuli in milliseconds. */

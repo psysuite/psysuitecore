@@ -50,7 +50,7 @@ class TestTIR(ctx: Context,
     override var LOG_TAG: String = TestTIR::class.java.simpleName
 
     companion object {
-        @JvmStatic val TEST_BASIC_LABEL = "TRI"
+        @JvmStatic val TEST_BASIC_LABEL = "TIR"
 
 //        @JvmStatic val ISI_SUB   = 750L
 //        @JvmStatic val ISI_SUPRA = 1500L
@@ -158,7 +158,7 @@ class TestTIR(ctx: Context,
                 }
                 else -> FixedTrialsManager(createFixedTrials() as MutableList<TrialBasic>)
             }
-        createResultFile(LOG_HEADER)
+        createResultFile(TrialTIR.LOG_HEADER)
 
         mStimuliManager = when(subject.type){
 
@@ -220,7 +220,7 @@ class TestTIR(ctx: Context,
         if(isRepeat)    mTrial.repetitions++
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(trial as TrialTIR)
+            deliverStimulus(trial as TrialTIR, )
             testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }, FIRST_STIMULUS_DELAY)
 

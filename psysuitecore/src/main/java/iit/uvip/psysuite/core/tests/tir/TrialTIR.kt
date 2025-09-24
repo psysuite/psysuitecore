@@ -1,12 +1,13 @@
 package iit.uvip.psysuite.core.tests.tir
 
-import iit.uvip.psysuite.core.stimuli.iStimulusManager
+import android.util.Log
 import iit.uvip.psysuite.core.trials.TrialBasic
+import kotlin.math.abs
 
 /*
+    stim_value: duration of the stimulus
     correct_answer: time to press (in ms)
     user_answer:  is the error = (time pressed by the user - correct_answer)
-    stim_value: the actual trial pace (main_isi +- magnitude)
     succ: if abs(curr error) < abs(prev error), then success is true
  */
 
@@ -15,6 +16,51 @@ class TrialTIR (id:Int=-1, type:Int, label:String,
                 isADA:Boolean=false, isTraining: Boolean=false): TrialBasic(id, type, label, isADA= isADA, isTraining = isTraining) {
 
     companion object {
-        @JvmStatic val LOG_HEADER = "id\tlabel\tisi\tonset\terror\tsuccess\telapsed\tmagnitude\n"
+        @JvmStatic val LOG_HEADER = "id\tlabel\tdur\tdelta\tsuccess\n"
+    }
+
+    init {
+        setupTrial(magnitude)
+    }
+
+    override fun setupTrial(newvalue:Float):Long {
+        magnitude       = newvalue
+        correct_answer  = newvalue.toInt()
+        return stim_value
+    }
+
+    // result: user's button press duration == elapsed
+    // success is true if the present error is smaller than the previous one
+    // if first trial, success is always true
+    override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
+        user_answer         = (result - correct_answer)
+        elapsed             = elapsedms
+        prev_trial          = prev_tr
+
+        success =   if(prev_tr!= null){
+            val succ = (abs(user_answer) <= abs(prev_tr.user_answer))
+
+            val delta = user_answer - prev_tr.user_answer
+            Log.d("TrialTIR", "--------------------------------------------")
+            Log.d("TrialTIR", "delta=$delta,  success=$succ, curr_error=$user_answer, prev_error=${prev_tr.user_answer}, ")
+            succ
+        }
+        else    true
+        user_answer_extra   = extra_text
+    }
+
+    // all class exported as string
+    override fun toString():String{
+        return "$id\t$label\t$stim_value\t$user_answer\t$success\n"
+    }
+
+    // data exported to log file
+    //          "id\tlabel\tisi         \tonset         \terror\tsuccess\telapsed\tmagnitude\n"
+    override fun Log():String{
+        return "$id\t$label\t$stim_value\t$user_answer\t$success\n"
+    }
+
+    override fun debugInfo():String{
+        return "${super.debugInfo()}, pos=$stim_value"
     }
 }

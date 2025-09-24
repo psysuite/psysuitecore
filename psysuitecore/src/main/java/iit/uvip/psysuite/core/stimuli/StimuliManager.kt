@@ -356,7 +356,7 @@ class StimuliManager(
 
             val dur = if(duration > 0) duration else mAudioManager.duration
 
-            mAudioManager.deliver()
+            mAudioManager.deliver(duration)
             mStimuliHandler.postDelayed({
                 mAudioManager.stop()
                 onEnd() }, dur)
@@ -373,9 +373,10 @@ class StimuliManager(
 
             val dur = if(duration > 0) duration else mTactileManager.duration
 
-            mTactileManager.deliver()
+            mTactileManager.deliver(duration)
             mStimuliHandler.postDelayed({
-                mTactileManager.stop()
+                if(type != STIM_TYPE_T1)
+                    mTactileManager.stop()
                 onEnd()
             }, dur)
         }
@@ -392,11 +393,8 @@ class StimuliManager(
 
             val dur = if(duration > 0) duration else mVisualManager.duration
 
-            mVisualManager.deliver()
-            mStimuliHandler.postDelayed({
-                mVisualManager.stop()
-                onEnd()
-            }, dur)
+            mVisualManager.deliver(duration)
+            mStimuliHandler.postDelayed({ onEnd() }, dur)
         }
         catch (e:Exception){
             throw Exception(e.message)
