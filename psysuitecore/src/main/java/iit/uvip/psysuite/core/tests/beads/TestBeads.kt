@@ -368,7 +368,7 @@ class TestBeads(ctx: Context,
         val bead_type   =   if((mTrial as TrialBeads).beads_types[currBead])    BEAD_TYPE_TRUE
                             else                                                BEAD_TYPE_FALSE
         val elapsed = uptimeMillis() - trialStartMs
-        saveText("BEAD\t" + (currBead+1).toString() + "\t" + bead_type + "\t" +elapsed.toString()+"\n", notifyDm = false)
+        saveText("BEAD\t${(currBead + 1)}\t$bead_type\t$elapsed\n", notifyDm = false)
 
         button_left.text        = buttonsLabels[2] // "New Bead"
         button_right.text       = buttonsLabels[3] // "Choose Jar"

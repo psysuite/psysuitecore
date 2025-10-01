@@ -802,7 +802,7 @@ class TestTTC(ctx: Context,
     override fun onStimuliEnd(){
 
         stopPolling()
-        setAnswer(trialEndMs.toInt(), trialEndMs)
+        setAnswer(trialEndMs.toInt())
         mStimuliHandler.removeCallbacksAndMessages(null)
         mScenario.clearScenario()
 

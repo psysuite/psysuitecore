@@ -28,11 +28,6 @@ class TrialTFI(id:Int=-1, type:Int, label:String, override var correct_answer:In
         processModalities(str_corr_answer.split(","))
     }
 
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$type\t$label\t$soa\t$success\n"
-    }
-
     // data exported to log file
     override fun Log():String{
         return "$id\t$label\t$soa\t$success\t${valid_answers[correct_answer]}\t$user_answer_extra\t$elapsed\t$repetitions\n"

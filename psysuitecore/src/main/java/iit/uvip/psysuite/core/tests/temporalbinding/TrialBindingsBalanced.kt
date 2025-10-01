@@ -65,11 +65,6 @@ class TrialBindingsBalanced(id:Int=-1, type:Int=0, override var magnitude:Float,
         return stim_value
     }
 
-    // all class exported as string
-    override fun toString():String {
-        return "$id\t$type\t$label\t$stim_value\n"
-    }
-
     // data exported to log file
     override fun Log():String {
         return "$id\t$type\t$stim_value\t${correct_answers[user_answer]}\t$success\t$elapsed\n"

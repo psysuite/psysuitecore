@@ -111,5 +111,4 @@ data class PsySuiteCorePreferences(val delay_a1: Long,
                                    val delay_t2: Long,
                                    val delay_v1: Long,
                                    val delay_v2: Long,
-                                   val main_email:String){
-}
+                                   val main_email:String)

@@ -10,11 +10,6 @@ class TrialFGI(id: Int = -1, type: Int, label: String, var audio_name:String) :
         @JvmStatic val LOG_HEADER           = "id\ttype\tfig\taudio\n"
     }
 
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$type\t$label\t$audio_name\tn.a.\n"
-    }
-
     // only to validate Class
     override fun Log():String{
         return "$id\t$type\t$label\t$audio_name\n"

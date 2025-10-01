@@ -15,7 +15,7 @@ open class TrialBasic(
 
     var user_answer:Int             = -1
     var repetitions:Int             =  1
-    var elapsed:Long                = -1
+    var elapsed:Long                = -1L
     var prev_trial: TrialBasic?     = null
     var user_answer_extra:String    = ""
     open var correct_answer:Int     = 0 // TODO: should become Any. so i can store also durations (e.g. TTC e TSP),
@@ -39,12 +39,17 @@ open class TrialBasic(
     // - contains user response (result, elapsed, extra)
     // calculate success
     // this method shall be overridden in all the tasks where success also depends on previous trial (e.g. TTC, TSP)
-    open fun setResponse(result: Int, elapsedms: Long, prev_tr: TrialBasic? = null, extra_text:String="") {
+    open fun setResponse(result: Int, elapsedms: Long = -1L, prev_tr: TrialBasic? = null, extra_text:String="") {
         user_answer         = result
         elapsed             = elapsedms
         prev_trial          = prev_tr
         success             = (result == correct_answer)
         user_answer_extra   = extra_text
+    }
+
+
+    override fun toString():String{
+        return Log()
     }
 
     // data exported to log file

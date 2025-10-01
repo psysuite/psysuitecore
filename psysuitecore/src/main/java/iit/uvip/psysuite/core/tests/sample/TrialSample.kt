@@ -14,14 +14,6 @@ class TrialSample(id:Int=-1, type:Int, label:String, val source:Int, val extraTr
         @JvmStatic val LAST_STIMULUS_DELAY  = 1000
     }
 
-    init {
-    }
-
-    // all class exported as string
-    override fun toString():String{
-        return id.toString() + "\t" + type.toString() + "\t" + label + "\t" + "\n"
-    }
-
     // data exported to log file
     override fun Log():String{
         return id.toString() +  "\t" + label + "\t" + "\n"

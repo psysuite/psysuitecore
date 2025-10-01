@@ -83,23 +83,29 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         else                    binding.radioGroupGender.clearCheck()
 
         //------------------------------------------------------
-        // trials manager
+        // trials manager (label + spinner)
         //------------------------------------------------------
-        with(binding.spTrialManager!!){
+        with(binding.spTrialManager){
 
             if(subj.trman_type == TestBasic.TEST_TRMAN_ADAPTIVE || subj.trman_type == TestBasic.TEST_TRMAN_FIXED)
                 visibility                          = View.INVISIBLE
             else{
-                // is TEST_TRMAN_CHOOSE_FIXED or TEST_TRMAN_CHOOSE_QUEST
+                // is TEST_TRMAN_CHOOSE_FIXED or TEST_TRMAN_CHOOSE_ADAPTIVE
                 visibility                          = View.VISIBLE
                 val trial_managers                  = resources.getStringArray(R.array.trial_manager_types)
                 val adapter                         = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, trial_managers)
-                binding.spTrialManager!!.adapter    = adapter
+                binding.spTrialManager.adapter    = adapter
                 if(subj.trman_type == TestBasic.TEST_TRMAN_CHOOSE_FIXED)
                         setSelection(0)
                 else    setSelection(1)
             }
         }
+
+        with(binding.labTrialManager){
+            visibility =    if(subj.trman_type == TestBasic.TEST_TRMAN_ADAPTIVE || subj.trman_type == TestBasic.TEST_TRMAN_FIXED)   View.INVISIBLE
+                            else                                                                                                    View.VISIBLE
+        }
+
         binding.spTrialManager.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 setTrialManager(binding.spTrialManager.selectedItem)
@@ -130,7 +136,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             TestBasic.TEST_NEXTTRIAL_ANSWER -> binding.swInteractive.visibility   = View.GONE
         }
         //------------------------------------------------------
-        // noise visibility
+        // noise visibility (switch)
         //------------------------------------------------------
         with(binding.swWhiteNoise){
 
@@ -147,7 +153,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             }
         }
         //------------------------------------------------------
-        // can repeat trial
+        // can repeat trial (switch)
         //------------------------------------------------------
         with(binding.swRepeatTrial!!){
 
@@ -164,7 +170,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             }
         }
         //------------------------------------------------------
-        // show result
+        // show result (switch)
         //------------------------------------------------------
         with(binding.swShowResult!!){
 
@@ -181,7 +187,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             }
         }
         //---------------------------------------------------
-        // do training
+        // do training (switch)
         //------------------------------------------------------
         with(binding.swTraining!!){
 

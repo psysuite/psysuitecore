@@ -258,8 +258,8 @@ class TestBIS(
     private val nAT_range_supra             = 600F
     private val adoParams                   = ADOParams(guess_rate=0.5F, lapse_rate=0.04F, noise_perc=0.1F)
 
-    lateinit private var taskADAParams:TaskADAParams
-    lateinit private var adoWrapper:AdaptiveWrapper
+    private lateinit var taskADAParams:TaskADAParams
+    private lateinit var adoWrapper:AdaptiveWrapper
     // endregion
 
     // =============================================================================================================================

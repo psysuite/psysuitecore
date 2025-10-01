@@ -593,7 +593,7 @@ abstract class TestBasic(protected val ctx: Context,
      * @param elapsed The time elapsed for the answer in milliseconds. Defaults to -1.
      * @param extra_text Any additional text associated with the answer. Defaults to an empty string.
      */
-    open fun setAnswer(result: Int = -1, elapsed: Long = -1, extra_text: String = ""){
+    open fun setAnswer(result: Int = -1, elapsed: Long = -1L, extra_text: String = ""){
         if (result != -1 || extra_text.isNotEmpty()){
             mTrialsManager.setResponse(result, elapsed, extra_text)
             mSummary?.add(mTrial)
@@ -805,7 +805,7 @@ abstract class TestBasic(protected val ctx: Context,
         mNoise?.stop()
         mNoise?.prepare()
 
-        // wait for 500 ms and then send event
+        // wait for 500 ms and then decide what to do
         mStimuliHandler.postDelayed({
             when (subject.nextTrailModality) {
                 TEST_NEXTTRIAL_BUTTON               ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_ABORT, null, listOf()))

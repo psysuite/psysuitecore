@@ -220,12 +220,12 @@ class TestTIR(ctx: Context,
         if(isRepeat)    mTrial.repetitions++
 
         mStimuliHandler.postDelayed({
-            deliverStimulus(trial as TrialTIR, )
+            deliverStimulus(trial as TrialTIR)
             testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
         }, FIRST_STIMULUS_DELAY)
 
         mStimuliHandler.postDelayed({
-            mRespButton.visibility = View.VISIBLE
+            mRespButton.visibility = VISIBLE
         }, FIRST_STIMULUS_DELAY + trial.stim_value + 100L)
 
         mStimuliHandler.postDelayed({
@@ -308,7 +308,7 @@ class TestTIR(ctx: Context,
     override fun onStimuliEnd() {
         mStimuliHandler.removeCallbacksAndMessages(null)
         mRespButton.visibility = View.INVISIBLE
-        setAnswer(trialEndMs.toInt(), trialEndMs)
+        setAnswer(trialEndMs.toInt())
 
         super.onStimuliEnd()
     }

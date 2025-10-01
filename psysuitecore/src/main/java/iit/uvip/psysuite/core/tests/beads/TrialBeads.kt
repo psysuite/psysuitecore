@@ -10,18 +10,8 @@ class TrialBeads(id: Int = -1, type: Int, label: String, var img_res:Int, var be
         @JvmStatic val LOG_HEADER           = "id\ttype\tfig\n"
     }
 
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$type\t$label\n"
-    }
-
     // only to validate Class
     override fun Log():String{
-        return "$id\t$type\t$label\n"
-    }
-
-    // data exported to log file
-    fun Log(res:Int):String{
         return "$id\t$type\t$label\n"
     }
 }

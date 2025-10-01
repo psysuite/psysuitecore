@@ -12,11 +12,6 @@ open class TrialBindings3latencies(id:Int=-1, type:Int=0, var a:Long=0L, var t:L
         val LOG_HEADER = "id\ttype\taudio\ttactile\tvideo\tanswer\tsuccess\telapsed\n"
     }
 
-    // all class exported as string
-    override fun toString(): String {
-        return "$id\t$type\t$a\t$t\t$v\n"
-    }
-
     // data exported to log file
     override fun Log(): String {
         return "$id\t$type\t$a\t$t\t$v\t$user_answer\t$success\t$elapsed\n"

@@ -16,7 +16,7 @@ class TrialTIR (id:Int=-1, type:Int, label:String,
                 isADA:Boolean=false, isTraining: Boolean=false): TrialBasic(id, type, label, isADA= isADA, isTraining = isTraining) {
 
     companion object {
-        @JvmStatic val LOG_HEADER = "id\tlabel\tdur\tdelta\tsuccess\n"
+        @JvmStatic val LOG_HEADER = "id\tlabel\tdur\terror\tsuccess\n"
     }
 
     init {
@@ -34,7 +34,6 @@ class TrialTIR (id:Int=-1, type:Int, label:String,
     // if first trial, success is always true
     override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
         user_answer         = (result - correct_answer)
-        elapsed             = elapsedms
         prev_trial          = prev_tr
 
         success =   if(prev_tr!= null){
@@ -47,11 +46,6 @@ class TrialTIR (id:Int=-1, type:Int, label:String,
         }
         else    true
         user_answer_extra   = extra_text
-    }
-
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$label\t$stim_value\t$user_answer\t$success\n"
     }
 
     // data exported to log file

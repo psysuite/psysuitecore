@@ -15,11 +15,6 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, override var magnitude:Floa
         setupTrial(magnitude)
     }
 
-    // all class exported as string
-    override fun toString():String {
-        return "$id\t$type\t$stim_value\n"
-    }
-
     // data exported to log file
     override fun Log():String {
         return "$id\t$type\t$stim_value\t$user_answer\t$success\t$elapsed\n"

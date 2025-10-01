@@ -74,7 +74,7 @@ abstract class TrialsManager(
         return mTrial.stim_value
     }
 
-    open fun setResponse(result:Int, elapsedms:Long, extra_text:String = "") {
+    open fun setResponse(result:Int, elapsedms:Long = -1L, extra_text:String = "") {
         mTrial.setResponse(result, elapsedms, mPrevTrial, extra_text)
     }
 

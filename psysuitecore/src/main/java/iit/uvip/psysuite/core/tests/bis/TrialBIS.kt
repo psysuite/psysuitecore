@@ -23,7 +23,7 @@ import iit.uvip.psysuite.core.trials.TrialBasic
  * @param type The type identifier for the trial.
  * @param label A descriptive label for the trial.
  */
-class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false): TrialBasic(
+class TrialBIS(id:Int=-1, type:Int, label:String, override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false): TrialBasic(
     id,
     type,
     label,
@@ -64,7 +64,7 @@ class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:F
      * @param newvalue The new magnitude (temporal distance from `mid_latency`) for the trial.
      * @return The calculated `stim_value` (actual stimulus presentation time in ms).
      */
-    final override fun setupTrial(newvalue: Float):Long{
+    override fun setupTrial(newvalue: Float):Long{
         magnitude       = newvalue
         correct_answer  =   if(isBefore)    0
                             else            1
@@ -90,17 +90,6 @@ class TrialBIS(id:Int=-1, type:Int, label:String, final override var magnitude:F
     protected fun stimvalue2magnitude():Long{
         return  if(isBefore)  mid_latency - stim_value
                 else          stim_value - mid_latency
-    }
-
-
-    /**
-     * Returns a string representation of the trial's core parameters.
-     * This is useful for quick debugging or simple display of trial information.
-     *
-     * @return A tab-separated string including id, type, label, conflict type, stimulus value, primary duration, success status, and secondary duration.
-     */
-    override fun toString():String{
-        return "$id\t$type\t$label\t$conflict_type\t$stim_value\t$duration\t$success\t$duration2\n"
     }
 
     /**

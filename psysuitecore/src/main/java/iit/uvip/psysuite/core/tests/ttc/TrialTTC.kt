@@ -97,7 +97,6 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
     // if first trial, success is always true
     override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
         user_answer         = (result - TT).toInt()
-        elapsed             = elapsedms
         prev_trial          = prev_tr
 
 //        var delta           = 0
@@ -121,19 +120,13 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
         user_answer_extra   = extra_text
     }
 
-
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$label\t$stim_value\t$isHoriz\t$isDownRight\t$user_answer\t${SP.round(3)}\t$TPL\t$TT\t$imageId"
-    }
-
     fun toStringShort():String{
         return "sval=$stim_value\t,error=$user_answer\t, vel=${SP.round(3)}\t, ipl=$IPL"
     }
 
     // data exported to log file
     override fun Log():String{
-        return toString() + "\n"
+        return "$id\t$label\t$stim_value\t$isHoriz\t$isDownRight\t$user_answer\t${SP.round(3)}\t$TPL\t$TT\t$imageId"
     }
 
     override fun debugInfo():String{

@@ -80,6 +80,7 @@ class TestTSP(ctx: Context,
         @JvmStatic val ISI_RND_MULT = 0.1F  // percentage of isi to randomize
         @JvmStatic val FIRST_STIMULUS_DELAY = 1000L  //
         @JvmStatic val N_BLOCKS = 10  //
+        @JvmStatic val STIMULUS_DURATION_VISUAL = 100L  //
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
             ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}",     TEST_TSP_V_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}" ,   Populations.sighted_populations),
@@ -214,7 +215,7 @@ class TestTSP(ctx: Context,
                 }
                 else -> FixedTrialsManager(createFixedTrials() as MutableList<TrialBasic>)
             }
-        createResultFile(LOG_HEADER)
+        createResultFile(TrialTSP.LOG_HEADER)
 
         mStimuliManager = when(subject.type){
 
@@ -280,26 +281,26 @@ class TestTSP(ctx: Context,
         if(isRepeat)    mTrial.repetitions++
 
         mStimuliHandler.postDelayed({
-            trialStartMs = uptimeMillis()
-            deliverStimulus(trial as TrialTSP)
-            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
+            mRespButton.visibility = VISIBLE
         }, FIRST_STIMULUS_DELAY)
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
-        }, (FIRST_STIMULUS_DELAY + trial.stim_value))
+            testEvent.accept(Triple(EVENT_STIMULI_START, null, listOf()))
+        }, FIRST_STIMULUS_DELAY + 250L)
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
-        }, (FIRST_STIMULUS_DELAY + 2*trial.stim_value))
+        }, (FIRST_STIMULUS_DELAY + trial.stim_value + 250L))
 
         mStimuliHandler.postDelayed({
-            mRespButton.visibility = View.VISIBLE
-        }, FIRST_STIMULUS_DELAY + 2*trial.stim_value + 100L)
+            deliverStimulus(trial as TrialTSP)
+            trialStartMs = uptimeMillis()
+        }, (FIRST_STIMULUS_DELAY + 2*trial.stim_value + 250L))
 
         mStimuliHandler.postDelayed({
             onStimuliEnd()
-        }, (FIRST_STIMULUS_DELAY + trialAbortTime))
+        }, (FIRST_STIMULUS_DELAY + trialAbortTime + 250L))
     }
 
     private fun createResponseButton(txt:String, parent_layout:ConstraintLayout, onPress:() -> Unit): Button {
@@ -346,9 +347,9 @@ class TestTSP(ctx: Context,
 
     private fun deliverStimulus(trial: TrialTSP){
         when(trial.type) {
-            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA ->  mStimuliManager.deliverAStimulus()
-            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA ->  mStimuliManager.deliverVStimulus()
-            TEST_TSP_T_SUB, TEST_TSP_T_SUPRA ->  mStimuliManager.deliverTStimulus()
+            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA ->  mStimuliManager.deliverAStimulus(trial.duration)
+            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA ->  mStimuliManager.deliverVStimulus(trial.duration)
+            TEST_TSP_T_SUB, TEST_TSP_T_SUPRA ->  mStimuliManager.deliverTStimulus(trial.duration)
         }
     }
 
@@ -357,7 +358,7 @@ class TestTSP(ctx: Context,
 
         mStimuliHandler.removeCallbacksAndMessages(null)
         mRespButton.visibility = View.INVISIBLE
-        setAnswer(trialEndMs.toInt(), trialEndMs)
+        setAnswer(trialEndMs.toInt())
 
         super.onStimuliEnd()
     }

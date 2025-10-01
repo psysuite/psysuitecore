@@ -45,11 +45,6 @@ class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:In
         return stim_value
     }
 
-    // all class exported as string
-    override fun toString():String{
-        return "" //id.toString() + "\t" + type.toString() + "\t" + label + "\t" + conflict_type + "\t" + stim_value.toString() + "\t" + duration.toString() + "\t" + success.toString() + "\t" + duration2.toString()+ "\n"
-    }
-
     // data exported to log file
     override fun Log(): String {
         return id.toString() + "\t" + type.toString() + "\t" + block.toString() + "\t" + group.toString() + "\t" + session.toString() + "\t" + user_answer + "\t" + success.toString() + "\t" + elapsed.toString() + "\t" + delta1.toString() + "\t" + delta2.toString() + "\t" + ref_first.toString() +"\n"

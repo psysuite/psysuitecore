@@ -480,7 +480,7 @@ class TestRIVGRP(ctx: Context,
     override fun show(trial: TrialBasic, isRepeat:Boolean){
 
         try {
-            val res = saveText(mTrial.Log(), notifyDm = false) // Save trial log without immediate DM notification
+            saveText(mTrial.Log(), notifyDm = false) // Save trial log without immediate DM notification
 
             if(isContinuosResponse) {
                 txt_left?.visibility        = View.VISIBLE

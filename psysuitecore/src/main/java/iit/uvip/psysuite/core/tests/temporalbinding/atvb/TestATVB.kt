@@ -406,7 +406,7 @@ class TestATVB(
 
         // static part
         // 8
-        for (i in 0 until 8) trials.add(TrialBindingsUnBalanced(++cnt, BindingsConstants.TYPE_ATV, 0.0F))
+        for (i in 0 until 8) trials.add(TrialBindingsUnBalanced(++cnt, TYPE_ATV, 0.0F))
 
         // 36
         lStimuliUnbalanced.map {

@@ -75,7 +75,7 @@ class AnswerDialogFragmentTFI: DialogFragment()
             val title                   = getString("title", "Enter Name")
             dialog?.setTitle(title)
 
-            binding.txtTrials.text      = "trial " +  (getInt("trial_id", 0) + 1).toString() + " of " + getInt("tot_trials", 0)
+            binding.txtTrials.text      = "trial ${(getInt("trial_id", 0) + 1)} of ${getInt("tot_trials", 0)}"
             mQuestion                   = getString("question", "Enter Name")
             mAnswers                    = getStringArrayList("answers") ?: arrayListOf()
             correctAnswerId             = getInt("correct_answer", 0)

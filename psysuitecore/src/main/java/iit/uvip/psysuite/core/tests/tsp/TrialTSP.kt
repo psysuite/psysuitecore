@@ -22,17 +22,17 @@ class TrialTSP (id:Int=-1, type:Int, label:String,
                 isTraining: Boolean=false): TrialBasic(id, type, label, isADA=isADA, isTraining = isTraining) {
 
     companion object {
-        @JvmStatic val LOG_HEADER = "id\tlabel\tisi\tonset\terror\tsuccess\telapsed\tmagnitude\n"
+        @JvmStatic val LOG_HEADER = "id\tlabel\tisi\terror\tsuccess\tmagnitude\n"
     }
 
     init {
         setupTrial(magnitude)
     }
 
-    // 0 trial latency is calculated when delivering the first stimuli. correct answer is thus nCues x actual isi (isi +- magnitude)
+    // trial latency is calculated at last stimulus onset, correct answer is thus actual isi (isi +- magnitude)
     override fun setupTrial(newvalue: Float):Long{
         magnitude       = newvalue
-        correct_answer  = (nCues*stim_value).toInt()
+        correct_answer  = stim_value.toInt()
         return stim_value
     }
 
@@ -49,7 +49,6 @@ class TrialTSP (id:Int=-1, type:Int, label:String,
     // results is # ms of user answer
     override fun setResponse(result:Int, elapsedms:Long, prev_tr: TrialBasic?, extra_text:String) {
         user_answer         = (result - correct_answer)
-        elapsed             = elapsedms
         prev_trial          = prev_tr
 
         success =   if(prev_tr!= null){
@@ -65,20 +64,10 @@ class TrialTSP (id:Int=-1, type:Int, label:String,
         user_answer_extra   = extra_text
     }
 
-    protected fun stimvalue2magnitude():Long{
-        return  if(isBefore)  isi - stim_value
-                else          stim_value - isi
-    }
-
-    // all class exported as string
-    override fun toString():String{
-        return "$id\t$label\t$stim_value\t$correct_answer\t$user_answer\t$success\t$elapsed\t$magnitude\n"
-    }
-
     // data exported to log file
     //          "id\tlabel\tisi         \tonset         \terror\tsuccess\telapsed\tmagnitude\n"
     override fun Log():String{
-        return "$id\t$label\t$stim_value\t$correct_answer\t$user_answer\t$success\t$elapsed\t$magnitude\n"
+        return "$id\t$label\t$stim_value\t$user_answer\t$success\t$magnitude\n"
     }
 
     override fun debugInfo():String{

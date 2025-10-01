@@ -30,16 +30,6 @@ class TrialMMD(id: Int = -1, type: Int, label: String, override var correct_answ
     }
 
     /**
-     * Provides a string representation of the trial, typically for simpler display or debugging.
-     * Includes id, type, label, success status, and audio_id.
-     *
-     * @return A tab-separated string with key trial information.
-     */
-    override fun toString():String{
-        return "$id\t$type\t$label\t$success\t$audio_id\n"
-    }
-
-    /**
      * Formats the trial data for logging to a result file.
      * Uses the format defined by [LOG_HEADER].
      *
