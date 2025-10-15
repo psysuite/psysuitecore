@@ -400,8 +400,9 @@ class TestFragment : BaseFragment(
             if(it.isNotEmpty()) files_list.add(it)
         }
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name),
-                            TestBasic.TEST_BUNDLE_RESULT_LABEL)
+//        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name, mSubjectParcel), TestBasic.TEST_BUNDLE_RESULT_LABEL)
+        // TODO: depends on TestResult definition and ResultsManager in psysuite
+        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         requireView().findNavController().popBackStack()
     }
     // endregion

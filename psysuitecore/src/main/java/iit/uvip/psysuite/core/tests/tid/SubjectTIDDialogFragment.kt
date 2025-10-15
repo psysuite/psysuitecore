@@ -9,10 +9,10 @@ import android.widget.ArrayAdapter
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoTidBinding
 import iit.uvip.psysuite.core.tests.TestBasic
-import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectLongitudinalDialogFragment
+import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 import iit.uvip.psysuite.core.utility.ConditionData
 
-class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterView.OnItemSelectedListener
+class SubjectTIDDialogFragment : SubjectBasicDialogFragment(), AdapterView.OnItemSelectedListener
 {
     override val LOG_TAG: String = SubjectTIDDialogFragment::class.java.simpleName
     private lateinit var binding: FragmentSubjectInfoTidBinding
@@ -107,7 +107,7 @@ class SubjectTIDDialogFragment : SubjectLongitudinalDialogFragment(), AdapterVie
     }
 
     override fun updateSubject(): SubjectTIDParcel{
-        subject  = super.updateSubject() as SubjectTIDParcel
+        subject  = super.updateSubject()
 
         (subject as SubjectTIDParcel).group     = mTaskCodeLabels[binding.spGroup.selectedItemPosition].id
         (subject as SubjectTIDParcel).session   = binding.spinner.selectedItemPosition - 1

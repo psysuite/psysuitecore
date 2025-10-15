@@ -32,7 +32,11 @@ class SubjectBeadsParcel(
     override var doTraining: Int = TestBasic.TEST_SWITCH_DISABLED,
     
     override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
-    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND
+    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
+
+    override var spinner_sel: Int = -1000,
+    override var spinner_label: String = "session",
+    override var spinner_data_resource: Int = -1
 ) : SubjectBasicParcel(
     classes = classes,
     label = label,
@@ -52,7 +56,10 @@ class SubjectBeadsParcel(
     canRepeat = canRepeat,
     doTraining = doTraining,
     showTrialID = showTrialID,
-    abortMode = abortMode
+    abortMode = abortMode,
+    spinner_sel = spinner_sel,
+    spinner_label = spinner_label,
+    spinner_data_resource = spinner_data_resource
 )
 
 

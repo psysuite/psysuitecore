@@ -8,8 +8,6 @@ import android.widget.AdapterView
 
 import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicRivgrpBinding
-import iit.uvip.psysuite.core.databinding.FragmentSubjectInfoBasicSpinnerBinding
-import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.ui.subjects_dialog.SubjectBasicDialogFragment
 
 

@@ -1,6 +1,7 @@
 package iit.uvip.psysuite.core.utility
 
 import android.os.Parcelable
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -74,6 +75,7 @@ fun List<IdLabelData>.getIds():List<Int>{
 }
 
 @Parcelize
+//data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files: ArrayList<String> = arrayListOf(), val testClass:String, val subject: SubjectBasicParcel) : Parcelable
 data class TestResult(var code:Int=-1, var mailsubject:String, var mailbody:String, var res_files: ArrayList<String> = arrayListOf(), val testClass:String) : Parcelable
 
 data class StimulusATBInfants(val type: Int, val tactile_pattern:Int)

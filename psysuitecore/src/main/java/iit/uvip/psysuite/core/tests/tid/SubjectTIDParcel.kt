@@ -2,7 +2,7 @@ package iit.uvip.psysuite.core.tests.tid
 
 import android.content.Context
 import iit.uvip.psysuite.core.model.Populations
-import iit.uvip.psysuite.core.model.parcel.SubjectLongitParcel
+import iit.uvip.psysuite.core.model.parcel.SubjectBasicParcel
 import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.utility.ConditionData
@@ -40,9 +40,10 @@ class SubjectTIDParcel(
     override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
 
     override var spinner_sel: Int = -1,
+    override var spinner_label: String = "session",
     override var spinner_data_resource: Int = -1,
     var group: Int = -1
-) : SubjectLongitParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, spinner_sel, spinner_data_resource){
+) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, spinner_sel, spinner_label, spinner_data_resource){
 
     override fun getFilesPrefix(ctx:Context):String{
 

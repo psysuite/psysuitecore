@@ -43,9 +43,13 @@ class SubjectRIVGRPParcel(
     var blockDuration:Long      = 150000,
     var minImagesXblock:Int     = 2,
     var defaultBlocks:List<Int> = listOf(2,2,4,2,2,4),
-    var totBlocks:Int           = 4
+    var totBlocks:Int           = 4,
 
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode){
+    override var spinner_sel: Int = -1000,
+    override var spinner_label: String = "session",
+    override var spinner_data_resource: Int = -1
+
+) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, spinner_sel, spinner_label, spinner_data_resource){
 
     override fun getFilesPrefix(ctx:Context):String{
 

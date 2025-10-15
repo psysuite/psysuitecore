@@ -25,12 +25,13 @@ import org.albaspazio.core.filesystem.*
  * It provides functionality for:
  * - Storing basic subject demographics (label, age, gender, population).
  * - Holding test-specific parameters (type, block, debug status, device info, stimuli delays, trial progression modalities).
+ * - Supporting longitudinal tests with session/spinner selection (when spinner_sel != -1000).
  * - Generating standardized file names for subject data, results, and summaries.
  * - Saving and loading subject configurations to/from JSON files.
  * - Validating subject information.
  *
- * Subclasses are created for each specific test, initializing options like `classes`,
- * `nextTrailModality`, `whitenoise`, etc., as needed.
+ * All tests are intrinsically longitudinal. For non-longitudinal tests, set spinner_sel = -1000
+ * to hide the longitudinal UI elements and ignore session functionality.
  *
  * @param classes List of class names, typically used for reflection or identification. Used to find companion object methods.
  * @param label A descriptive label or identifier for the subject (e.g., name or code). Defaults to an empty string.
@@ -51,6 +52,9 @@ import org.albaspazio.core.filesystem.*
  * @param doTraining Configuration for enabling a training phase. Defaults to [TestBasic.TEST_SWITCH_DISABLED].
  * @param showTrialID Configuration for showing trial IDs. Defaults to [TestBasic.TEST_SHOWTRIALS_NEVER].
  * @param abortMode Configuration for aborting the test. Defaults to [TestBasic.TEST_ABORT_TRIALEND].
+ * @param spinner_sel The currently selected item's index in the spinner. Set to -1000 for non-longitudinal tests. Defaults to -1000.
+ * @param spinner_label The label associated with the current spinner selection. Defaults to "session".
+ * @param spinner_data_resource The resource ID for the data populating the spinner (e.g., a string array). Defaults to -1.
  */
 abstract class SubjectBasicParcel(
     open var classes: List<String> = listOf(),
@@ -74,7 +78,11 @@ abstract class SubjectBasicParcel(
     open var doTraining: Int    = TestBasic.TEST_SWITCH_DISABLED,
     
     open var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
-    open var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND
+    open var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
+
+    open var spinner_sel: Int = -1000,
+    open var spinner_label: String = "session",
+    open var spinner_data_resource: Int = -1
 ) : Parcelable {
 
     /** The name of the file where this subject's data is stored. Not included in Parcelization. */
@@ -288,4 +296,33 @@ abstract class SubjectBasicParcel(
                 }
     }
     // =============================================================================================================
+
+    /**
+     * The currently selected session number (0-indexed).
+     * This is an alias for `spinner_sel`.
+     * Only meaningful when spinner_sel != -1000 (longitudinal tests).
+     */
+    var session: Int
+        get() = spinner_sel
+        set(value) {
+            spinner_sel = value
+        }
+
+    /**
+     * The resource ID for the array that defines the available test sessions (e.g., a string array from resources).
+     * This is an alias for `spinner_data_resource`.
+     * Only meaningful when spinner_sel != -1000 (longitudinal tests).
+     */
+    var test_sessions_array: Int
+        get() = spinner_data_resource
+        set(value) {
+            spinner_data_resource = value
+        }
+
+    /**
+     * Indicates whether this test configuration uses longitudinal functionality.
+     * Returns true if spinner_sel != -1000, false otherwise.
+     */
+    val isLongitudinal: Boolean
+        get() = spinner_sel != -1000
 }

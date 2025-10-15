@@ -56,8 +56,12 @@ class SubjectBISParcel(
     override var doTraining: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
     
     override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
-    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode)
+    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
+
+    override var spinner_sel: Int = -1000,
+    override var spinner_label: String = "session",
+    override var spinner_data_resource: Int = -1
+) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, spinner_sel, spinner_label, spinner_data_resource)
 
 
 

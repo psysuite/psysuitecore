@@ -18,6 +18,7 @@ import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.filesystem.deleteFilesStartingWith
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
+import androidx.core.view.isVisible
 
 open class SubjectBasicDialogFragment: DialogFragment(){
 
@@ -36,6 +37,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     protected lateinit var mTaskCodeLabels: List<ConditionData>
     private lateinit var mNextTrialModes:List<List<Int>>
     protected lateinit var subject: SubjectBasicParcel
+
+    // Longitudinal functionality
+    private var nSpinnerItems: Int = 0
+    private var selSpinnerItem: Int = -1
 
     companion object {
         @JvmStatic val EVENT_SUBJECT:String = "subject"
@@ -70,6 +75,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         //------------------------------------------------------
         setConditions(mTaskCodeLabels)
         setPopulation(selCondition)
+        setLongitudinalSpinner()
 
         //------------------------------------------------------
         // SUBJECT DEMOGRAPHIC
@@ -285,6 +291,47 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     }
 
     protected open fun setTrialManager(selManager:Any){}
+
+    private fun setLongitudinalSpinner(){
+        // Show/hide longitudinal spinner based on spinner_sel value
+        val isLongitudinal = subject.spinner_sel != -1000
+        
+        // Use safe calls since these elements might not exist in all layouts
+        binding.labSpinner?.visibility = if(isLongitudinal) View.VISIBLE else View.GONE
+        binding.spinner?.visibility = if(isLongitudinal) View.VISIBLE else View.GONE
+        
+        if(isLongitudinal && binding.spinner != null && binding.labSpinner != null) {
+            // Set spinner label
+            binding.labSpinner?.let { it.text = subject.spinner_label }
+            
+            // Set up spinner data if resource is provided
+            if(subject.spinner_data_resource != -1) {
+                val spinnerData = resources.getStringArray(subject.spinner_data_resource)
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, spinnerData)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinner?.let { spinner ->
+                    spinner.adapter = adapter
+                    nSpinnerItems = adapter.count
+                    
+                    // Set selection
+                    if(subject.spinner_sel >= 0 && subject.spinner_sel < nSpinnerItems) {
+                        spinner.setSelection(subject.spinner_sel, false)
+                        selSpinnerItem = subject.spinner_sel
+                    } else {
+                        selSpinnerItem = 0
+                        spinner.setSelection(selSpinnerItem)
+                    }
+                    
+                    spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            selSpinnerItem = position
+                        }
+                        override fun onNothingSelected(parent: AdapterView<*>?) {}
+                    }
+                }
+            }
+        }
+    }
     //------------------------------------------------------------------------------------
     // UI presses
     //------------------------------------------------------------------------------------
@@ -319,6 +366,12 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         }
 
         binding.swWhiteNoise.isChecked = true
+
+        // Clear longitudinal spinner if visible
+        if(subject.spinner_sel != -1000 && binding.spinner?.visibility == View.VISIBLE) {
+            binding.spinner?.setSelection(-1)
+            selSpinnerItem = -1
+        }
     }
 
     //------------------------------------------------------------------------------------
@@ -334,6 +387,10 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         if(binding.radioGroupGender.checkedRadioButtonId == -1)     errors.add(" - " + resources.getString(R.string.select_gender))
         if(binding.spCondition.selectedItemPosition == -1)          errors.add(" - " + resources.getString(R.string.select_condition))
         if(binding.spPopulation.selectedItemPosition == -1)         errors.add(" - " + resources.getString(R.string.select_population))
+        
+        // Validate longitudinal spinner if visible
+        if(subject.spinner_sel != -1000 && binding.spinner?.visibility == View.VISIBLE && binding.spinner?.selectedItemPosition == -1)
+            errors.add(" - " + "Select ${subject.spinner_label}")
 
         return errors
     }
@@ -360,25 +417,30 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 false ->    TestBasic.TEST_NEXTTRIAL_AUTO
             }
         }
-        if(binding.swWhiteNoise.visibility == View.VISIBLE)
+        if(binding.swWhiteNoise.isVisible)
             subject.whitenoise =    if(binding.swWhiteNoise.isChecked)      TestBasic.TEST_SWITCH_ENABLED
                                     else                                    TestBasic.TEST_SWITCH_DISABLED
 
-        if(binding.swRepeatTrial.visibility == View.VISIBLE)
+        if(binding.swRepeatTrial.isVisible)
             subject.canRepeat  =    if(binding.swRepeatTrial.isChecked)   TestBasic.TEST_SWITCH_ENABLED
                                     else                                  TestBasic.TEST_SWITCH_DISABLED
 
-        if(binding.spTrialManager.visibility == View.VISIBLE)
+        if(binding.spTrialManager.isVisible)
             subject.trman_type =    if(binding.spTrialManager.selectedItemPosition == 0)    TestBasic.TEST_TRMAN_FIXED
                                     else                                                    TestBasic.TEST_TRMAN_ADAPTIVE
 
-        if(binding.swShowResult.visibility == View.VISIBLE)
+        if(binding.swShowResult.isVisible)
             subject.showResult =    if(binding.swShowResult.isChecked)  TestBasic.TEST_SWITCH_ENABLED
                                     else                                TestBasic.TEST_SWITCH_DISABLED
 
-        if(binding.swTraining.visibility == View.VISIBLE)
+        if(binding.swTraining.isVisible)
             subject.doTraining =    if(binding.swTraining.isChecked)    TestBasic.TEST_SWITCH_ENABLED
                                     else                                TestBasic.TEST_SWITCH_DISABLED
+
+        // Update longitudinal spinner selection if visible
+        if(subject.spinner_sel != -1000 && binding.spinner?.visibility == View.VISIBLE)
+            subject.spinner_sel = selSpinnerItem
+
         return subject
     }
 
