@@ -37,7 +37,8 @@ class SubjectBeadsParcel(
     override var spinner_sel: Int = -1000,
     override var spinner_label: String = "session",
     override var spinner_data_resource: Int = -1,
-    override var date: String = ""
+    override var date: String = "",
+    override var expUniqueId: String = ""
 ) : SubjectBasicParcel(
     classes = classes,
     label = label,
@@ -61,7 +62,8 @@ class SubjectBeadsParcel(
     spinner_sel = spinner_sel,
     spinner_label = spinner_label,
     spinner_data_resource = spinner_data_resource,
-    date = date
+    date = date,
+    expUniqueId = expUniqueId
 )
 
 
