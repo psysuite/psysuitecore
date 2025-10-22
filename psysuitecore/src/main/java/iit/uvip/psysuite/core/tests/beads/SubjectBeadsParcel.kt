@@ -38,7 +38,7 @@ class SubjectBeadsParcel(
     override var session_spsel: Int = TestBasic.Companion.TEST_NO_LONGITUDINAL,
     override var session_spdatares: Int = R.array.sessions_array,
     override var date: String = "",
-    override var expUniqueId: String = ""
+    override var exp_uid: String = ""
 ) : SubjectBasicParcel(
     classes = classes,
     label = label,
@@ -62,7 +62,7 @@ class SubjectBeadsParcel(
     session_spsel = session_spsel,
     session_spdatares = session_spdatares,
     date = date,
-    expUniqueId = expUniqueId
+    exp_uid = exp_uid
 )
 
 

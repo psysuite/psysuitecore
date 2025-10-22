@@ -290,7 +290,7 @@ class TestFragment : BaseFragment(
                     TestBasic.EVENT_BLOCK_END            -> onBlockEnded()
                     TestBasic.EVENT_TEST_END             -> onTestEnded()
 
-                    TestBasic.EVENT_NAVIGATE_BACK        -> navigateBack(it.second as Int, it.third)
+                    TestBasic.EVENT_TEST_COMPLETED       -> navigateBack(it.second as Int, it.third)
 
                     TestBasic.EVENT_SHOW_DEBUGINFO       -> {
                                                             val info = (it.second ?: "DEBUG_INFO_MISSING") as String
@@ -396,9 +396,7 @@ class TestFragment : BaseFragment(
     private fun navigateBack(result_code: Int, results_file: List<String>){
 
         val files_list:ArrayList<String> = arrayListOf()
-        results_file.map{
-            if(it.isNotEmpty()) files_list.add(it)
-        }
+        results_file.map{  if(it.isNotEmpty()) files_list.add(it)  }
         // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
 //        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name, mSubjectParcel), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         // TODO: depends on TestResult definition and ResultsManager in psysuite

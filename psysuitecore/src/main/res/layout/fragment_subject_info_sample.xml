@@ -80,16 +80,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
-            <Button
-                android:id="@+id/bt_confirm"
-                style="@style/Base.Widget.AppCompat.Button.Colored"
-                android:layout_width="95dp"
-                android:layout_height="55dp"
-                android:layout_marginEnd="8dp"
-                android:text="@string/start"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline10"
-                app:srcCompat="@drawable/green_tick" />
 
             <EditText
                 android:id="@+id/etRepetitionNum"
@@ -102,14 +92,27 @@
                 app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
             <Button
+                android:id="@+id/bt_confirm"
+                style="@style/Base.Widget.AppCompat.Button.Colored"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/design_default_color_secondary_variant"
+                android:text="@string/start"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline10"
+                app:srcCompat="@drawable/green_tick" />
+
+            <Button
                 android:id="@+id/bt_cancel"
-                android:text="@string/cancel"
-                android:layout_width="80dp"
-                android:layout_height="51dp"
+                style="@style/Base.Widget.AppCompat.Button.Colored"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                style="@style/Base.Widget.AppCompat.Button.Colored"
                 android:background="@color/design_default_color_error"
+                android:text="@string/cancel"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline10"
                 app:srcCompat="@android:drawable/ic_menu_revert" />
@@ -320,11 +323,11 @@
             <Button
                 android:id="@+id/bt_clear"
                 style="@style/Base.Widget.AppCompat.Button.Colored"
-                android:background="@color/colorPrimary"
-                android:layout_width="120dp"
-                android:layout_height="48dp"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="8dp"
-                android:text="@android:string/cancel"
+                android:background="@color/colorPrimary"
+                android:text="@string/reset"
                 app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
                 app:layout_constraintStart_toEndOf="@+id/bt_cancel"
                 app:layout_constraintTop_toTopOf="@+id/guideline10" />

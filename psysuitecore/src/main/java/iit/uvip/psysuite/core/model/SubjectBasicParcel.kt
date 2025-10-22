@@ -1,6 +1,7 @@
 package iit.uvip.psysuite.core.model
 
 import android.content.Context
+import android.os.Environment
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -9,6 +10,7 @@ import iit.uvip.psysuite.core.stimuli.DelaysAligner
 import iit.uvip.psysuite.core.tests.TestBasic
 import iit.uvip.psysuite.core.tests.TestBasic.Companion.TEST_NO_LONGITUDINAL
 import iit.uvip.psysuite.core.utility.ConditionData
+import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
 import iit.uvip.psysuite.core.utility.getIds
 import iit.uvip.psysuite.core.utility.getLabelLog
 import kotlinx.parcelize.IgnoredOnParcel
@@ -64,7 +66,7 @@ import java.util.UUID
  * @param spinner_label The label associated with the current spinner selection. Defaults to "session".
  * @param session_spdatares The resource ID for the data populating the spinner (e.g., a string array). Defaults to -1.
  * @param date The creation/modification date in ISO 8601 format (yyyy-MM-dd HH:mm:ss). Set automatically in writeJson(). Defaults to empty string.
- * @param expUniqueId A unique identifier for the experiment instance, generated automatically in writeJson(). Defaults to empty string.
+ * @param exp_uid A unique identifier for the experiment instance, generated automatically in writeJson(). Defaults to empty string.
  */
 abstract class SubjectBasicParcel(
     open var classes: List<String> = listOf(),
@@ -93,7 +95,7 @@ abstract class SubjectBasicParcel(
     open var session_spsel: Int = TestBasic.Companion.TEST_NO_LONGITUDINAL,
     open var session_spdatares: Int = R.array.sessions_array,
     open var date: String = "",
-    open var expUniqueId: String = ""
+    open var exp_uid: String = ""
 ) : Parcelable {
 
     var session: String = ""
@@ -303,23 +305,20 @@ abstract class SubjectBasicParcel(
         val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val jsonAdapter = moshi.adapter(this.javaClass)
 
+        val outFolder = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}"
+
         return try {
                     // Set current date in ISO 8601 format
                     date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
                     // Set unique experiment ID
-                    expUniqueId = "${classes[0].substringAfterLast(".")}${System.currentTimeMillis()}_${UUID.randomUUID().toString().substring(0, 8)}"
+                    exp_uid = "${classes[0].substringAfterLast(".")}${System.currentTimeMillis()}_${UUID.randomUUID().toString().substring(0, 8)}"
 
                     // want to create subject file always without block info, I want to add block info only renaming it after a block stop
                     subjectFileName = composeSubjectFileName(context)
                     if(subjectFileName.isEmpty())   ERROR_SUBJECT_INCOMPLETE
                     else {
-                        saveText(
-                            context,
-                            subjectFileName,
-                            jsonAdapter.toJson(this),
-                            forceOld = true
-                        )        // var jsontext = context!!.resources.openRawResource(R.raw.script_001).bufferedReader().use { it.readText() }
+                        saveText(context,subjectFileName, jsonAdapter.toJson(this),outFolder, forceOld = true)
                         0
                     }
                 }

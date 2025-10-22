@@ -38,8 +38,8 @@ class SubjectTVBParcel(
     override var session_spsel: Int = TestBasic.Companion.TEST_NO_LONGITUDINAL,
     override var session_spdatares: Int = R.array.sessions_array,
     override var date: String = "",
-    override var expUniqueId: String = ""
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, expUniqueId)
+    override var exp_uid: String = ""
+) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, exp_uid)
 
 
 

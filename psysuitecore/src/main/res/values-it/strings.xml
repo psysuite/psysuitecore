@@ -17,7 +17,7 @@
     <string name="restart">ricomincia</string>
     <string name="restart_training">ripeti il training</string>
     <string name="stop">STOP</string>
-    <string name="cancel">cancella</string>
+    <string name="cancel">annulla</string>
     <string name="continue_label">CONTINUA</string>
     <string name="block_ended">Questa parte del test è terminata\nVuoi continuare o interrompere per poi proseguire un\'altra volta?</string>
     <string name="training_ended">Il training è terminato\nVuoi ripeterlo o iniziare il test?</string>

@@ -19,6 +19,7 @@ import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.StimuliManager
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.trials.TrialsManager
+import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
 
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.logLastTwo
@@ -49,7 +50,7 @@ import org.albaspazio.core.ui.showAlert
  * @property vibrator An optional [VibrationManager] for tests involving tactile stimuli.
  * @property mImageView An optional [ImageView] for tests involving visual stimuli.
  * @property speechManager An optional [SpeechManager] for tests involving voice input.
- * @property outResultsDir The directory where result files will be saved. Defaults to `Environment.DIRECTORY_DOWNLOADS`.
+ * @property outResultsDir The directory where result files will be saved. Defaults to `Environment.DIRECTORY_DOWNLOADS/FileSystemManager.RESULTS_FOLDER_NAME`.
  */
 abstract class TestBasic(protected val ctx: Context,
                          protected val activity: Activity,
@@ -59,7 +60,7 @@ abstract class TestBasic(protected val ctx: Context,
                          protected val mImageView: ImageView? = null,
                          protected val speechManager: SpeechManager? = null,
                          protected val mainView: View? = null,
-                         protected val outResultsDir:String= Environment.DIRECTORY_DOWNLOADS)
+                         protected val outResultsDir:String= "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
 {
 
     /**
@@ -390,7 +391,7 @@ abstract class TestBasic(protected val ctx: Context,
         /** Event code indicating that debug information should be shown. */
         @JvmStatic val EVENT_SHOW_DEBUGINFO             = 211
         /** Event code indicating that navigation should go back (e.g., from TestFragment to menu). */
-        @JvmStatic val EVENT_NAVIGATE_BACK              = 213
+        @JvmStatic val EVENT_TEST_COMPLETED              = 213
         /** Event code indicating that the next trial has started after the previous one ended. */
         @JvmStatic val EVENT_TRIAL_STARTED              = 214
         /** Event code indicating that the next trial has started after the previous one ended. */
@@ -646,7 +647,7 @@ abstract class TestBasic(protected val ctx: Context,
      * Terminates the current test with a given completion code.
      * This method handles cleaning up resources, closing summary files,
      * and notifying the system about result files. Depending on the `code`,
-     * it may keep or delete result files. Finally, it emits an [EVENT_NAVIGATE_BACK]
+     * it may keep or delete result files. Finally, it emits an [EVENT_TEST_COMPLETED]
      * event to signal the UI to navigate away from the test screen.
      *
      * @param code The termination code, e.g., [TEST_COMPLETED], [TEST_ABORTED_KEEP_RESULT], [BLOCK_COMPLETED].
@@ -680,7 +681,7 @@ abstract class TestBasic(protected val ctx: Context,
                 filesToReturn = listOf()
             }
         }
-        testEvent.accept(Triple(EVENT_NAVIGATE_BACK, code, filesToReturn))
+        testEvent.accept(Triple(EVENT_TEST_COMPLETED, code, filesToReturn))
     }
 
     /**
@@ -854,9 +855,9 @@ abstract class TestBasic(protected val ctx: Context,
      */
     protected fun saveText(text: String, overwrite: Boolean = false, notifyDm: Boolean = false): Any {
         return  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            saveTextQ(ctx, mResultUri!!, text, overwrite = overwrite, notifyDm = notifyDm)
+            saveTextQ(ctx, mResultUri!!, text, overwrite = overwrite, notifyDm = notifyDm, dir = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
         else
-            saveText(ctx, mResultFile, text, overwrite = overwrite, notifyDm = notifyDm)
+            saveText(ctx, mResultFile, text, overwrite = overwrite, notifyDm = notifyDm, dir = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
     }
 
     /**
@@ -868,9 +869,9 @@ abstract class TestBasic(protected val ctx: Context,
      */
     protected fun createResultFile(header:String){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            mResultUri = saveTextQ(ctx, mResultFile, header)
+            mResultUri = saveTextQ(ctx, mResultFile, header, dir = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
         else
-            saveText(ctx, mResultFile, header)
+            saveText(ctx, mResultFile, header, dir = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
     }
 
     // ===============================================================================================================

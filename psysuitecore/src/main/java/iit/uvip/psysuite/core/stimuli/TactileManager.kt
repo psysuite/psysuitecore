@@ -56,6 +56,8 @@ class TactileManager(
 
         fun validateTimings(pattern:String):LongArray{
             val timings:MutableList<Long> = mutableListOf()
+            if(pattern.isEmpty())   return longArrayOf()
+
             pattern.split(",").map{
                 try {
                     timings.add(it.toLong())

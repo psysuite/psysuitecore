@@ -144,11 +144,14 @@ class TestSample(ctx: Context, activity: Activity, hostfragment: Fragment, subje
         val tact_amplitudes = TactileManager.validateAmplitudes(subject.tactileAmplitudes)
         val tact_timings    = TactileManager.validateTimings(subject.tactileTimings)
 
-        val tactileManager  =   if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
-            TactileManager(vibrator!!, tact_amplitudes, duration = subject.tactileTimings.toLong(), handler = mStimuliHandler)
-        else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0)
-            TactileManager(vibrator!!, tact_amplitudes, tact_timings, type = StimuliManager.STIM_TYPE_T2, handler = mStimuliHandler)
-        else throw Exception()
+//        val tactileManager  =   if(subject.stim_sources and StimuliManager.STIM_TYPE_T1 > 0)
+//                                    TactileManager(vibrator!!, tact_amplitudes, duration = subject.tactileTimings.toLong(), handler = mStimuliHandler)
+//                                else if(subject.stim_sources and StimuliManager.STIM_TYPE_T2 > 0)
+//                                    TactileManager(vibrator!!, tact_amplitudes, tact_timings, type = StimuliManager.STIM_TYPE_T2, handler = mStimuliHandler)
+//                                else throw Exception()
+        // TODO Check commented code, temporary solution
+        val tactileManager  =  TactileManager(vibrator!!, tact_amplitudes, duration = 200 /*subject.tactileTimings.toLong()*/, handler = mStimuliHandler)
+
 
 
 

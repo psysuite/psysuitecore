@@ -23,13 +23,8 @@ import iit.uvip.psysuite.core.trials.TrialBasic
  * @param type The type identifier for the trial.
  * @param label A descriptive label for the trial.
  */
-class TrialBIS(id:Int=-1, type:Int, label:String, override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false): TrialBasic(
-    id,
-    type,
-    label,
-    isADA=isADA,
-    isTraining = isTraining
-){
+class TrialBIS(id:Int=-1, type:Int, label:String, override var magnitude:Float, val isBefore:Boolean, val conflict_type:String, val duration:Long, private val duration2:Long=0L, val mid_latency:Long = 500L, val conflict_magn:Float=0F, isADA:Boolean=false, isTraining:Boolean=false):
+    TrialBasic(id, type, label, isADA=isADA, isTraining = isTraining){
 
     companion object {
         /**

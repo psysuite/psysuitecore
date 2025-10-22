@@ -265,7 +265,7 @@
         android:text="@string/reset"
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
-        app:layout_constraintHorizontal_bias="0.375"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/bt_cancel"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
