@@ -654,8 +654,8 @@ abstract class TestBasic(protected val ctx: Context,
      */
     fun terminateTest(code:Int){
 
-        var filesToReturn = listOf( getAbsoluteResultFilePath(),
-                                    subject.getAbsoluteSubjectFilePath(),
+        var filesToReturn = listOf( absoluteResultFilePath,
+                                    subject.absoluteSubjectFilePath,
                                     closeSummary())
         unloadStimuli()
         when(code){
@@ -908,14 +908,13 @@ abstract class TestBasic(protected val ctx: Context,
         mNoise?.stop()
     }
 
-    private fun getAbsoluteResultFilePath(): String = getAbsoluteFilePath(mResultFile).second
+    private val absoluteResultFilePath: String
+        get() = getAbsoluteFilePath(mResultFile, outResultsDir).second
 
     private fun onCriticalError(msg:String, delete:Boolean=false){
         if(delete)  terminateTest(TEST_ABORTED_DEL_RESULT)
         else        terminateTest(TEST_ABORTED_KEEP_RESULT)
-        testEvent.accept(Triple(EVENT_TEST_ERROR, msg, listOf(  getAbsoluteResultFilePath(),
-            subject.getAbsoluteSubjectFilePath(),
-            closeSummary())))
+        testEvent.accept(Triple(EVENT_TEST_ERROR, msg, listOf(  absoluteResultFilePath, subject.absoluteSubjectFilePath, closeSummary())))
     }
 
     // endregion

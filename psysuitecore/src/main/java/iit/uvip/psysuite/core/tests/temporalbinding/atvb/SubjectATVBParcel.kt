@@ -18,6 +18,7 @@ class SubjectATVBParcel(
     override var gender: Int = -1,
     override var population: Int = Populations.POPULATION_TD,
     override var type: Int = -1,
+    override var project: String = "",
 
     override var block: Int = -1,
     override var isDebug: Boolean = false,
@@ -31,7 +32,7 @@ class SubjectATVBParcel(
     override var showResult: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
     override var canRepeat:Int = TestBasic.TEST_SWITCH_DISABLED,
     override var doTraining: Int = TestBasic.TEST_SWITCH_DISABLED,
-    
+
     override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_ALWAYS,
     override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
 
@@ -39,7 +40,7 @@ class SubjectATVBParcel(
     override var session_spdatares: Int = R.array.sessions_array,
     override var date: String = "",
     override var exp_uid: String = ""
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, exp_uid)
+) : SubjectBasicParcel(classes, label, age, gender, population, type, project, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, exp_uid)
 
 
 

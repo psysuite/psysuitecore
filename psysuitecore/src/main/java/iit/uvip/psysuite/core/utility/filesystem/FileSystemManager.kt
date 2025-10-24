@@ -335,7 +335,6 @@ class FileSystemManager private constructor() {
                     allMoved = false
                 }
             }
-            
             allMoved
         } catch (e: Exception) {
             Log.e(TAG, "Error moving files to submitted folder", e)

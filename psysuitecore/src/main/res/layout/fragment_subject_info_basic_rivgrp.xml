@@ -103,6 +103,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroupGender" />
 
+
+    <TextView
+        android:id="@+id/labProject"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="215dp"
+        android:text="@string/project"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/project_spinner"
+        android:layout_width="135dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="215dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
     <TextView
         android:id="@+id/labCondition"
         android:layout_width="120dp"
@@ -197,7 +219,7 @@
         android:layout_width="120dp"
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="220dp"
+        android:layout_marginTop="260dp"
         android:text="session"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -206,7 +228,7 @@
         android:id="@+id/session_spinner"
         android:layout_width="135dp"
         android:layout_height="28dp"
-        android:layout_marginTop="220dp"
+        android:layout_marginTop="260dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -216,21 +238,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="170dp" />
+        app:layout_constraintGuide_end="135dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="256dp" />
+        app:layout_constraintGuide_begin="295dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="273dp" />
+        app:layout_constraintGuide_end="234dp" />
 
 
     <TextView
@@ -297,22 +319,22 @@
 
     <Button
         android:id="@+id/bt_clear"
-        android:text="@string/reset"
         style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
         android:background="@color/colorPrimary"
-        android:layout_width="121dp"
-        android:layout_height="63dp"
+        android:text="@string/reset"
         app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <Button
         android:id="@+id/bt_confirm"
-        android:text="@string/start"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="130dp"
+        android:layout_width="120dp"
         android:layout_height="62dp"
         android:layout_marginEnd="24dp"
+        android:text="@string/start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@drawable/green_tick" />
@@ -320,10 +342,9 @@
     <Button
         android:id="@+id/bt_cancel"
         style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
         android:background="@color/design_default_color_error"
-        android:layout_width="117dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="4dp"
         android:text="@string/cancel"
         app:layout_constraintEnd_toStartOf="@+id/bt_clear"
         app:layout_constraintStart_toStartOf="parent"

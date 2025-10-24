@@ -395,11 +395,8 @@ class TestFragment : BaseFragment(
      */
     private fun navigateBack(result_code: Int, results_file: List<String>){
 
-        val files_list:ArrayList<String> = arrayListOf()
-        results_file.map{  if(it.isNotEmpty()) files_list.add(it)  }
-        // data class TestResult      (code:Int=-1, mailsubject:String, mailbody:String,                       res_files:ArrayList<String> = arrayListOf(),  testClass:String)
-//        setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name, mSubjectParcel), TestBasic.TEST_BUNDLE_RESULT_LABEL)
-        // TODO: depends on TestResult definition and ResultsManager in psysuite
+        val files_list: ArrayList<String> = results_file.filter { it.isNotEmpty() } as ArrayList<String>
+
         setNavigationResult(TestResult(result_code, mTest.mTestLabel, mSubjectParcel.composeSubjectFileName(requireContext()), files_list, mTest.javaClass.name), TestBasic.TEST_BUNDLE_RESULT_LABEL)
         requireView().findNavController().popBackStack()
     }

@@ -149,11 +149,11 @@
 
     <TextView
         android:id="@+id/labSession"
-        android:layout_width="130dp"
+        android:layout_width="120dp"
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="215dp"
-        android:text="session"
+        android:text="@string/session"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -166,6 +166,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <TextView
+        android:id="@+id/labProject"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="255dp"
+        android:text="@string/project"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/project_spinner"
+        android:layout_width="135dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="255dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
     <Switch
         android:id="@+id/swWhiteNoise"
         android:layout_width="130dp"
@@ -175,6 +196,7 @@
         android:text="@string/whitenoise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
 
     <Spinner
         android:id="@+id/spTrialManager"
@@ -229,7 +251,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="261dp" />
+        app:layout_constraintGuide_begin="301dp" />
 
 
     <Button

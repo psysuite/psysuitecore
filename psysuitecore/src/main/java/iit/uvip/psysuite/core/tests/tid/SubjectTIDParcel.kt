@@ -23,6 +23,7 @@ class SubjectTIDParcel(
     override var gender: Int = -1,
     override var population: Int = Populations.POPULATION_TD,
     override var type: Int = -1,
+    override var project: String = "",
 
     override var block: Int = -1,
     override var isDebug: Boolean = false,
@@ -45,7 +46,7 @@ class SubjectTIDParcel(
     override var date: String = "",
     override var exp_uid: String = "",
     var group: Int = -1
-) : SubjectBasicParcel(classes, label, age, gender, population, type, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, exp_uid){
+) : SubjectBasicParcel(classes, label, age, gender, population, type, project, block, isDebug, device, vercode, stimuliDelays, nextTrailModality, whitenoise, trman_type, showResult, canRepeat, doTraining, showTrialID, abortMode, session_spsel, session_spdatares, date, exp_uid){
 
     override fun getFilesPrefix(ctx:Context):String{
 

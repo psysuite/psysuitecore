@@ -12,14 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="300dp" />
+        app:layout_constraintGuide_begin="386dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="243dp" />
+        app:layout_constraintGuide_end="227dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline6"
@@ -40,7 +40,7 @@
 
     <EditText
         android:id="@+id/txtName"
-        android:layout_width="135dp"
+        android:layout_width="150dp"
         android:layout_height="35dp"
         android:layout_marginTop="4dp"
         android:digits="abcdefghijklmnopqrstuvwxyz_0123456789"
@@ -83,7 +83,7 @@
 
     <Spinner
         android:id="@+id/spCondition"
-        android:layout_width="220dp"
+        android:layout_width="150dp"
         android:layout_height="28dp"
         android:textAlignment="textEnd"
         app:layout_constraintStart_toEndOf="@+id/labCondition"
@@ -130,7 +130,7 @@
 
     <Spinner
         android:id="@+id/spPopulation"
-        android:layout_width="135dp"
+        android:layout_width="150dp"
         android:layout_height="28dp"
         android:layout_marginTop="52dp"
         android:gravity="end"
@@ -187,10 +187,10 @@
         android:layout_width="150dp"
         android:layout_height="24dp"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="165dp"
+        android:layout_marginTop="40dp"
         android:text="@string/do_training"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+        app:layout_constraintTop_toTopOf="@+id/guideline22" />
 
     <Switch
         android:id="@+id/swShowResult"
@@ -203,7 +203,7 @@
 
     <TextView
         android:id="@+id/labSession"
-        android:layout_width="130dp"
+        android:layout_width="120dp"
         android:layout_height="24dp"
         android:layout_marginStart="100dp"
         android:layout_marginTop="45dp"
@@ -216,8 +216,27 @@
         android:layout_width="150dp"
         android:layout_height="28dp"
         android:layout_marginTop="45dp"
-        android:layout_marginEnd="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/labSession"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+
+    <TextView
+        android:id="@+id/labProject"
+        android:layout_width="120dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/project"
+        app:layout_constraintStart_toEndOf="@+id/session_spinner"
+        app:layout_constraintTop_toTopOf="@+id/guideline15" />
+
+    <Spinner
+        android:id="@+id/project_spinner"
+        android:layout_width="150dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="44dp"
+        app:layout_constraintStart_toEndOf="@+id/labProject"
         app:layout_constraintTop_toTopOf="@+id/guideline15" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -225,14 +244,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="456dp" />
+        app:layout_constraintGuide_begin="444dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="186dp" />
+        app:layout_constraintGuide_begin="115dp" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -240,31 +259,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="248dp" />
+        app:layout_constraintGuide_begin="243dp" />
 
 
     <Button
         android:id="@+id/bt_clear"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="121dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="44dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="24dp"
         android:background="@color/colorPrimary"
         android:text="@string/reset"
         app:layout_constraintEnd_toStartOf="@+id/bt_confirm"
-        app:layout_constraintHorizontal_bias="0.453"
+        app:layout_constraintHorizontal_bias="0.455"
         app:layout_constraintStart_toEndOf="@+id/bt_cancel"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
     <Button
         android:id="@+id/bt_confirm"
-        android:text="@string/start"
         style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="130dp"
-        android:layout_height="62dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="136dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="120dp"
+        android:text="@string/start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         app:srcCompat="@drawable/green_tick" />
@@ -274,8 +293,8 @@
         style="@style/Base.Widget.AppCompat.Button.Colored"
         android:layout_width="200dp"
         android:layout_height="55dp"
-        android:layout_marginStart="128dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="24dp"
         android:background="@color/design_default_color_error"
         android:text="@string/cancel"
         app:layout_constraintStart_toStartOf="parent"

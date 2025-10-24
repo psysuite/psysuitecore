@@ -35,7 +35,7 @@ open class SubjectSampleDialogFragment: DialogFragment(), AdapterView.OnItemSele
     private var selCondition: Int = -1
 
     companion object {
-        @JvmStatic val EVENT_SUBJECT:String = "subject"
+        @JvmStatic val SUBJECT_PARCEL:String = "subject"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -52,7 +52,7 @@ open class SubjectSampleDialogFragment: DialogFragment(), AdapterView.OnItemSele
     // cannot call super.initData as some UI elements are missing
     private fun initData() {
 
-        val subj: SubjectSampleParcel? = arguments?.getParcelable(SubjectBasicDialogFragment.EVENT_SUBJECT)
+        val subj: SubjectSampleParcel? = arguments?.getParcelable(SubjectBasicDialogFragment.SUBJECT_PARCEL)
         if (subj == null) {
             showAlert(
                 requireActivity(), resources.getString(R.string.critical_error),
@@ -381,7 +381,7 @@ open class SubjectSampleDialogFragment: DialogFragment(), AdapterView.OnItemSele
     private fun sendResult(subj: SubjectBasicParcel?) {
 
         val bundle = Bundle().apply {
-            putParcelable(EVENT_SUBJECT, subj)
+            putParcelable(SUBJECT_PARCEL, subj)
         }
         parentFragmentManager.setFragmentResult(targetRequestCode.toString(), bundle)
         dismiss()

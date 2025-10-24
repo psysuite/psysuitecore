@@ -49,6 +49,7 @@ import java.util.UUID
  * @param gender The gender of the subject (e.g., 0 for male, 1 for female). Defaults to -1 (unknown).
  * @param population The population group the subject belongs to (e.g., [Populations.POPULATION_TD]). Defaults to [Populations.POPULATION_TD].
  * @param type An integer code representing the specific type of test or configuration. Defaults to -1.
+ * @param project The name of the project this subject belongs to. Defaults to an empty string.
  * @param block The current block number in a series of tests. Defaults to -1.
  * @param isDebug Flag indicating if the test is running in debug mode. Defaults to `false`.
  * @param device Information about the device running the test. Defaults to `null`.
@@ -75,6 +76,7 @@ abstract class SubjectBasicParcel(
     open var gender: Int = -1,
     open var population: Int = Populations.POPULATION_TD,
     open var type: Int = -1,
+    open var project: String = "",
 
     open var block: Int = -1,
     open var isDebug: Boolean = false,
@@ -103,6 +105,9 @@ abstract class SubjectBasicParcel(
     /** The name of the file where this subject's data is stored. Not included in Parcelization. */
     @IgnoredOnParcel
     var subjectFileName:String = ""
+
+    @IgnoredOnParcel
+    private val outFolder = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}"
 
 
     companion object  {
@@ -146,7 +151,7 @@ abstract class SubjectBasicParcel(
     open fun loadSubject(): SubjectBasicParcel {
         val subj = existFile(CURR_SUBJ_FILE + TestBasic.Companion.SUBJFILE_EXTENSION)
         if (subj.first) {
-            val jsontext = readText(CURR_SUBJ_FILE + TestBasic.Companion.SUBJFILE_EXTENSION)
+            val jsontext = readText(CURR_SUBJ_FILE + TestBasic.Companion.SUBJFILE_EXTENSION, outFolder)
             return try {
                 loadJsonText(jsontext)
             } catch (e: Exception) {
@@ -197,7 +202,7 @@ abstract class SubjectBasicParcel(
      * @return The next block number (0-based if no blocks, N if last block was N-1).
      */
     private fun getLastValidBlock(prefix: String, allowedext: List<String> = listOf()):Int{
-        val list = getFileList(allowedext = allowedext, contains = prefix)
+        val list = getFileList(outFolder, allowedext = allowedext, contains = prefix)
         var blk = -1
         list.map{
             val words = it.name.split(".")[0].split("_blk")
@@ -287,7 +292,8 @@ abstract class SubjectBasicParcel(
      * Gets the absolute file path for the currently set [subjectFileName].
      * @return The absolute path as a string, or an empty string if [subjectFileName] is not set or the file doesn't exist.
      */
-    fun getAbsoluteSubjectFilePath():String = getAbsoluteFilePath(subjectFileName).second   // is "" if file was not present
+    val absoluteSubjectFilePath:String
+            get() = getAbsoluteFilePath(subjectFileName, outFolder).second   // is "" if file was not present
 
     // =============================================================================================================
     // WRITE
@@ -304,8 +310,6 @@ abstract class SubjectBasicParcel(
 
         val moshi       = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val jsonAdapter = moshi.adapter(this.javaClass)
-
-        val outFolder = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}"
 
         return try {
                     // Set current date in ISO 8601 format

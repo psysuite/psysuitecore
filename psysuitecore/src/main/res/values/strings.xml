@@ -68,6 +68,7 @@
     <string name="frequency">frequenza</string>
     <string name="condition">condizione</string>
     <string name="population">popolazione</string>
+    <string name="project">progetto</string>
 
     <string name="warning">Attenzione</string>
     <string name="nblocks">Num. Blocchi</string>

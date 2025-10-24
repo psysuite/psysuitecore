@@ -18,6 +18,7 @@ class SubjectBeadsParcel(
     override var gender: Int = -1,
     override var population: Int = Populations.POPULATION_TD,
     override var type: Int = -1,
+    override var project: String = "",
 
     override var block: Int = -1,
     override var isDebug: Boolean = false,
@@ -31,7 +32,7 @@ class SubjectBeadsParcel(
     override var showResult: Int = TestBasic.TEST_SWITCH_DISABLED,
     override var canRepeat:Int = TestBasic.TEST_SWITCH_DISABLED,
     override var doTraining: Int = TestBasic.TEST_SWITCH_DISABLED,
-    
+
     override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
     override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
 

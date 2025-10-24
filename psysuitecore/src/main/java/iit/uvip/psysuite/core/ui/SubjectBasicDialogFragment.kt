@@ -20,7 +20,6 @@ import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.filesystem.deleteFilesStartingWith
 import org.albaspazio.core.ui.show2ChoisesDialog
 import org.albaspazio.core.ui.showAlert
-import kotlin.properties.Delegates
 
 open class SubjectBasicDialogFragment: DialogFragment(){
 
@@ -43,9 +42,14 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     // Longitudinal functionality
     private var sessionsData:Array<String> = emptyArray()
     private var nSpinnerItems: Int = 0
+    
+    // Project functionality
+    private var availableProjects: List<String> = emptyList()
+    private var selProject: Int = 0
 
     companion object {
-        @JvmStatic val EVENT_SUBJECT:String = "subject"
+        @JvmStatic val SUBJECT_PARCEL:String = "subject"
+        @JvmStatic val PROJECTS_PARCEL:String = "projects"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -59,7 +63,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
     }
 
     protected open fun initData() {
-        val subj: SubjectBasicParcel? = arguments?.getParcelable(EVENT_SUBJECT)
+        val subj: SubjectBasicParcel? = arguments?.getParcelable(SUBJECT_PARCEL)
         if (subj == null) {
             showAlert(
                 requireActivity(),
@@ -77,11 +81,12 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         mTaskCodeLabels = ci.first?.call(ci.second, requireContext()) as List<ConditionData>
 
         //------------------------------------------------------
-        // SET SPINNERS (SUB TASKS, TRIAL MANAGERS & POPULATION)
+        // SET SPINNERS (SUB TASKS, TRIAL MANAGERS, POPULATION & PROJECT)
         //------------------------------------------------------
         setConditions(mTaskCodeLabels)
         setPopulation(selCondition)
         setLongitudinalSpinner()
+        setProjectSpinner()
 
         //------------------------------------------------------
         // SUBJECT DEMOGRAPHIC
@@ -345,6 +350,43 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         }
     }
 
+    private fun setProjectSpinner() {
+        // Get projects from arguments
+        availableProjects = arguments?.getStringArrayList(PROJECTS_PARCEL) ?: emptyList()
+        
+        // Check if project spinner exists in the layout
+        try {
+            if (availableProjects.isNotEmpty() && ::binding.isInitialized) {
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    availableProjects
+                )
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                
+                // Try to set adapter - will fail silently if projectSpinner doesn't exist
+                binding.projectSpinner.adapter = adapter
+                
+                // Set selection based on existing project or default to first item
+                val currentProject = subject.project
+                if (!currentProject.isNullOrEmpty()) {
+                    val projectIndex = availableProjects.indexOf(currentProject)
+                    if (projectIndex != -1) {
+                        selProject = projectIndex
+                        binding.projectSpinner.setSelection(selProject, false)
+                    }
+                } else {
+                    // Default to first item ("Select project")
+                    selProject = 0
+                    binding.projectSpinner.setSelection(selProject, false)
+                }
+            }
+        } catch (e: Exception) {
+            // Silently handle if projectSpinner doesn't exist in layout
+            // This allows backward compatibility with layouts that don't have the project spinner
+        }
+    }
+
     //------------------------------------------------------------------------------------
     // UI presses
     //------------------------------------------------------------------------------------
@@ -386,6 +428,15 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
         // Clear longitudinal spinner if visible
         if(subject.session_spsel != TEST_NO_LONGITUDINAL) binding.sessionSpinner.setSelection(0)
+        
+        // Clear project spinner if visible
+        try {
+            if (availableProjects.isNotEmpty()) {
+                binding.projectSpinner.setSelection(0)
+            }
+        } catch (e: Exception) {
+            // Ignore if projectSpinner doesn't exist in layout
+        }
     }
 
     //------------------------------------------------------------------------------------
@@ -409,6 +460,21 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         // Validate longitudinal spinner if visible
         if(subject.isLongitudinal && binding.sessionSpinner.selectedItemPosition == 0)
             errors.add(" - " + "Select session")
+        
+        // Validate project selection
+        try {
+            if (availableProjects.isNotEmpty()) {
+                val selectedProject = if (binding.projectSpinner.selectedItemPosition >= 0) {
+                    availableProjects[binding.projectSpinner.selectedItemPosition]
+                } else null
+                
+                if (selectedProject == null || selectedProject == "Select project") {
+                    errors.add(" - " + "Select project")
+                }
+            }
+        } catch (e: Exception) {
+            // If projectSpinner doesn't exist, skip validation
+        }
 
         return errors
     }
@@ -458,6 +524,15 @@ open class SubjectBasicDialogFragment: DialogFragment(){
         // Update longitudinal spinner selection if visible
         if(subject.isLongitudinal)
             subject.session = sessionsData[binding.sessionSpinner.selectedItemPosition]
+        
+        // Update project selection
+        try {
+            if (availableProjects.isNotEmpty() && binding.projectSpinner.selectedItemPosition >= 0) {
+                subject.project = availableProjects[binding.projectSpinner.selectedItemPosition]
+            }
+        } catch (e: Exception) {
+            // If projectSpinner doesn't exist, keep existing project value
+        }
 
         return subject
     }
@@ -511,7 +586,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
 
     private fun sendResult(subj: SubjectBasicParcel?) {
         val bundle = Bundle().apply {
-            putParcelable(EVENT_SUBJECT, subj)
+            putParcelable(SUBJECT_PARCEL, subj)
         }
         parentFragmentManager.setFragmentResult(targetRequestCode.toString(), bundle)
         dismiss()

@@ -360,5 +360,6 @@
     <string name="condition_not_allowed">codice sub-test non ammesso</string>
     <string name="error_test_code_not_recognized">Test non riconosciuto</string>
     <string name="start_test">incomincia il test</string>
+    <string name="project">Progetto</string>
 
 </resources>

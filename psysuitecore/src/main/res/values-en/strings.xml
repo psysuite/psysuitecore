@@ -35,6 +35,7 @@
     <string name="gender">gender</string>
     <string name="age">age</string>
     <string name="group">group</string>
+    <string name="project">project</string>
 
     <string name="source">source</string>
     <string name="type">type</string>
