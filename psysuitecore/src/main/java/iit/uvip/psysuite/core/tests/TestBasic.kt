@@ -599,6 +599,11 @@ abstract class TestBasic(protected val ctx: Context,
      * @param extra_text Any additional text associated with the answer. Defaults to an empty string.
      */
     open fun setAnswer(result: Int = -1, elapsed: Long = -1L, extra_text: String = ""){
+
+        if(mTrial.isTraining)   return
+
+        saveText(mTrial.Log())
+
         if (result != -1 || extra_text.isNotEmpty()){
             mTrialsManager.setResponse(result, elapsed, extra_text)
             mSummary?.add(mTrial)
@@ -617,8 +622,6 @@ abstract class TestBasic(protected val ctx: Context,
      *               else, If the test continues,                   => emits an [EVENT_TRIAL_STARTED] and calls [doNextTrial].
      */
     open fun onNextTrial() {
-
-        saveText(mTrial.Log())
 
         when {
             mTrialsManager.isLastTrainingTrial ->
