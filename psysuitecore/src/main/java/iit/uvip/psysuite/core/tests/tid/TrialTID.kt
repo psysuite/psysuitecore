@@ -22,10 +22,10 @@ class TrialTID(id:Int=-1, type:Int, val block:Int, val group:Int, val session:St
     }
 
     init {
-        setupTrial(magnitude)
+        initTrial(magnitude)
     }
 
-    override fun setupTrial(newvalue: Float):Long{
+    override fun initTrial(newvalue: Float):Long{
         magnitude = newvalue
         if(ref_first){
             delta1 = ref_stim_value

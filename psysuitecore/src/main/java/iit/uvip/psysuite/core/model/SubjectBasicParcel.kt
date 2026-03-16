@@ -94,7 +94,7 @@ abstract class SubjectBasicParcel(
     open var showTrialID: Int = TestBasic.Companion.TEST_SHOWTRIALS_NEVER,
     open var abortMode: Int = TestBasic.Companion.TEST_ABORT_TRIALEND,
 
-    open var session_spsel: Int = TestBasic.Companion.TEST_NO_LONGITUDINAL,
+    open var session_spsel: Int = TEST_NO_LONGITUDINAL,
     open var session_spdatares: Int = R.array.sessions_array,
     open var date: String = "",
     open var exp_uid: String = ""

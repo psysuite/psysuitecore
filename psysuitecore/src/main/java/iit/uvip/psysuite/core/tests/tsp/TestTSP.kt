@@ -28,7 +28,7 @@ import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import iit.uvip.psysuite.core.utility.ConditionData
-import iit.uvip.psysuite.core.utility.StimuliSetTSP
+import iit.uvip.psysuite.core.utility.StimuliSet
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -75,54 +75,62 @@ class TestTSP(ctx: Context,
         @JvmStatic val TEST_BASIC_LABEL = "TSP"
 
         // Test-specific durations
-        @JvmStatic val ISI_SUB   = 750L
-        @JvmStatic val ISI_SUPRA = 1500L
-        @JvmStatic val ISI_RND_MULT = 0.1F  // percentage of isi to randomize
         @JvmStatic val FIRST_STIMULUS_DELAY = 1000L  //
-        @JvmStatic val N_BLOCKS = 10  //
+        @JvmStatic val N_BLOCKS = 3  //
         @JvmStatic val STIMULUS_DURATION_VISUAL = 100L  //
 
         fun getConditionsInfo(ctx: Context): List<ConditionData> = mutableListOf(
-            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}",     TEST_TSP_V_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}" ,   Populations.sighted_populations),
-            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUB}",     TEST_TSP_A_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUB}" ,   Populations.hearing_populations),
-            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUB}",     TEST_TSP_T_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUB}" ,   Populations.all_populations),
-            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUPRA}",   TEST_TSP_V_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.sighted_populations),
-            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUPRA}",   TEST_TSP_A_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.hearing_populations),
-            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUPRA}",   TEST_TSP_T_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.all_populations),
+            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUB}",         TEST_TSP_A_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUB}" ,           Populations.hearing_populations),
+            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}",        TEST_TSP_V_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUB}" ,          Populations.sighted_populations),
+            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUB}",       TEST_TSP_T_SUB,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUB}" ,         Populations.all_populations),
+            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUPRA}",       TEST_TSP_A_SUPRA,      "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUPRA}" ,         Populations.hearing_populations),
+            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUPRA}",      TEST_TSP_V_SUPRA,      "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUPRA}" ,        Populations.sighted_populations),
+            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUPRA}",     TEST_TSP_T_SUPRA,      "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUPRA}" ,       Populations.all_populations),
+            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUBSUPRA}",    TEST_TSP_A_SUBSUPRA,   "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUBSUPRA}" ,      Populations.hearing_populations),
+            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUBSUPRA}",   TEST_TSP_V_SUBSUPRA,   "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUBSUPRA}" ,     Populations.sighted_populations),
+            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUBSUPRA}",  TEST_TSP_T_SUBSUPRA,   "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUBSUPRA}" ,    Populations.all_populations)
         )
 
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO)
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
 
     // region: DEFINE TRIALS SCHEMA: stimulus type & delay
-    private var trialsUnimodalSubSchema:List<StimuliSetTSP> = listOf(
-        StimuliSetTSP(2, 200F, true),
-        StimuliSetTSP(2, 150F, true),
-        StimuliSetTSP(2, 100F, true),
-        StimuliSetTSP(2, 50F,  true),
-        StimuliSetTSP(2, 50F,  false),
-        StimuliSetTSP(2, 100F, false),
-        StimuliSetTSP(2, 150F, false),
-        StimuliSetTSP(2, 200F, false)
+//    private var trialsUnimodalSubSchema: List<StimuliSetTSP> = createEquallySpacedInts(450, 850, N_TRIALS).map {
+//        StimuliSetTSP(1, it.toFloat())}
+//
+//    private var trialsUnimodalSupraSchema: List<StimuliSetTSP> = createEquallySpacedInts(1500, 2000, N_TRIALS).map {
+//        StimuliSetTSP(1, it.toFloat())}
+
+
+    private var trialsUnimodalSubSchema:List<StimuliSet> = listOf(
+        StimuliSet(2, 500F),
+        StimuliSet(2, 540F),
+        StimuliSet(2, 585F),
+        StimuliSet(2, 630F),
+        StimuliSet(2, 680F),
+        StimuliSet(2, 735F),
+        StimuliSet(2, 795F),
+        StimuliSet(2, 860F),
     )
 
-    private var trialsUnimodalSupraSchema:List<StimuliSetTSP> = listOf(
-        StimuliSetTSP(2, 400F, true),
-        StimuliSetTSP(2, 300F, true),
-        StimuliSetTSP(2, 200F, true),
-        StimuliSetTSP(2, 100F, true),
-        StimuliSetTSP(2, 100F, false),
-        StimuliSetTSP(2, 200F, false),
-        StimuliSetTSP(2, 300F, false),
-        StimuliSetTSP(2, 400F, false)
+    private var trialsUnimodalSupraSchema:List<StimuliSet> = listOf(
+        StimuliSet(2, 1000F),
+        StimuliSet(2, 1080F),
+        StimuliSet(2, 1170F),
+        StimuliSet(2, 1265F),
+        StimuliSet(2, 1370F),
+        StimuliSet(2, 1480F),
+        StimuliSet(2, 1600F),
+        StimuliSet(2, 1730F),
     )
+
+    private var trialsUnimodalSubSupraSchema:List<StimuliSet> = trialsUnimodalSubSchema + trialsUnimodalSupraSchema
+
+
     // endregion
 
     private val binding: FragmentTestBinding =  (hostfragment as TestFragment).binding
@@ -142,7 +150,12 @@ class TestTSP(ctx: Context,
     private var main_isi:Long                   = 0L     // isi within the cue sequence and base target
     private var nCueStimuli:Int                 = 3      // num of cue stimuli
 
-    private val isSupra: Boolean = (subject.type == TEST_TSP_V_SUPRA || subject.type == TEST_TSP_A_SUPRA || subject.type == TEST_TSP_T_SUPRA)
+    private val schema: List<StimuliSet> = when (subject.type) {
+
+        TEST_TSP_V_SUB, TEST_TSP_A_SUB, TEST_TSP_T_SUB          -> trialsUnimodalSubSchema
+        TEST_TSP_V_SUPRA, TEST_TSP_A_SUPRA, TEST_TSP_T_SUPRA    -> trialsUnimodalSupraSchema
+        else                                                    -> trialsUnimodalSubSupraSchema
+    }
 
     private var trialAbortTime:Long = 0L
 
@@ -177,8 +190,8 @@ class TestTSP(ctx: Context,
         mLayout = binding.root
 
         when {
-            mImageView == null && (subject.type == TEST_TSP_V_SUB || subject.type == TEST_TSP_V_SUPRA)  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null && (subject.type == TEST_TSP_T_SUB || subject.type == TEST_TSP_T_SUPRA)    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mImageView == null && (subject.type == TEST_TSP_V_SUB || subject.type == TEST_TSP_V_SUPRA || subject.type == TEST_TSP_V_SUBSUPRA)  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+            vibrator == null   && (subject.type == TEST_TSP_T_SUB || subject.type == TEST_TSP_T_SUPRA || subject.type == TEST_TSP_T_SUBSUPRA)    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
             mainView == null                                                                            -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
         }
         // set question & create mTrials list
@@ -186,11 +199,11 @@ class TestTSP(ctx: Context,
         mQuestion       = ""
 
         when(subject.type){
-            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA    -> {
+            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA, TEST_TSP_V_SUBSUPRA    -> {
                 currStimulusDuration    = STIMULUS_DURATION_VISUAL
                 currStimulusLabel       = "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}"
             }
-            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA    -> {
+            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA, TEST_TSP_A_SUBSUPRA    -> {
                 currStimulusDuration    = STIMULUS_DURATION_AUDIO
                 currStimulusLabel       = "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}"
             }
@@ -200,7 +213,6 @@ class TestTSP(ctx: Context,
             }
         }
 
-        main_isi = if(isSupra) ISI_SUPRA else ISI_SUB
         currImageRes            = mDrawablesResource[0]
 
         mTestLabel              = ""
@@ -219,12 +231,12 @@ class TestTSP(ctx: Context,
 
         mStimuliManager = when(subject.type){
 
-            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA -> {
+            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA, TEST_TSP_V_SUBSUPRA -> {
                 StimuliManager(null, null,
                     VisualManager(STIM_T, mImageView!!, currImageRes, duration = currStimulusDuration, handler = mStimuliHandler),
                     subject.stimuliDelays, ctx, mStimuliHandler)
             }
-            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA -> {
+            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA, TEST_TSP_A_SUBSUPRA -> {
                 StimuliManager(AudioManager(STIM_A, audioResources[STIMULUS_DURATION_AUDIO] ?: "t1000hz_50ms.wav",  duration = STIMULUS_DURATION_AUDIO, handler = mStimuliHandler, ctx = ctx), null,null,
                     subject.stimuliDelays, ctx, mStimuliHandler)
             }
@@ -245,16 +257,13 @@ class TestTSP(ctx: Context,
         
         val trials:MutableList<TrialBasic> = mutableListOf()
 
-        val schema =    if(isSupra)     trialsUnimodalSupraSchema
-        else                            trialsUnimodalSubSchema
-
-        var temp_trials:MutableList<TrialBasic> = mutableListOf()
+        var temp_trials: MutableList<TrialBasic>
 
         for(i in 0 until N_BLOCKS){
             temp_trials = mutableListOf()
             for(section in schema)
                 for(i in 0 until section.ntrials)
-                    temp_trials.add(TrialTSP(-1, subject.type, currStimulusLabel, section.magnitude, main_isi, section.isBefore, nCueStimuli, currStimulusDuration))
+                    temp_trials.add(TrialTSP(-1, subject.type, currStimulusLabel, section.magnitude, nCueStimuli, currStimulusDuration))
             temp_trials.shuffle()
             trials.addAll(temp_trials)
         }
@@ -291,16 +300,16 @@ class TestTSP(ctx: Context,
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
-        }, (FIRST_STIMULUS_DELAY + trial.stim_value + 250L))
+        }, (FIRST_STIMULUS_DELAY + 250L + trial.stim_value))
 
         mStimuliHandler.postDelayed({
             deliverStimulus(trial as TrialTSP)
             trialStartMs = uptimeMillis()
-        }, (FIRST_STIMULUS_DELAY + 2*trial.stim_value + 250L))
+        }, (FIRST_STIMULUS_DELAY + 250L + 2*trial.stim_value))
 
         mStimuliHandler.postDelayed({
             onStimuliEnd()
-        }, (FIRST_STIMULUS_DELAY + trialAbortTime + 250L))
+        }, (FIRST_STIMULUS_DELAY + 250L + trialAbortTime))
     }
 
     private fun createResponseButton(txt:String, parent_layout:ConstraintLayout, onPress:() -> Unit): Button {
@@ -347,9 +356,10 @@ class TestTSP(ctx: Context,
 
     private fun deliverStimulus(trial: TrialTSP){
         when(trial.type) {
-            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA ->  mStimuliManager.deliverAStimulus(trial.duration)
-            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA ->  mStimuliManager.deliverVStimulus(trial.duration)
-            TEST_TSP_T_SUB, TEST_TSP_T_SUPRA ->  mStimuliManager.deliverTStimulus(trial.duration)
+            TEST_TSP_A_SUB, TEST_TSP_A_SUPRA, TEST_TSP_A_SUBSUPRA ->  mStimuliManager.deliverAStimulus(trial.duration)
+            TEST_TSP_V_SUB, TEST_TSP_V_SUPRA, TEST_TSP_V_SUBSUPRA ->  mStimuliManager.deliverVStimulus(trial.duration)
+            TEST_TSP_T_SUB, TEST_TSP_T_SUPRA, TEST_TSP_T_SUBSUPRA ->  mStimuliManager.deliverTStimulus(trial.duration)
+            else -> throw Exception("Unknown trial type")
         }
     }
 

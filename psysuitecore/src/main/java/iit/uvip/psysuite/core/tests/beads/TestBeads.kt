@@ -277,28 +277,6 @@ class TestBeads(ctx: Context,
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
     /**
-     * Handles progression to the next trial or end of the test.
-     * If it's the last trial, it saves data and ends the test.
-     * If it's the end of a block, it triggers a block end event (currently just `EVENT_BLOCK_END`).
-     * Otherwise, it proceeds to the next trial using [doNextTrial].
-     */
-    override fun onNextTrial(){
-        when {
-            currTrialID == (nTrials - 1) -> {
-                saveText("", notifyDm = true) // Save any final data.
-                testEvent.accept(Triple(EVENT_TEST_END, null, listOf())) // Signal test completion.
-            }
-            mListBlocks.contains(currTrialID) -> { // Handle block endings if defined.
-                // Consider implementing a pause or message for block ends.
-                // For now, it just calls EVENT_BLOCK_END, which TestBasic might handle.
-                testEvent.accept(Triple(EVENT_BLOCK_END, null, listOf()))
-                doNextTrial() // Assuming progression even after block end for now.
-            }
-            else -> doNextTrial() // Proceed to the next trial.
-        }
-    }
-
-    /**
      * Called when a single trial (sequence of bead draws and decision) ends.
      * Hides response buttons and bead images, stops the main visual (jar),
      * and schedules the "next trial" button to appear after a delay.

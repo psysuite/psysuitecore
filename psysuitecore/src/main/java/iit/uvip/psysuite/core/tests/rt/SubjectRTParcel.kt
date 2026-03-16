@@ -1,4 +1,4 @@
-package iit.uvip.psysuite.core.tests.tsp
+package iit.uvip.psysuite.core.tests.rt
 
 import iit.uvip.psysuite.core.model.Populations
 import iit.uvip.psysuite.core.model.SubjectBasicParcel
@@ -10,9 +10,9 @@ import iit.uvip.psysuite.core.R
 
 // session
 @Parcelize
-class SubjectTSPParcel(
+class SubjectRTParcel(
 
-    override var classes: List<String> = listOf("iit.uvip.psysuite.core.tests.tsp.TestTSP"),
+    override var classes: List<String> = listOf("iit.uvip.psysuite.core.tests.rt.TestRT"),
     override var label: String = "",
     override var age: Int = -1,
     override var gender: Int = -1,
@@ -27,16 +27,16 @@ class SubjectTSPParcel(
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
 
     override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_AUTO,
-    override var whitenoise: Int        = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var trman_type: Int        = TestBasic.TEST_TRMAN_FIXED,
-    override var showResult: Int        = TestBasic.TEST_SWITCH_DISABLED,
-    override var canRepeat:Int          = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var doTraining: Int        = TestBasic.TEST_SWITCH_CHOOSE_ON,
+    override var whitenoise: Int = TestBasic.TEST_SWITCH_DISABLED,
+    override var trman_type: Int = TestBasic.TEST_TRMAN_FIXED,
+    override var showResult: Int = TestBasic.TEST_SWITCH_DISABLED,
+    override var canRepeat:Int = TestBasic.TEST_SWITCH_DISABLED,
+    override var doTraining: Int = TestBasic.TEST_SWITCH_DISABLED,
 
-    override var showTrialID: Int       = TestBasic.TEST_SHOWTRIALS_NEVER,
-    override var abortMode: Int         = TestBasic.TEST_ABORT_TRIALEND,
+    override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
+    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
 
-    override var session_spsel: Int     = TestBasic.Companion.TEST_NO_LONGITUDINAL,
+    override var session_spsel: Int = TestBasic.Companion.TEST_NO_LONGITUDINAL,
     override var session_spdatares: Int = R.array.sessions_array,
     override var date: String = "",
     override var exp_uid: String = ""

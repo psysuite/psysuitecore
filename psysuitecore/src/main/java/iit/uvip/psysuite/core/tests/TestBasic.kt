@@ -17,6 +17,7 @@ import iit.uvip.psysuite.core.R
 import iit.uvip.psysuite.core.model.SubjectBasicParcel
 import iit.uvip.psysuite.core.model.summary.Summary
 import iit.uvip.psysuite.core.stimuli.StimuliManager
+import iit.uvip.psysuite.core.trials.AdaptiveTrialsManager
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.trials.TrialsManager
 import iit.uvip.psysuite.core.utility.filesystem.FileSystemManager
@@ -105,197 +106,217 @@ abstract class TestBasic(protected val ctx: Context,
         // region ---- TESTS UNIQUE CODES ---
         //-----------------------------------------------------------------------------------------
 
+        /** Unique code for Sample test with aligned stimuli. */
+        @JvmStatic val TEST_SAMPLE_ALIGNED          = 1
+        /** Unique code for Sample test with shifted stimuli. */
+        @JvmStatic val TEST_SAMPLE_SHIFTED          = 2
+        /** Unique code for Sample test with paired stimuli. */
+        @JvmStatic val TEST_SAMPLE_PAIR             = 3
+
         /** Unique code for Reaction Time test with audio stimulus. */
-        @JvmStatic val TEST_RT_AUDIO                = 1
+        @JvmStatic val TEST_RT_AUDIO                = 51
         /** Unique code for Reaction Time test with tactile stimulus. */
-        @JvmStatic val TEST_RT_TACTILE              = 2
+        @JvmStatic val TEST_RT_TACTILE              = 52
         /** Unique code for Reaction Time test with visual stimulus. */
-        @JvmStatic val TEST_RT_VISUAL               = 3
+        @JvmStatic val TEST_RT_VISUAL               = 53
 
         /** Unique code for Bisection test with audio stimulus. */
-        @JvmStatic val TEST_BISECTION_AUDIO                 = 100
-        /** Unique code for Bisection test with tactile stimulus. */
-        @JvmStatic val TEST_BISECTION_TACTILE               = 101
-        /** Unique code for Bisection test with audio-tactile stimuli. */
-        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE         = 102
-        /** Unique code for Bisection test with audio-visual stimuli. */
-        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL          = 103
+        @JvmStatic val TEST_BISECTION_AUDIO                 = 101
         /** Unique code for Bisection test with visual stimulus. */
-        @JvmStatic val TEST_BISECTION_VISUAL                = 104
+        @JvmStatic val TEST_BISECTION_VISUAL                = 102
+        /** Unique code for Bisection test with tactile stimulus. */
+        @JvmStatic val TEST_BISECTION_TACTILE               = 103
+        /** Unique code for Bisection test with audio-visual stimuli. */
+        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL          = 104
+        /** Unique code for Bisection test with audio-tactile stimuli. */
+        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE         = 105
         /** Unique code for Bisection test with visual-tactile stimuli. */
-        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE        = 105
+        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE        = 106
         /** Unique code for Bisection test with supra-threshold audio stimulus. */
-        @JvmStatic val TEST_BISECTION_AUDIO_SUPRA           = 106
-        /** Unique code for Bisection test with supra-threshold tactile stimulus. */
-        @JvmStatic val TEST_BISECTION_TACTILE_SUPRA         = 107
-        /** Unique code for Bisection test with supra-threshold audio-tactile stimuli. */
-        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE_SUPRA   = 108
-        /** Unique code for Bisection test with supra-threshold audio-visual stimuli. */
-        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL_SUPRA    = 109
+        @JvmStatic val TEST_BISECTION_AUDIO_SUPRA           = 107
         /** Unique code for Bisection test with supra-threshold visual stimulus. */
-        @JvmStatic val TEST_BISECTION_VISUAL_SUPRA          = 110
-        /** Unique code for Bisection test with supra-threshold visual-tactile stimuli. */
-        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE_SUPRA  = 111
+        @JvmStatic val TEST_BISECTION_VISUAL_SUPRA          = 108
+        /** Unique code for Bisection test with supra-threshold tactile stimulus. */
+        @JvmStatic val TEST_BISECTION_TACTILE_SUPRA         = 109
+        /** Unique code for Bisection test with supra-threshold audio-visual stimuli. */
+        @JvmStatic val TEST_BISECTION_AUDIO_VISUAL_SUPRA    = 110
+        /** Unique code for Bisection test with supra-threshold audio-tactile stimuli. */
+        @JvmStatic val TEST_BISECTION_AUDIO_TACTILE_SUPRA   = 111
+/** Unique code for Bisection test with supra-threshold visual-tactile stimuli. */
+        @JvmStatic val TEST_BISECTION_VISUAL_TACTILE_SUPRA  = 112
         /** Unique code for Bisection test with audio stimulus comparing SUB vs SUPRA. */
-        @JvmStatic val TEST_BISECTION_AUDIO_SUBSUPRA        = 112
+        @JvmStatic val TEST_BISECTION_AUDIO_SUBSUPRA        = 113
+        /** Unique code for Bisection test with visual stimulus comparing SUB vs SUPRA. */
+        @JvmStatic val TEST_BISECTION_VISUAL_SUBSUPRA       = 114
+        /** Unique code for Bisection test with tactile stimulus comparing SUB vs SUPRA. */
+        @JvmStatic val TEST_BISECTION_TACTILE_SUBSUPRA      = 115
+
 
         /** Unique code for Temporal Integration Window (TID) test with short audio stimulus. */
-        @JvmStatic val TEST_TID_SHORT_AUDIO         = 120
-        /** Unique code for Temporal Integration Window (TID) test with short tactile stimulus. */
-        @JvmStatic val TEST_TID_SHORT_TACTILE       = 121
-        /** Unique code for Temporal Integration Window (TID) test with long audio stimulus. */
-        @JvmStatic val TEST_TID_LONG_AUDIO          = 122
-        /** Unique code for Temporal Integration Window (TID) test with long tactile stimulus. */
-        @JvmStatic val TEST_TID_LONG_TACTILE        = 123
+        @JvmStatic val TEST_TID_SHORT_AUDIO         = 201
         /** Unique code for Temporal Integration Window (TID) test with short visual stimulus. */
-        @JvmStatic val TEST_TID_SHORT_VISUAL        = 124
+        @JvmStatic val TEST_TID_SHORT_VISUAL        = 206
+        /** Unique code for Temporal Integration Window (TID) test with short tactile stimulus. */
+        @JvmStatic val TEST_TID_SHORT_TACTILE       = 202
+        /** Unique code for Temporal Integration Window (TID) test with long audio stimulus. */
+        @JvmStatic val TEST_TID_LONG_AUDIO          = 203
         /** Unique code for Temporal Integration Window (TID) test with long visual stimulus. */
-        @JvmStatic val TEST_TID_LONG_VISUAL         = 125
+        @JvmStatic val TEST_TID_LONG_VISUAL         = 205
+        /** Unique code for Temporal Integration Window (TID) test with long tactile stimulus. */
+        @JvmStatic val TEST_TID_LONG_TACTILE        = 204
         /** Unique code for Temporal Integration Window (TID) training with short audio stimulus. */
-        @JvmStatic val TEST_TID_SHORT_AUDIO_TRAIN   = 126
-        /** Unique code for Temporal Integration Window (TID) training with short tactile stimulus. */
-        @JvmStatic val TEST_TID_SHORT_TACTILE_TRAIN = 127
+        @JvmStatic val TEST_TID_SHORT_AUDIO_TRAIN   = 207
         /** Unique code for Temporal Integration Window (TID) training with short visual stimulus. */
-        @JvmStatic val TEST_TID_SHORT_VISUAL_TRAIN  = 128
+        @JvmStatic val TEST_TID_SHORT_VISUAL_TRAIN  = 208
+        /** Unique code for Temporal Integration Window (TID) training with short tactile stimulus. */
+        @JvmStatic val TEST_TID_SHORT_TACTILE_TRAIN = 209
+
 
         /** Unique code for Auditory Temporal Binding (ATB) test with single stimulus. */
-        @JvmStatic val TEST_ATB_TIME_SINGLESTIM     = 130
+        @JvmStatic val TEST_ATB_TIME_SINGLESTIM     = 301
         /** Unique code for Auditory Temporal Binding (ATB) test with double stimuli. */
-        @JvmStatic val TEST_ATB_TIME_DOUBLESTIM     = 131
+        @JvmStatic val TEST_ATB_TIME_DOUBLESTIM     = 302
         /** Unique code for Auditory Temporal Binding (ATB) test with inferred timing. */
-        @JvmStatic val TEST_ATB_TIME_INF            = 132
+        @JvmStatic val TEST_ATB_TIME_INF            = 303
         /** Unique code for Auditory Temporal Binding (ATB) test with single stimulus for toddlers. */
-        @JvmStatic val TEST_ATB_TIME_SINGLESTIM_TOD = 133
+        @JvmStatic val TEST_ATB_TIME_SINGLESTIM_TOD = 304
         /** Unique code for Auditory Temporal Binding (ATB) test with double stimuli for toddlers. */
-        @JvmStatic val TEST_ATB_TIME_DOUBLESTIM_TOD = 134
+        @JvmStatic val TEST_ATB_TIME_DOUBLESTIM_TOD = 305
 
         /** Unique code for Audio-Tactile-Visual Binding (ATVB) test, single stimulus, unbalanced. */
-        @JvmStatic val TEST_ATVB_TIME_S_UNBAL       = 140
+        @JvmStatic val TEST_ATVB_TIME_S_UNBAL       = 401
         /** Unique code for Audio-Tactile-Visual Binding (ATVB) test, double stimuli, unbalanced. */
-        @JvmStatic val TEST_ATVB_TIME_D_UNBAL       = 141
+        @JvmStatic val TEST_ATVB_TIME_D_UNBAL       = 402
         /** Unique code for Audio-Tactile-Visual Binding (ATVB) test, double stimuli, balanced. */
-        @JvmStatic val TEST_ATVB_TIME_D_BAL         = 142
+        @JvmStatic val TEST_ATVB_TIME_D_BAL         = 403
         /** Unique code for Audio-Tactile-Visual Binding (ATVB) test, single stimulus, balanced. */
-        @JvmStatic val TEST_ATVB_TIME_S_BAL         = 143
+        @JvmStatic val TEST_ATVB_TIME_S_BAL         = 404
         /** Unique code for Audio-Tactile-Visual Binding (ATVB) test, single stimulus, balanced (alternative). */
-        @JvmStatic val TEST_ATVB_TIME_S_BAL2        = 144
-
-        /** Unique code for Sample test with aligned stimuli. */
-        @JvmStatic val TEST_SAMPLE_ALIGNED          = 150
-        /** Unique code for Sample test with shifted stimuli. */
-        @JvmStatic val TEST_SAMPLE_SHIFTED          = 151
-        /** Unique code for Sample test with paired stimuli. */
-        @JvmStatic val TEST_SAMPLE_PAIR             = 152
-
-        /** Unique code for Temporal Frequency Illusions (TFI) test. */
-        @JvmStatic val TEST_TFI                     = 160
-        /** Unique code for Temporal Frequency Illusions (TFI) test for toddlers. */
-        @JvmStatic val TEST_TFI_TODDLERS            = 161
-        /** Unique code for Temporal Frequency Illusions (TFI) test with bimodal stimuli. */
-        @JvmStatic val TEST_TFI_BIMODAL             = 162
-        /** Unique code for Temporal Frequency Illusions (TFI) test with audio-visual stimuli. */
-        @JvmStatic val TEST_TFI_AV                  = 163
+        @JvmStatic val TEST_ATVB_TIME_S_BAL2        = 405
 
         /** Unique code for Visual Temporal Binding (TVB) test with single stimulus. */
-        @JvmStatic val TEST_TVB_TIME_SINGLESTIM     = 170
+        @JvmStatic val TEST_TVB_TIME_SINGLESTIM     = 501
         /** Unique code for Visual Temporal Binding (TVB) test with double stimuli. */
-        @JvmStatic val TEST_TVB_TIME_DOUBLESTIM     = 171
+        @JvmStatic val TEST_TVB_TIME_DOUBLESTIM     = 502
         /** Unique code for Visual Temporal Binding (TVB) test with inferred timing. */
-        @JvmStatic val TEST_TVB_TIME_INF            = 172
+        @JvmStatic val TEST_TVB_TIME_INF            = 503
         /** Unique code for Visual Temporal Binding (TVB) test with single stimulus for toddlers. */
-        @JvmStatic val TEST_TVB_TIME_SINGLESTIM_TOD = 173
+        @JvmStatic val TEST_TVB_TIME_SINGLESTIM_TOD = 504
         /** Unique code for Visual Temporal Binding (TVB) test with double stimuli for toddlers. */
-        @JvmStatic val TEST_TVB_TIME_DOUBLESTIM_TOD = 174
+        @JvmStatic val TEST_TVB_TIME_DOUBLESTIM_TOD = 505
 
         /** Unique code for Audio-Visual Binding (AVB) test with single stimulus. */
-        @JvmStatic val TEST_AVB_TIME_SINGLESTIM     = 180
+        @JvmStatic val TEST_AVB_TIME_SINGLESTIM     = 601
         /** Unique code for Audio-Visual Binding (AVB) test with double stimuli. */
-        @JvmStatic val TEST_AVB_TIME_DOUBLESTIM     = 181
+        @JvmStatic val TEST_AVB_TIME_DOUBLESTIM     = 602
         /** Unique code for Audio-Visual Binding (AVB) test with inferred timing. */
-        @JvmStatic val TEST_AVB_TIME_INF            = 182
+        @JvmStatic val TEST_AVB_TIME_INF            = 603
         /** Unique code for Audio-Visual Binding (AVB) test with single stimulus for toddlers. */
-        @JvmStatic val TEST_AVB_TIME_SINGLESTIM_TOD = 183
+        @JvmStatic val TEST_AVB_TIME_SINGLESTIM_TOD = 604
         /** Unique code for Audio-Visual Binding (AVB) test with double stimuli for toddlers. */
-        @JvmStatic val TEST_AVB_TIME_DOUBLESTIM_TOD = 184
+        @JvmStatic val TEST_AVB_TIME_DOUBLESTIM_TOD = 605
+
+
+        /** Unique code for Temporal Frequency Illusions (TFI) test. */
+        @JvmStatic val TEST_TFI                     = 701
+        /** Unique code for Temporal Frequency Illusions (TFI) test for toddlers. */
+        @JvmStatic val TEST_TFI_TODDLERS            = 702
+        /** Unique code for Temporal Frequency Illusions (TFI) test with bimodal stimuli. */
+        @JvmStatic val TEST_TFI_BIMODAL             = 703
+        /** Unique code for Temporal Frequency Illusions (TFI) test with audio-visual stimuli. */
+        @JvmStatic val TEST_TFI_AV                  = 704
 
         /** Unique code for Figure-Ground Illusion (FGI) test, type 1, unscrambled. */
-        @JvmStatic val TEST_FGI_1_UNSCRAMBLED       = 190
+        @JvmStatic val TEST_FGI_1_UNSCRAMBLED       = 801
         /** Unique code for Figure-Ground Illusion (FGI) test, type 1, scrambled. */
-        @JvmStatic val TEST_FGI_1_SCRAMBLED         = 191
+        @JvmStatic val TEST_FGI_1_SCRAMBLED         = 802
         /** Unique code for Figure-Ground Illusion (FGI) test, type 2, unscrambled. */
-        @JvmStatic val TEST_FGI_2_UNSCRAMBLED       = 192
+        @JvmStatic val TEST_FGI_2_UNSCRAMBLED       = 803
         /** Unique code for Figure-Ground Illusion (FGI) test, type 2, scrambled. */
-        @JvmStatic val TEST_FGI_2_SCRAMBLED         = 193
+        @JvmStatic val TEST_FGI_2_SCRAMBLED         = 804
         /** Unique code for Figure-Ground Illusion (FGI) test, type 3, unscrambled. */
-        @JvmStatic val TEST_FGI_3_UNSCRAMBLED       = 194
+        @JvmStatic val TEST_FGI_3_UNSCRAMBLED       = 805
         /** Unique code for Figure-Ground Illusion (FGI) test, type 3, scrambled. */
-        @JvmStatic val TEST_FGI_3_SCRAMBLED         = 195
+        @JvmStatic val TEST_FGI_3_SCRAMBLED         = 806
 
         /** Unique code for Rivalry/Grouping (RIVGRP) test, rivalry, high frequency. */
-        @JvmStatic val TEST_RIVGRP_RIV_HF           = 200
+        @JvmStatic val TEST_RIVGRP_RIV_HF           = 901
         /** Unique code for Rivalry/Grouping (RIVGRP) test, grouping, high frequency. */
-        @JvmStatic val TEST_RIVGRP_GRP_HF           = 201
+        @JvmStatic val TEST_RIVGRP_GRP_HF           = 902
         /** Unique code for Rivalry/Grouping (RIVGRP) test, rivalry and grouping, high frequency. */
-        @JvmStatic val TEST_RIVGRP_RIVGRP_HF        = 202
+        @JvmStatic val TEST_RIVGRP_RIVGRP_HF        = 903
         /** Unique code for Rivalry/Grouping (RIVGRP) test, rivalry, high contrast. */
-        @JvmStatic val TEST_RIVGRP_RIV_HC           = 203
+        @JvmStatic val TEST_RIVGRP_RIV_HC           = 904
         /** Unique code for Rivalry/Grouping (RIVGRP) test, grouping, high contrast. */
-        @JvmStatic val TEST_RIVGRP_GRP_HC           = 204
+        @JvmStatic val TEST_RIVGRP_GRP_HC           = 905
         /** Unique code for Rivalry/Grouping (RIVGRP) test, rivalry and grouping, high contrast. */
-        @JvmStatic val TEST_RIVGRP_RIVGRP_HC        = 205
+        @JvmStatic val TEST_RIVGRP_RIVGRP_HC        = 906
 
         /** Unique code for Beads test with low uncertainty. */
-        @JvmStatic val TEST_BEADS_LOWUNCERT         = 210
+        @JvmStatic val TEST_BEADS_LOWUNCERT         = 1001
         /** Unique code for Beads test with medium uncertainty. */
-        @JvmStatic val TEST_BEADS_MIDUNCERT         = 211
+        @JvmStatic val TEST_BEADS_MIDUNCERT         = 1002
 
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal. */
-        @JvmStatic val TEST_MOTPRE_VH               = 220
+        @JvmStatic val TEST_MOTPRE_VH               = 1101
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical. */
-        @JvmStatic val TEST_MOTPRE_VV               = 221
+        @JvmStatic val TEST_MOTPRE_VV               = 1102
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal-vertical. */
-        @JvmStatic val TEST_MOTPRE_VHV              = 222
+        @JvmStatic val TEST_MOTPRE_VHV              = 1103
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical, arrow cue. */
-        @JvmStatic val TEST_MOTPRE_VV_CUE_ARROW     = 223
+        @JvmStatic val TEST_MOTPRE_VV_CUE_ARROW     = 1104
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, arrow cue. */
-        @JvmStatic val TEST_MOTPRE_VH_CUE_ARROW     = 224
+        @JvmStatic val TEST_MOTPRE_VH_CUE_ARROW     = 1105
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical, weight cue. */
-        @JvmStatic val TEST_MOTPRE_VV_CUE_WEIGHT    = 225
+        @JvmStatic val TEST_MOTPRE_VV_CUE_WEIGHT    = 1106
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, fixed speed. */
-        @JvmStatic val TEST_MOTPRE_VH_FIXSPEED      = 226
+        @JvmStatic val TEST_MOTPRE_VH_FIXSPEED      = 1107
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, variable speed, fixed visual target. */
-        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVT= 227
+        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVT= 1108
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, variable speed, fixed visual path length. */
-        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVPL= 228
+        @JvmStatic val TEST_MOTPRE_VH_VARSPEED_FIXVPL= 1109
 
         /** Unique code for Temporal Scaling Paradigm (TSP) test, audio, sub-threshold. */
-        @JvmStatic val TEST_TSP_A_SUB               = 230
+        @JvmStatic val TEST_TSP_A_SUB               = 1201
         /** Unique code for Temporal Scaling Paradigm (TSP) test, visual, sub-threshold. */
-        @JvmStatic val TEST_TSP_V_SUB               = 231
+        @JvmStatic val TEST_TSP_V_SUB               = 1202
         /** Unique code for Temporal Scaling Paradigm (TSP) test, tactile, sub-threshold. */
-        @JvmStatic val TEST_TSP_T_SUB               = 232
+        @JvmStatic val TEST_TSP_T_SUB               = 1203
         /** Unique code for Temporal Scaling Paradigm (TSP) test, audio, supra-threshold. */
-        @JvmStatic val TEST_TSP_A_SUPRA             = 233
+        @JvmStatic val TEST_TSP_A_SUPRA             = 1204
         /** Unique code for Temporal Scaling Paradigm (TSP) test, visual, supra-threshold. */
-        @JvmStatic val TEST_TSP_V_SUPRA             = 234
+        @JvmStatic val TEST_TSP_V_SUPRA             = 1205
         /** Unique code for Temporal Scaling Paradigm (TSP) test, tactile, supra-threshold. */
-        @JvmStatic val TEST_TSP_T_SUPRA             = 235
+        @JvmStatic val TEST_TSP_T_SUPRA             = 1206
+        /** Unique code for Temporal Scaling Paradigm (TSP) test, audio, sub-threshold. */
+        @JvmStatic val TEST_TSP_A_SUBSUPRA          = 1207
+        /** Unique code for Temporal Scaling Paradigm (TSP) test, visual, sub-threshold. */
+        @JvmStatic val TEST_TSP_V_SUBSUPRA          = 1208
+        /** Unique code for Temporal Scaling Paradigm (TSP) test, tactile, sub-threshold. */
+        @JvmStatic val TEST_TSP_T_SUBSUPRA          = 1209
+
 
         /** Unique code for Temporal Integration Range (TIR) test, audio, sub-threshold. */
-        @JvmStatic val TEST_TIR_A_SUB               = 240
+        @JvmStatic val TEST_TIR_A_SUB               = 1301
         /** Unique code for Temporal Integration Range (TIR) test, visual, sub-threshold. */
-        @JvmStatic val TEST_TIR_V_SUB               = 241
+        @JvmStatic val TEST_TIR_V_SUB               = 1302
         /** Unique code for Temporal Integration Range (TIR) test, tactile, sub-threshold. */
-        @JvmStatic val TEST_TIR_T_SUB               = 242
+        @JvmStatic val TEST_TIR_T_SUB               = 1303
         /** Unique code for Temporal Integration Range (TIR) test, audio, supra-threshold. */
-        @JvmStatic val TEST_TIR_A_SUPRA             = 243
+        @JvmStatic val TEST_TIR_A_SUPRA             = 1304
         /** Unique code for Temporal Integration Range (TIR) test, visual, supra-threshold. */
-        @JvmStatic val TEST_TIR_V_SUPRA             = 244
+        @JvmStatic val TEST_TIR_V_SUPRA             = 1305
         /** Unique code for Temporal Integration Range (TIR) test, tactile, supra-threshold. */
-        @JvmStatic val TEST_TIR_T_SUPRA             = 245
+        @JvmStatic val TEST_TIR_T_SUPRA             = 1306
+        /** Unique code for Temporal Integration Range (TIR) test, audio, sub + supra thresholds. */
+        @JvmStatic val TEST_TIR_A_SUBSUPRA          = 1307
+        /** Unique code for Temporal Integration Range (TIR) test, visual, sub + supra thresholds. */
+        @JvmStatic val TEST_TIR_V_SUBSUPRA          = 1308
+        /** Unique code for Temporal Integration Range (TIR) test, tactile, sub + supra thresholds. */
+        @JvmStatic val TEST_TIR_T_SUBSUPRA          = 1309
 
         /** Unique code for Musical Meters test. */
-        @JvmStatic val TEST_MUSICAL_METERS          = 250
+        @JvmStatic val TEST_MUSICAL_METERS          = 1401
 
         // endregion
         //-----------------------------------------------------------------------------------------
@@ -469,9 +490,19 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val STIMULUS_ISI_SUB        = "SUB"
         /** Identifier for supra-threshold Inter-Stimulus Interval (ISI) condition. */
         @JvmStatic val STIMULUS_ISI_SUPRA      = "SUPRA"
+        /** Identifier for mixed (sub & supra-threshold) Inter-Stimulus Interval (ISI) condition. */
+        @JvmStatic val STIMULUS_ISI_SUBSUPRA      = "SUBSUPRA"
 
         /** Identifier for no conflict type in stimulus presentation. */
         @JvmStatic val CONFLICT_TYPE_NONE   = "none"
+
+        // time scale for stimulus presentation
+        /** Task involving sub-seconds timings. */
+        @JvmStatic val TIME_SUB         = 1
+        /** Task involving supra-seconds timings. */
+        @JvmStatic val TIME_SUPRA       = 2
+        /** Task involving sub and supra-seconds timings. */
+        @JvmStatic val TIME_SUBSUPRA    = 3
 
         // Common durations
         /** Default duration for visual stimuli in milliseconds. */
@@ -501,7 +532,7 @@ abstract class TestBasic(protected val ctx: Context,
     // PUBLIC
     // ===============================================================================================================
     /** The total number of trials in the current test configuration. */
-    val nTrials:Int     get() = mTrialsManager.nTrials
+    open val nTrials:Int     get() = mTrialsManager.nTrials
     /** The index of the current trial (0-based). */
     val currTrialID:Int   get() = mTrialsManager.currTrialID
 
@@ -661,6 +692,10 @@ abstract class TestBasic(protected val ctx: Context,
                                     subject.absoluteSubjectFilePath,
                                     closeSummary())
         unloadStimuli()
+
+        // Cleanup adaptive trials manager if needed
+        if (this::mTrialsManager.isInitialized && mTrialsManager is AdaptiveTrialsManager)  (mTrialsManager as AdaptiveTrialsManager).cleanup()
+
         when(code){
 
             TEST_COMPLETED -> {
@@ -877,6 +912,22 @@ abstract class TestBasic(protected val ctx: Context,
             saveText(ctx, mResultFile, header, dir = "${Environment.DIRECTORY_DOWNLOADS}/${FileSystemManager.RESULTS_FOLDER_NAME}")
     }
 
+    /**
+     * Creates a list of integer equally spaced from start to end.
+     *
+     * @param start first element of the list.
+     * @param end last element of the list.
+     * @param count number of items.
+     */
+    protected fun createEquallySpacedInts(start: Int, end: Int, count: Int): List<Int> {
+        val startF  = start.toFloat()
+        val endF    = end.toFloat()
+        val step    = (endF - startF) / (count - 1)
+
+        return (0 until count).map { i ->
+            (startF + i * step).toInt()
+        }
+    }
     // ===============================================================================================================
     // region PRIVATE
     // ===============================================================================================================

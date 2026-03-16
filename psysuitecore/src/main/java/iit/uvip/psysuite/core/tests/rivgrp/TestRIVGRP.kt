@@ -411,33 +411,6 @@ class TestRIVGRP(ctx: Context,
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
     /**
-     * Handles the progression to the next trial.
-     * If it's the last trial, it saves the final data and emits [EVENT_TEST_END].
-     * If it's the end of a block (not explicitly handled here beyond a placeholder event), it would manage block transitions.
-     * Otherwise, it calls [doNextTrial] from the base class to proceed.
-     */
-    override fun onNextTrial(){
-
-        // if !last trial && !block end => doNextTrial
-        when {
-            currTrialID == (nTrials - 1) -> { // Last trial
-                saveText("", notifyDm = true) // Save any remaining data and notify data manager
-                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
-            }
-            mListBlocks.contains(currTrialID) -> { // End of a block
-                // Handle end of block logic, e.g., show a break message
-                // Currently, this just sends an event that might not be actively handled.
-                // Consider adding specific block end UI or logic here if needed.
-                testEvent.accept(Triple(EVENT_BLOCK_END, null, listOf()))
-                // Typically, after a block end, you might want to call doNextTrial() or show a specific UI.
-                // For now, let's assume it proceeds to the next trial if not handled by EVENT_BLOCK_END observers.
-                 doNextTrial() // Or show a break screen and then call doNextTrial
-            }
-            else -> doNextTrial() // Proceed to the next trial
-        }
-    }
-
-    /**
      * Called when a trial ends (e.g., stimulus duration is over).
      * Hides response UI elements (buttons or continuous response views).
      * Stops response polling and any media playback.

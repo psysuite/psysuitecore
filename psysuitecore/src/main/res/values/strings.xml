@@ -312,6 +312,10 @@
     <string name="bisection_rb2_text">Uguale</string>
     <string name="bisection_rb3_text">terzo</string>
 
+    <!-- REACTION TIME -->
+    <string name="start_reactiontimes">TEMPO DI REAZIONE (RT)</string>
+    <string name="tr_label_short" translatable="false">TR</string>
+
     <!-- MUSICAL METERS -->
     <string name="start_musicalmeter">MUSICAL METER DISCRIMINATION (MMD)</string>
 

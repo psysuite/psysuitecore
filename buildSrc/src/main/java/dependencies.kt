@@ -53,6 +53,7 @@ object Versions {
     const val sunmail = "1.6.7"
 
     const val junit = "4.13.2"
+    const val coroutines = "1.6.4"
     const val testRunner = "1.5.2"
     const val testEspressoCore = "3.5.1"
 }
@@ -91,6 +92,8 @@ object Dependencies {
     object Kotlin {
         const val stdLib    = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
         const val reflect   = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
+        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+        const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
     }
 
     object Moshi {

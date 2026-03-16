@@ -27,13 +27,13 @@ open class TrialBasic(
     // - update the magnitude value
     // - define, whether applicable (when results depends only on the present trial's user response), the correct answer
     // - return the value actually given to the subject
-    open fun setupTrial(newvalue:Float):Long {
+    open fun initTrial(newvalue:Float):Long {
         magnitude       = newvalue
         correct_answer  = 0
         return stim_value
     }
 
-    // value actually given to the subject
+    // value actually given to the subject (may or may not coincide with magnitude)
     // this properties shall be overridden in all the tasks that need to control magnitude-stimulus coupling
     open val stim_value:Long
         get() = magnitude.toLong()
@@ -47,6 +47,12 @@ open class TrialBasic(
         prev_trial          = prev_tr
         success             = (result == correct_answer)
         user_answer_extra   = extra_text
+    }
+
+    // determine which property (in general: success or user_response) is used to update the ADO model
+    // HERE trial subclasses, overriding this method, can implement their own logic
+    open fun getAdoUpdatingPropr(): Any {
+        return user_answer  // default behavior
     }
 
     override fun toString():String{

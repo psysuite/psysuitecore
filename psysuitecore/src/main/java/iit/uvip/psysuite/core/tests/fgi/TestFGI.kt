@@ -229,21 +229,6 @@ class TestFGI(ctx: Context,
     // =============================================================================================================================
     // MANAGE TRIALS STIMULI
     // =============================================================================================================================
-    override fun onNextTrial(){
-
-        // if !last trial && !block end => doNextTrial
-        when {
-            currTrialID == (nTrials - 1) -> {
-                saveText("", notifyDm = true)
-                testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
-            }
-            mListBlocks.contains(currTrialID) -> {
-                EVENT_BLOCK_END
-            }
-            else -> doNextTrial()
-        }
-    }
-
     override fun onStimuliEnd(){
 
         txt_left.visibility     = View.INVISIBLE
@@ -330,7 +315,7 @@ class TestFGI(ctx: Context,
             id = View.generateViewId()
             text = labels.first
             setBackgroundColor(ctx.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+//            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(ctx.resources.getColor(R.color.colorPrimary))
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             gravity = Gravity.CENTER
@@ -346,7 +331,7 @@ class TestFGI(ctx: Context,
             text = labels.second
             id = View.generateViewId()
             setBackgroundColor(ctx.resources.getColor(R.color.colorPrimary))
-            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
+//            setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Widget_Button_Colored)
             setLinkTextColor(ctx.resources.getColor(R.color.colorPrimary))
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             gravity = Gravity.CENTER

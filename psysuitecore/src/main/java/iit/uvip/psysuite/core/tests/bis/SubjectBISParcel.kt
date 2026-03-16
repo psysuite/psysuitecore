@@ -52,14 +52,14 @@ class SubjectBISParcel(
     override var stimuliDelays: DelaysAligner = DelaysAligner(),
 
     override var nextTrailModality: Int = TestBasic.TEST_NEXTTRIAL_ANSWER,
-    override var whitenoise: Int = TestBasic.TEST_SWITCH_CHOOSE_ON,
-    override var trman_type: Int = TestBasic.TEST_TRMAN_CHOOSE_FIXED,
-    override var showResult: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var canRepeat:Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
-    override var doTraining: Int = TestBasic.TEST_SWITCH_CHOOSE_OFF,
+    override var whitenoise: Int        = TestBasic.TEST_SWITCH_CHOOSE_OFF,
+    override var trman_type: Int        = TestBasic.TEST_TRMAN_CHOOSE_ADAPTIVE,
+    override var showResult: Int        = TestBasic.TEST_SWITCH_CHOOSE_OFF,
+    override var canRepeat:Int          = TestBasic.TEST_SWITCH_CHOOSE_OFF,
+    override var doTraining: Int        = TestBasic.TEST_SWITCH_CHOOSE_ON,
 
-    override var showTrialID: Int = TestBasic.TEST_SHOWTRIALS_NEVER,
-    override var abortMode: Int = TestBasic.TEST_ABORT_TRIALEND,
+    override var showTrialID: Int       = TestBasic.TEST_SHOWTRIALS_NEVER,
+    override var abortMode: Int         = TestBasic.TEST_ABORT_TRIALEND,
 
     override var session_spsel: Int = TestBasic.Companion.TEST_LONGITUDINAL_TOBESELECTED,
     override var session_spdatares: Int = R.array.sessions_array,

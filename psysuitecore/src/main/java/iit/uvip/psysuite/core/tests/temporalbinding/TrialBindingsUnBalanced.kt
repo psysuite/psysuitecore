@@ -13,7 +13,7 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, override var magnitude:Floa
     }
 
     init {
-        setupTrial(magnitude)
+        initTrial(magnitude)
     }
 
     // data exported to log file
@@ -25,7 +25,7 @@ class TrialBindingsUnBalanced(id:Int=-1, type:Int=0, override var magnitude:Floa
         return "${super.debugInfo()}, delay=$stim_value"
     }
 
-    override fun setupTrial(newvalue: Float): Long {
+    override fun initTrial(newvalue: Float): Long {
         magnitude       = newvalue
         correct_answer  =   if(magnitude == 0.0F)   0
                             else                    1

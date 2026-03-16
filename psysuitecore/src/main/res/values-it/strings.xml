@@ -198,9 +198,8 @@
     <string name="avb_question">Sono uguali?</string>
 
     <!-- TIR -->
-
+    <string name="start_reactiontimes">TEMPO DI REAZIONE (RT)</string>
     <string name="tir_label">Temporal Interval Reproduction (TIR)</string>
-    <string name="tir_label_short" translatable="false">TIR</string>
 
 
     <!-- TID -->

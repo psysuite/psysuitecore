@@ -48,10 +48,10 @@ class TrialTTC(id:Int=-1, type:Int, label:String,
                 TPL = distance
             }
         }
-        setupTrial(magnitude)
+        initTrial(magnitude)
     }
 
-    override fun setupTrial(newvalue:Float):Long {
+    override fun initTrial(newvalue:Float):Long {
         magnitude       = newvalue
 
         when(type){

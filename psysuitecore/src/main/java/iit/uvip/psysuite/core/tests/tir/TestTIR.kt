@@ -30,7 +30,7 @@ import iit.uvip.psysuite.core.trials.FixedTrialsManager
 import iit.uvip.psysuite.core.trials.TrialBasic
 import iit.uvip.psysuite.core.ui.fragments.TestFragment
 import iit.uvip.psysuite.core.utility.ConditionData
-import iit.uvip.psysuite.core.utility.StimuliSetTIR
+import iit.uvip.psysuite.core.utility.StimuliSet
 import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
@@ -51,10 +51,7 @@ class TestTIR(ctx: Context,
 
     companion object {
         @JvmStatic val TEST_BASIC_LABEL = "TIR"
-
-//        @JvmStatic val ISI_SUB   = 750L
-//        @JvmStatic val ISI_SUPRA = 1500L
-//        @JvmStatic val ISI_RND_MULT = 0.2F  // percentage of isi to randomize
+        @JvmStatic val N_TRIALS = 50  //
 
         @JvmStatic val STIMULUS_DURATION_AUDIO      = 2000L // indicates the duration of the wav file to be loaded
 
@@ -65,37 +62,57 @@ class TestTIR(ctx: Context,
             ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_$STIMULUS_ISI_SUPRA",   TEST_TIR_V_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.sighted_populations),
             ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_$STIMULUS_ISI_SUPRA",   TEST_TIR_A_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.hearing_populations),
             ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_$STIMULUS_ISI_SUPRA",   TEST_TIR_T_SUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUPRA}" , Populations.all_populations),
+            ConditionData("${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUBSUPRA}",   TEST_TIR_V_SUBSUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}_${STIMULUS_ISI_SUBSUPRA}" , Populations.sighted_populations),
+            ConditionData("${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUBSUPRA}",   TEST_TIR_A_SUBSUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}_${STIMULUS_ISI_SUBSUPRA}" , Populations.hearing_populations),
+            ConditionData("${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUBSUPRA}",   TEST_TIR_T_SUBSUPRA,        "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_TACTILE_LOG}_${STIMULUS_ISI_SUBSUPRA}" , Populations.all_populations),
         )
 
         fun getNextTrialModes(ctx:Context):List<List<Int>> =  listOf(
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO),
-            listOf(TEST_NEXTTRIAL_AUTO)
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),
+            listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO),listOf(TEST_NEXTTRIAL_AUTO)
         )
     }
-
-    private val isSupra: Boolean = (subject.type == TEST_TIR_V_SUPRA || subject.type == TEST_TIR_A_SUPRA || subject.type == TEST_TIR_T_SUPRA)
-
-    private val nBlocks = 10
-
     // region: DEFINE TRIALS SCHEMA: stimulus type & delay
-    private var trialsSchemaSub:List<StimuliSetTIR> = listOf(
-        StimuliSetTIR(2, 840F),
-        StimuliSetTIR(2, 760F),
-        StimuliSetTIR(2, 680F),
-        StimuliSetTIR(2, 600F),
-        StimuliSetTIR(2, 520F),
+
+//    private var trialsSchemaSub: List<StimuliSetTIR> = createEquallySpacedInts(450, 850, N_TRIALS).map {
+//        StimuliSetTIR(1, it.toFloat())}
+
+//    private var trialsSchemaSupra: List<StimuliSetTIR> = createEquallySpacedInts(1500, 2000, N_TRIALS).map {
+//        StimuliSetTIR(1, it.toFloat())}
+
+    private var trialsSchemaSub:List<StimuliSet> = listOf(
+        StimuliSet(2, 500F),
+        StimuliSet(2, 540F),
+        StimuliSet(2, 585F),
+        StimuliSet(2, 630F),
+        StimuliSet(2, 680F),
+        StimuliSet(2, 735F),
+        StimuliSet(2, 795F),
+        StimuliSet(2, 860F),
     )
-    private var trialsSchemaSupra:List<StimuliSetTIR> = listOf(
-        StimuliSetTIR(2, 2000F),
-        StimuliSetTIR(2, 1920F),
-        StimuliSetTIR(2, 1840F),
-        StimuliSetTIR(2, 1760F),
-        StimuliSetTIR(2, 1680F),
+    private var trialsSchemaSupra:List<StimuliSet> = listOf(
+        StimuliSet(2, 1000F),
+        StimuliSet(2, 1080F),
+        StimuliSet(2, 1170F),
+        StimuliSet(2, 1265F),
+        StimuliSet(2, 1370F),
+        StimuliSet(2, 1480F),
+        StimuliSet(2, 1600F),
+        StimuliSet(2, 1730F),
     )
+    private var trialsSchemaSubSupra:List<StimuliSet> = trialsSchemaSub + trialsSchemaSupra
+
+
+    private val schema: List<StimuliSet> = when (subject.type) {
+
+        TEST_TIR_V_SUB, TEST_TIR_A_SUB, TEST_TIR_T_SUB          -> trialsSchemaSub
+        TEST_TIR_V_SUPRA, TEST_TIR_A_SUPRA, TEST_TIR_T_SUPRA    -> trialsSchemaSupra
+        else                                                    -> trialsSchemaSubSupra
+    }
+
+    private val nBlocks = 1
+
     // endregion
 
     private val binding: FragmentTestBinding =  (hostfragment as TestFragment).binding
@@ -121,9 +138,9 @@ class TestTIR(ctx: Context,
         mLayout = binding.root
 
         when {
-            mImageView == null && (subject.type == TEST_TIR_V_SUB || subject.type == TEST_TIR_V_SUPRA)  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
-            vibrator == null && (subject.type == TEST_TIR_T_SUB || subject.type == TEST_TIR_T_SUPRA)    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
-            mainView == null                                                                            -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
+            mImageView == null && (subject.type == TEST_TIR_V_SUB || subject.type == TEST_TIR_V_SUPRA || subject.type == TEST_TIR_V_SUBSUPRA)  -> throw ImageViewDefinedException("IMAGE_VIEW_NOT_DEFINED")
+            vibrator == null && (subject.type == TEST_TIR_T_SUB || subject.type == TEST_TIR_T_SUPRA || subject.type == TEST_TIR_T_SUBSUPRA)    -> throw VibratorNotDefinedException("VIBRATOR_NOT_DEFINED")
+            mainView == null                                                                                                                   -> throw ImageViewDefinedException("MAIN_VIEW_NOT_DEFINED")
         }
 
         // set question & create mTrials list
@@ -131,11 +148,11 @@ class TestTIR(ctx: Context,
         mQuestion       = ""
 
         when(subject.type){
-            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA    -> {
+            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA, TEST_TIR_V_SUBSUPRA    -> {
                 currStimulusDuration    = STIMULUS_DURATION_VISUAL
                 currStimulusLabel       = "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_VISUAL_LOG}"
             }
-            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA    -> {
+            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA, TEST_TIR_A_SUBSUPRA    -> {
                 currStimulusDuration    = STIMULUS_DURATION_AUDIO
                 currStimulusLabel       = "${TEST_BASIC_LABEL}_${STIMULUS_TYPE_AUDIO_LOG}"
             }
@@ -162,12 +179,12 @@ class TestTIR(ctx: Context,
 
         mStimuliManager = when(subject.type){
 
-            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA -> {
+            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA, TEST_TIR_V_SUBSUPRA -> {
                 StimuliManager(null, null,
                     VisualManager(STIM_T, mImageView!!, currImageRes, duration = currStimulusDuration, handler = mStimuliHandler),
                     subject.stimuliDelays, ctx, mStimuliHandler)
             }
-            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA -> {
+            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA, TEST_TIR_A_SUBSUPRA -> {
                 StimuliManager(AudioManager(STIM_A, audioResources[STIMULUS_DURATION_AUDIO] ?: "t1000hz_50ms.wav",  duration = STIMULUS_DURATION_AUDIO, handler = mStimuliHandler, ctx = ctx), null,null,
                     subject.stimuliDelays, ctx, mStimuliHandler)
             }
@@ -188,8 +205,6 @@ class TestTIR(ctx: Context,
 
         val trials:MutableList<TrialBasic> = mutableListOf()
         var temp_trials:MutableList<TrialBasic> = mutableListOf()
-
-        val schema = if(isSupra)    trialsSchemaSupra else trialsSchemaSub
 
         for(i in 0 until nBlocks){
             temp_trials = mutableListOf()
@@ -275,10 +290,7 @@ class TestTIR(ctx: Context,
                         onPress()
                         performClick()
                     }
-
-                    MotionEvent.ACTION_UP -> {
-                        onRelease()
-                    }
+                    MotionEvent.ACTION_UP ->    onRelease()
                 }
                 true
             }
@@ -298,13 +310,13 @@ class TestTIR(ctx: Context,
 
     private fun deliverStimulus(trial: TrialTIR){
         when(trial.type) {
-            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA ->  mStimuliManager.deliverAStimulus(duration = trial.stim_value)
-            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA ->  mStimuliManager.deliverVStimulus(duration = trial.stim_value)
-            TEST_TIR_T_SUB, TEST_TIR_T_SUPRA ->  mStimuliManager.deliverTStimulus(duration = trial.stim_value)
+            TEST_TIR_A_SUB, TEST_TIR_A_SUPRA, TEST_TIR_A_SUBSUPRA ->  mStimuliManager.deliverAStimulus(duration = trial.stim_value)
+            TEST_TIR_V_SUB, TEST_TIR_V_SUPRA, TEST_TIR_V_SUBSUPRA ->  mStimuliManager.deliverVStimulus(duration = trial.stim_value)
+            TEST_TIR_T_SUB, TEST_TIR_T_SUPRA, TEST_TIR_T_SUBSUPRA ->  mStimuliManager.deliverTStimulus(duration = trial.stim_value)
+            else -> throw Exception("STIMULUS_TYPE_NOT_DEFINED")
         }
     }
 
-    // +500 ms
     override fun onStimuliEnd() {
         mStimuliHandler.removeCallbacksAndMessages(null)
         mRespButton.visibility = View.INVISIBLE

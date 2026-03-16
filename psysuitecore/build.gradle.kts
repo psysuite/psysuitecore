@@ -43,6 +43,8 @@ dependencies {
 
 
     implementation(Dependencies.Kotlin.stdLib)
+    implementation(Dependencies.Kotlin.coroutinesCore)
+    implementation(Dependencies.Kotlin.coroutinesAndroid)
 
     implementation(Dependencies.permissions)
     implementation(Dependencies.AndroidX.legacy_support)

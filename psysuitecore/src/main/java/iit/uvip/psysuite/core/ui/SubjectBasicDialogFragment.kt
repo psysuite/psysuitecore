@@ -369,7 +369,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                 
                 // Set selection based on existing project or default to first item
                 val currentProject = subject.project
-                if (!currentProject.isNullOrEmpty()) {
+                if (currentProject.isNotEmpty()) {
                     val projectIndex = availableProjects.indexOf(currentProject)
                     if (projectIndex != -1) {
                         selProject = projectIndex
@@ -381,7 +381,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                     binding.projectSpinner.setSelection(selProject, false)
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Silently handle if projectSpinner doesn't exist in layout
             // This allows backward compatibility with layouts that don't have the project spinner
         }
@@ -434,7 +434,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             if (availableProjects.isNotEmpty()) {
                 binding.projectSpinner.setSelection(0)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Ignore if projectSpinner doesn't exist in layout
         }
     }
@@ -472,7 +472,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
                     errors.add(" - " + "Select project")
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // If projectSpinner doesn't exist, skip validation
         }
 
@@ -530,7 +530,7 @@ open class SubjectBasicDialogFragment: DialogFragment(){
             if (availableProjects.isNotEmpty() && binding.projectSpinner.selectedItemPosition >= 0) {
                 subject.project = availableProjects[binding.projectSpinner.selectedItemPosition]
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // If projectSpinner doesn't exist, keep existing project value
         }
 
