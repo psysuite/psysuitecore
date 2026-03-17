@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentSubjectInfoTidBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentSubjectInfoTidBinding
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment
 import org.albaspazio.psysuite.utility.ConditionData

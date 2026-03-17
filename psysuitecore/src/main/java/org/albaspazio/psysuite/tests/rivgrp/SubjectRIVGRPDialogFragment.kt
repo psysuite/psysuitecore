@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentSubjectInfoBasicRivgrpBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentSubjectInfoBasicRivgrpBinding
 import org.albaspazio.psysuite.ui.SubjectBasicDialogFragment
 
 

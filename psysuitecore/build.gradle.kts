@@ -6,6 +6,8 @@ plugins {
 
 android {
 
+    namespace = Configs.psysuitecorenamespace
+
     compileSdkVersion(Configs.compileSdkVersion)
     defaultConfig {
         minSdkVersion(Configs.minSdkVersion)

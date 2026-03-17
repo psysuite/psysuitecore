@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.Populations
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.stimuli.StimuliManager

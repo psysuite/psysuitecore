@@ -12,7 +12,7 @@ import org.albaspazio.psysuite.utility.getLabelLog
 import kotlinx.parcelize.Parcelize
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.getCompanionObjectMethod
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 
 // session
 @Parcelize

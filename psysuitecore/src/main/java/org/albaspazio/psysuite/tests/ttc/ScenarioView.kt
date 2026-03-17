@@ -13,7 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import kotlin.math.round
 
 /*

@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.Populations
 import org.albaspazio.psysuite.stimuli.*
 import org.albaspazio.psysuite.tests.TestBasic

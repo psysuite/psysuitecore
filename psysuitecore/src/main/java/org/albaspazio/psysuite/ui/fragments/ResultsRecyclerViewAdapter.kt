@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 
 
 class ResultsRecyclerViewAdapter(private val values: List<ResultFileEntry>) : RecyclerView.Adapter<ResultsRecyclerViewAdapter.ViewHolder>() {

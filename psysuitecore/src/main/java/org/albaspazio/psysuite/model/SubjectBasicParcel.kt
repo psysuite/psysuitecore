@@ -5,7 +5,7 @@ import android.os.Environment
 import android.os.Parcelable
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.albaspazio.psysuite.R
+import kotlinx.parcelize.IgnoredOnParcel
 import org.albaspazio.psysuite.stimuli.DelaysAligner
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_NO_LONGITUDINAL
@@ -13,7 +13,6 @@ import org.albaspazio.psysuite.utility.ConditionData
 import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
 import org.albaspazio.psysuite.utility.getIds
 import org.albaspazio.psysuite.utility.getLabelLog
-import kotlinx.parcelize.IgnoredOnParcel
 import org.albaspazio.core.accessory.Device
 import org.albaspazio.core.accessory.getCompanionObjectMethod
 import org.albaspazio.core.accessory.getDateString
@@ -24,6 +23,7 @@ import org.albaspazio.core.filesystem.getAbsoluteFilePath
 import org.albaspazio.core.filesystem.getFileList
 import org.albaspazio.core.filesystem.readText
 import org.albaspazio.core.filesystem.saveText
+import org.albaspazio.psysuite.core.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

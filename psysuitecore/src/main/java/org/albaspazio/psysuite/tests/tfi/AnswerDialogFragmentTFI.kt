@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentAnswerTfiBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentAnswerTfiBinding
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.ui.fragments.TestFragment
 import org.albaspazio.psysuite.ui.fragments.TestFragment.Companion.EVENT_ANSWER_CODE

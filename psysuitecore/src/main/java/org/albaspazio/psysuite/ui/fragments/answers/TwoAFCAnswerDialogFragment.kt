@@ -12,8 +12,8 @@ import androidx.fragment.app.DialogFragment
 import java.lang.Math.random
 import java.util.*
 
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.Fragment2afcAnswerBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.Fragment2afcAnswerBinding
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.ui.fragments.TestFragment
 import org.albaspazio.psysuite.ui.fragments.TestFragment.Companion.EVENT_ANSWER_CODE

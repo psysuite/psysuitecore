@@ -13,8 +13,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentTestBinding
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.Populations
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.stimuli.StimuliManager
@@ -29,6 +28,7 @@ import org.albaspazio.core.accessory.VibrationManager
 import org.albaspazio.core.accessory.toDp
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
+import org.albaspazio.psysuite.core.databinding.FragmentTestBinding
 import java.lang.Double.POSITIVE_INFINITY
 
 

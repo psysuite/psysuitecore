@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 
-import org.albaspazio.psysuite.databinding.FragmentResultsListBinding
+import org.albaspazio.psysuite.core.databinding.FragmentResultsListBinding
 
 import org.albaspazio.core.filesystem.getFileNamesList
 

@@ -3,7 +3,7 @@ package org.albaspazio.psysuite.model.preferences
 import android.content.Context
 import android.content.res.Resources
 import androidx.preference.PreferenceManager
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.stimuli.DelaysAligner
 import org.albaspazio.core.sharedpreferences.SharedPreferenceWrapper
 

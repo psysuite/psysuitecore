@@ -8,8 +8,8 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentSubjectInfoSampleBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentSubjectInfoSampleBinding
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.stimuli.StimuliManager
 import org.albaspazio.psysuite.tests.TestBasic

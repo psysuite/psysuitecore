@@ -9,8 +9,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentSubjectInfoBasicBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentSubjectInfoBasicBinding
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_NO_LONGITUDINAL

@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.Fragment3afcAnswerBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.Fragment3afcAnswerBinding
 
 import org.albaspazio.core.speech.SpeechManager
 

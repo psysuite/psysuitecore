@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import org.albaspazio.psysuite.R
-import org.albaspazio.psysuite.databinding.FragmentSubjectInfoBasicBinding
+import org.albaspazio.psysuite.core.R
+import org.albaspazio.psysuite.core.databinding.FragmentSubjectInfoBasicBinding
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.tests.TestBasic
 import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_ATB_TIME_INF

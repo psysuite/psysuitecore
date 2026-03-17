@@ -23,7 +23,7 @@ import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showToast
 
 import androidx.constraintlayout.widget.ConstraintLayout
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import androidx.constraintlayout.widget.ConstraintSet
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

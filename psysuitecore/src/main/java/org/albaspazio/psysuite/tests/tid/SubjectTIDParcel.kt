@@ -1,7 +1,7 @@
 package org.albaspazio.psysuite.tests.tid
 
 import android.content.Context
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.Populations
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.stimuli.DelaysAligner

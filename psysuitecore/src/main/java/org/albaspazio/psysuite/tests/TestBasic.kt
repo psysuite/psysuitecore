@@ -13,7 +13,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.PublishRelay
 
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.model.summary.Summary
 import org.albaspazio.psysuite.stimuli.StimuliManager

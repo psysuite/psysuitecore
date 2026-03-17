@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import org.albaspazio.psysuite.adaptive.ado.ADOWrapper
 import org.albaspazio.psysuite.adaptive.TaskADAParams
 import org.albaspazio.psysuite.adaptive.ado.ADOParams
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.psysuite.model.Populations
 import org.albaspazio.psysuite.model.SubjectBasicParcel
 import org.albaspazio.psysuite.stimuli.AudioManager

@@ -4,7 +4,7 @@ package org.albaspazio.psysuite.stimuli
 import android.content.Context
 import android.os.Handler
 import android.util.Log
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.core.accessory.getOnsetDate
 import java.util.Collections
 

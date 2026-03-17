@@ -1,6 +1,6 @@
 object Configs {
 
-    const val psysuitecorenamespace     = "org.albaspazio.psysuite"
+    const val psysuitecorenamespace     = "org.albaspazio.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
 
     const val compileSdkVersion = 34
@@ -37,7 +37,7 @@ object Versions {
     const val recycleView       = "1.2.1"
 
     // org.albaspazio.core
-    const val kotlin = "1.6.10"
+    const val kotlin = "1.9.20"
     const val ktxCore = "1.7.0"
     const val appCompat = "1.5.1"
     const val androidLibrary = "7.4.2"

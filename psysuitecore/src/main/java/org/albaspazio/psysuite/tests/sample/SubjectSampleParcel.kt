@@ -6,7 +6,7 @@ import org.albaspazio.psysuite.stimuli.DelaysAligner
 import org.albaspazio.psysuite.tests.TestBasic
 import kotlinx.parcelize.Parcelize
 import org.albaspazio.core.accessory.Device
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 
 
 /*

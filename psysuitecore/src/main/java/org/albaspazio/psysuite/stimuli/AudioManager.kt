@@ -11,7 +11,7 @@ import android.media.AudioTrack
 import android.os.Build
 import android.os.Handler
 import androidx.annotation.RequiresApi
-import org.albaspazio.psysuite.R
+import org.albaspazio.psysuite.core.R
 import org.albaspazio.nativeaudio.PlaybackEngine
 import java.io.IOException
 import java.io.InputStream
