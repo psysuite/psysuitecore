@@ -1,4 +1,4 @@
-package iit.uvip.psysuite.core.stimuli
+package org.albaspazio.psysuite.stimuli
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -9,7 +9,7 @@ import android.media.AudioTrack
 import android.os.*
 import android.util.Log
 import androidx.annotation.RequiresApi
-import iit.uvip.psysuite.core.R
+import org.albaspazio.psysuite.R
 import org.albaspazio.core.accessory.getOnsetDate
 import java.io.IOException
 import java.io.InputStream

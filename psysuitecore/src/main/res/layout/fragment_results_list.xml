@@ -11,7 +11,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
-        android:name="iit.uvip.psysuite.core.ResultsFragment"
+        android:name="org.albaspazio.psysuite.ui.fragments.ResultsFragment"
         android:layout_width="337dp"
         android:layout_height="581dp"
         android:layout_marginTop="80dp"

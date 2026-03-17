@@ -1,4 +1,4 @@
-package iit.uvip.psysuite.core.stimuli
+package org.albaspazio.psysuite.stimuli
 
 import android.content.Context
 import android.os.*

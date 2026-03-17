@@ -1,6 +1,6 @@
 object Configs {
 
-    const val psysuitecorenamespace     = "iit.uvip.psysuite.core"
+    const val psysuitecorenamespace     = "org.albaspazio.psysuite"
     const val corenamespace             = "org.albaspazio.core"
 
     const val compileSdkVersion = 34
@@ -30,7 +30,7 @@ object Versions {
     const val legacy_support = "1.0.0"
 
 
-    // iit.uvip.psysuite.core
+    // org.albaspazio.psysuite
     const val chaquopy          = "16.0.0"
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
@@ -69,7 +69,7 @@ object Dependencies {
         const val legacy_support    = "androidx.legacy:legacy-support-v4:${Versions.legacy_support}"
         const val fragment          = "androidx.fragment:fragment:${Versions.fragment}"
 
-        // iit.uvip.psysuite.core
+        // org.albaspazio.psysuite
         const val preference        = "androidx.preference:preference-ktx:${Versions.preference}"
         const val recycleView       = "androidx.recyclerview:recyclerview:${Versions.recycleView}"
         const val legacySupport     = "androidx.legacy:legacy-support-v4:${Versions.legacySupport}"
