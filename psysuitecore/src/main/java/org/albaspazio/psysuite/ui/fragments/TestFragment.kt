@@ -216,7 +216,7 @@ class TestFragment : BaseFragment(
         // visible when:
         // - answer dialog is not displayed
         // - next trial in shown automatically (after a short delay to let user abort the whole test)
-        binding.btNext.setOnClickListener{            mTest.onNextTrial()        }
+        binding.btNext.setOnClickListener{            mTest.onTrialTerminated()        }
 
         // visible when:
         // - TEST_ABORT_ALWAYS
@@ -231,13 +231,13 @@ class TestFragment : BaseFragment(
                 requireContext().resources.getString(R.string.yes),         // ok
                 requireContext().resources.getString(R.string.no),
                 {    onAskIfAbortTest()},
-                {   mTest.onNextTrial()}
+                {   mTest.onTrialTerminated()}
             )
         }
 
         binding.btPause.setOnClickListener{
             if(isPaused){               binding.btPause.text = resources.getString(R.string.pause)
-                mTest.onNextTrial()
+                mTest.onTrialTerminated()
             }
             else{
                 mHandler.removeCallbacksAndMessages(null)
@@ -283,8 +283,8 @@ class TestFragment : BaseFragment(
                     TestBasic.EVENT_SHOW_PAUSE_ABORT     -> {
                                                             val dur = (it.second ?: DEFAULT_ABORT_TIME) as Long
 
-                                                            if(dur > 0L)    continue2NextTrial(dur,{ mTest.onNextTrial() })
-                                                            else            mTest.onNextTrial()}
+                                                            if(dur > 0L)    continue2NextTrial(dur,{ mTest.onTrialTerminated() })
+                                                            else            mTest.onTrialTerminated()}
                     TestBasic.EVENT_TRAINING_END         -> onTrainingEnded()
 
                     TestBasic.EVENT_BLOCK_END            -> onBlockEnded()
@@ -561,7 +561,7 @@ class TestFragment : BaseFragment(
 
         mTest.setAnswer(result, elapsed, extra_text)
         // close trial (e.g. set answer) & check whether it was the last => test ended
-        mTest.onNextTrial()
+        mTest.onTrialTerminated()
     }
     //#endregion
 

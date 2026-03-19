@@ -22,11 +22,16 @@ import org.albaspazio.core.filesystem.saveTextQ
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.psysuite.core.R
-import org.albaspazio.psysuite.tests.SubjectBasicParcel
 import org.albaspazio.psysuite.model.summary.Summary
 import org.albaspazio.psysuite.stimuli.StimuliManager
+import org.albaspazio.psysuite.tests.TestBasic.Companion.BLOCK_COMPLETED
+import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_GIVE_ANSWER
+import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_COMPLETED
+import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_END
+import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_ERROR
+import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_ABORTED_KEEP_RESULT
+import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_COMPLETED
 import org.albaspazio.psysuite.trials.AdaptiveTrialsManager
-import org.albaspazio.psysuite.tests.TrialBasic
 import org.albaspazio.psysuite.trials.TrialsManager
 import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
 
@@ -146,11 +151,11 @@ abstract class TestBasic(protected val ctx: Context,
 /** Unique code for Bisection test with supra-threshold visual-tactile stimuli. */
         @JvmStatic val TEST_BISECTION_VISUAL_TACTILE_SUPRA  = 112
         /** Unique code for Bisection test with audio stimulus comparing SUB vs SUPRA. */
-        @JvmStatic val TEST_BISECTION_AUDIO_SUBSUPRA        = 113
+//        @JvmStatic val TEST_BISECTION_AUDIO_SUBSUPRA        = 113
         /** Unique code for Bisection test with visual stimulus comparing SUB vs SUPRA. */
-        @JvmStatic val TEST_BISECTION_VISUAL_SUBSUPRA       = 114
+//        @JvmStatic val TEST_BISECTION_VISUAL_SUBSUPRA       = 114
         /** Unique code for Bisection test with tactile stimulus comparing SUB vs SUPRA. */
-        @JvmStatic val TEST_BISECTION_TACTILE_SUBSUPRA      = 115
+//        @JvmStatic val TEST_BISECTION_TACTILE_SUBSUPRA      = 115
 
 
         /** Unique code for Temporal Integration Window (TID) test with short audio stimulus. */
@@ -259,17 +264,17 @@ abstract class TestBasic(protected val ctx: Context,
         @JvmStatic val TEST_BEADS_MIDUNCERT         = 1002
 
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal. */
-        @JvmStatic val TEST_MOTPRE_VH               = 1101
+//        @JvmStatic val TEST_MOTPRE_VH               = 1101
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical. */
-        @JvmStatic val TEST_MOTPRE_VV               = 1102
+//        @JvmStatic val TEST_MOTPRE_VV               = 1102
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal-vertical. */
-        @JvmStatic val TEST_MOTPRE_VHV              = 1103
+//        @JvmStatic val TEST_MOTPRE_VHV              = 1103
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical, arrow cue. */
-        @JvmStatic val TEST_MOTPRE_VV_CUE_ARROW     = 1104
+//        @JvmStatic val TEST_MOTPRE_VV_CUE_ARROW     = 1104
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, arrow cue. */
-        @JvmStatic val TEST_MOTPRE_VH_CUE_ARROW     = 1105
+//        @JvmStatic val TEST_MOTPRE_VH_CUE_ARROW     = 1105
         /** Unique code for Motion Prediction (MOTPRE) test, visual-vertical, weight cue. */
-        @JvmStatic val TEST_MOTPRE_VV_CUE_WEIGHT    = 1106
+//        @JvmStatic val TEST_MOTPRE_VV_CUE_WEIGHT    = 1106
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, fixed speed. */
         @JvmStatic val TEST_MOTPRE_VH_FIXSPEED      = 1107
         /** Unique code for Motion Prediction (MOTPRE) test, visual-horizontal, variable speed, fixed visual target. */
@@ -444,7 +449,7 @@ abstract class TestBasic(protected val ctx: Context,
         // region ---- TEST COMMON CONSTANTS ---
         // Email configuration
         /** Default email recipients for sending test results or feedback. */
-        @JvmStatic val DEFAULT_EMAIL_RECIPIENTS = arrayOf("psysuite@gmail.com")
+//        @JvmStatic val DEFAULT_EMAIL_RECIPIENTS = arrayOf("psysuite@gmail.com")
 
         /** Standard header for log files. */
         @JvmStatic val LOG_HEADER = "id\ttype\terror\tsuccess\telapsed\n"
@@ -499,11 +504,11 @@ abstract class TestBasic(protected val ctx: Context,
 
         // time scale for stimulus presentation
         /** Task involving sub-seconds timings. */
-        @JvmStatic val TIME_SUB         = 1
+//        @JvmStatic val TIME_SUB         = 1
         /** Task involving supra-seconds timings. */
-        @JvmStatic val TIME_SUPRA       = 2
+//        @JvmStatic val TIME_SUPRA       = 2
         /** Task involving sub and supra-seconds timings. */
-        @JvmStatic val TIME_SUBSUPRA    = 3
+//        @JvmStatic val TIME_SUBSUPRA    = 3
 
         // Common durations
         /** Default duration for visual stimuli in milliseconds. */
@@ -653,7 +658,7 @@ abstract class TestBasic(protected val ctx: Context,
      *                   a block ends                               => it emits [EVENT_BLOCK_END].
      *               else, If the test continues,                   => emits an [EVENT_TRIAL_STARTED] and calls [doNextTrial].
      */
-    open fun onNextTrial() {
+    open fun onTrialTerminated() {
 
         when {
             mTrialsManager.isLastTrainingTrial ->
@@ -666,10 +671,8 @@ abstract class TestBasic(protected val ctx: Context,
                 terminateTest(TEST_COMPLETED)
                 testEvent.accept(Triple(EVENT_TEST_END, null, listOf()))            // END !
             }
-
             else -> {
-                testEvent.accept(Triple(EVENT_TRIAL_STARTED, null, listOf()))
-                doNextTrial()
+                mStimuliHandler.postDelayed({ doNextTrial()}, (0..1000L).random())
             }
         }
     }
@@ -849,7 +852,7 @@ abstract class TestBasic(protected val ctx: Context,
         mNoise?.stop()
         mNoise?.prepare()
 
-        // wait for 500 ms and then decide what to do
+        // wait for 50 ms (was 500 but I added 0-1000, @19032026, at the end of onNextTrial) and then decide what to do
         mStimuliHandler.postDelayed({
             when (subject.nextTrailModality) {
                 TEST_NEXTTRIAL_BUTTON               ->  testEvent.accept(Triple(EVENT_SHOW_NEXT_ABORT, null, listOf()))
@@ -862,7 +865,7 @@ abstract class TestBasic(protected val ctx: Context,
                                                         testEvent.accept(Triple(EVENT_GIVE_VOCAL_ANSWER, null, listOf()))
                                                         testEvent.accept(Triple(EVENT_GIVE_ANSWER, null, listOf())) }
             }
-        }, 500L)
+        }, 50L)
     }
     /**
      * Proceeds to the next trial by fetching it from [mTrialsManager] and then displaying it using [show].
@@ -872,8 +875,9 @@ abstract class TestBasic(protected val ctx: Context,
      */
     protected fun doNextTrial():Int{
         return  try {
+            testEvent.accept(Triple(EVENT_TRIAL_STARTED, null, listOf()))
             show(mTrialsManager.getNewTrial())
-            if(subject.isDebug) testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, mTrial.debugInfo(), listOf()))    // send debug info
+            if (subject.isDebug) testEvent.accept(Triple(EVENT_SHOW_DEBUGINFO, mTrial.debugInfo(), listOf()))
             currTrialID
         }
         catch(e:Exception){
