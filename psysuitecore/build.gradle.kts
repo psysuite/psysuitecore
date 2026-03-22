@@ -62,6 +62,8 @@ dependencies {
     implementation(Dependencies.Moshi.moshi)
     implementation(Dependencies.Moshi.moshiKt)
 
+    implementation(Dependencies.network.okhttp)
+    implementation(Dependencies.network.gson)
 
     implementation("androidx.test.ext:junit-ktx:1.2.1")
     testImplementation("junit:junit:4.13.2")

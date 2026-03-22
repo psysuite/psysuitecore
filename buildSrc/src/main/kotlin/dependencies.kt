@@ -2,6 +2,7 @@ object Configs {
 
     const val psysuitecorenamespace     = "org.albaspazio.psysuite.core"
     const val corenamespace             = "org.albaspazio.core"
+    const val psysuitepythonnamespace   = "org.albaspazio.psysuite.python"
 
     const val compileSdkVersion = 34
     const val minSdkVersion     = 26
@@ -31,7 +32,7 @@ object Versions {
 
 
     // org.albaspazio.psysuite
-    const val chaquopy          = "16.0.0"
+    const val chaquopy          = "17.0.0"
     const val legacySupport     = "1.0.0"
     const val preference        = "1.2.0"
     const val recycleView       = "1.2.1"
@@ -51,6 +52,8 @@ object Versions {
     const val rxkotlin = "2.4.0"
     const val rxandroid = "2.1.1"
     const val sunmail = "1.6.7"
+    const val okhttp = "4.11.0"
+    const val gson = "2.10.1"
 
     const val junit = "4.13.2"
     const val coroutines = "1.6.4"
@@ -110,6 +113,11 @@ object Dependencies {
     object sunmail {
         const val mail          = "com.sun.mail:android-mail:${Versions.sunmail}"
         const val activation    = "com.sun.mail:android-activation:${Versions.sunmail}"
+    }
+
+    object network {
+        const val okhttp        = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
+        const val gson          = "com.google.code.gson:gson:${Versions.gson}"
     }
 
 

@@ -17,12 +17,12 @@ import org.albaspazio.core.filesystem.getFileList
 import org.albaspazio.core.filesystem.readText
 import org.albaspazio.core.filesystem.saveText
 import org.albaspazio.psysuite.core.R
-import org.albaspazio.psysuite.model.Populations
-import org.albaspazio.psysuite.stimuli.DelaysAligner
-import org.albaspazio.psysuite.utility.ConditionData
-import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
-import org.albaspazio.psysuite.utility.getIds
-import org.albaspazio.psysuite.utility.getLabelLog
+import org.albaspazio.psysuite.core.models.Populations
+import org.albaspazio.psysuite.core.stimuli.DelaysAligner
+import org.albaspazio.psysuite.core.utils.ConditionData
+import org.albaspazio.psysuite.core.utils.filesystem.FileSystemManager
+import org.albaspazio.psysuite.core.utils.getIds
+import org.albaspazio.psysuite.core.utils.getLabelLog
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -46,14 +46,14 @@ import java.util.UUID
  * @param label A descriptive label or identifier for the subject (e.g., name or code). Defaults to an empty string.
  * @param age The age of the subject. Defaults to -1 (unknown).
  * @param gender The gender of the subject (e.g., 0 for male, 1 for female). Defaults to -1 (unknown).
- * @param population The population group the subject belongs to (e.g., [org.albaspazio.psysuite.model.Populations.Companion.POPULATION_TD]). Defaults to [org.albaspazio.psysuite.model.Populations.Companion.POPULATION_TD].
+ * @param population The population group the subject belongs to (e.g., [Populations.Companion.POPULATION_TD]). Defaults to [Populations.Companion.POPULATION_TD].
  * @param type An integer code representing the specific type of test or configuration. Defaults to -1.
  * @param project The name of the project this subject belongs to. Defaults to an empty string.
  * @param block The current block number in a series of tests. Defaults to -1.
  * @param isDebug Flag indicating if the test is running in debug mode. Defaults to `false`.
  * @param device Information about the device running the test. Defaults to `null`.
  * @param vercode Version code of the application or test suite. Defaults to -1.
- * @param stimuliDelays Configuration for aligning stimuli delays. Defaults to a new [org.albaspazio.psysuite.stimuli.DelaysAligner] instance.
+ * @param stimuliDelays Configuration for aligning stimuli delays. Defaults to a new [DelaysAligner] instance.
  * @param nextTrailModality How the test proceeds to the next trial (e.g., [TestBasic.Companion.TEST_NEXTTRIAL_AUTO]). Defaults to [TEST_NEXTTRIAL_AUTO].
  * @param whitenoise Configuration for white noise during the test (e.g., [TestBasic.Companion.TEST_SWITCH_CHOOSE_ON]). Defaults to [TestBasic.Companion.TEST_SWITCH_CHOOSE_ON].
  * @param trman_type Trial management type (e.g., [TestBasic.Companion.TEST_TRMAN_FIXED]). Defaults to [TestBasic.Companion.TEST_TRMAN_FIXED].

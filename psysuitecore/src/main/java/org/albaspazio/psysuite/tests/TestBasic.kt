@@ -22,8 +22,8 @@ import org.albaspazio.core.filesystem.saveTextQ
 import org.albaspazio.core.speech.SpeechManager
 import org.albaspazio.core.ui.showAlert
 import org.albaspazio.psysuite.core.R
-import org.albaspazio.psysuite.model.summary.Summary
-import org.albaspazio.psysuite.stimuli.StimuliManager
+import org.albaspazio.psysuite.core.models.summary.Summary
+import org.albaspazio.psysuite.core.stimuli.StimuliManager
 import org.albaspazio.psysuite.tests.TestBasic.Companion.BLOCK_COMPLETED
 import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_GIVE_ANSWER
 import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_COMPLETED
@@ -31,9 +31,9 @@ import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_END
 import org.albaspazio.psysuite.tests.TestBasic.Companion.EVENT_TEST_ERROR
 import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_ABORTED_KEEP_RESULT
 import org.albaspazio.psysuite.tests.TestBasic.Companion.TEST_COMPLETED
-import org.albaspazio.psysuite.trials.AdaptiveTrialsManager
-import org.albaspazio.psysuite.trials.TrialsManager
-import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
+import org.albaspazio.psysuite.core.trials.AdaptiveTrialsManager
+import org.albaspazio.psysuite.core.trials.TrialsManager
+import org.albaspazio.psysuite.core.utils.filesystem.FileSystemManager
 
 /**
  * Base class for all psychophysical tests within the Psysuite framework.
@@ -41,8 +41,8 @@ import org.albaspazio.psysuite.utility.filesystem.FileSystemManager
  *
  * This abstract class handles:
  * - Initialization of test parameters and resources.
- * - Management of trials through a [org.albaspazio.psysuite.trials.TrialsManager].
- * - Delivery of stimuli via a [org.albaspazio.psysuite.stimuli.StimuliManager].
+ * - Management of trials through a [TrialsManager].
+ * - Delivery of stimuli via a [StimuliManager].
  * - Event handling and communication with the UI (typically a Fragment).
  * - Saving test results and subject data.
  * - Configuration of test behavior like trial display modes and abort mechanisms.
@@ -559,7 +559,7 @@ abstract class TestBasic(protected val ctx: Context,
     var validAnswers: MutableList<String>       = mutableListOf()
 
     // Stimulus type constants that can be overridden by subclasses
-    /** Protected value representing the primary audio stimulus type for this test. Defaults to [org.albaspazio.psysuite.stimuli.StimuliManager.Companion.STIM_TYPE_A4]. */
+    /** Protected value representing the primary audio stimulus type for this test. Defaults to [StimuliManager.Companion.STIM_TYPE_A4]. */
     protected open val STIM_A: Int      = StimuliManager.Companion.STIM_TYPE_A4
     /** Protected value representing the primary visual stimulus type for this test. Defaults to [StimuliManager.Companion.STIM_TYPE_V1]. */
     protected open val STIM_V: Int      = StimuliManager.Companion.STIM_TYPE_V1
@@ -586,7 +586,7 @@ abstract class TestBasic(protected val ctx: Context,
 
     /**
      * Starts the test execution.
-     * This method checks if the [StimuliManager] and [org.albaspazio.psysuite.trials.TrialsManager] are valid and initialized.
+     * This method checks if the [StimuliManager] and [TrialsManager] are valid and initialized.
      * If in debug mode, it emits debug information. Then, it calls [show] to present the first trial.
      *
      * @return `true` if the test started successfully, `false` if there was a critical error.
@@ -629,8 +629,8 @@ abstract class TestBasic(protected val ctx: Context,
 
     /**
      * Handles the event when an answer is given by the user.
-     * If a valid result or extra text is provided, it sets the response in the [org.albaspazio.psysuite.trials.TrialsManager]
-     * and adds the current trial data to the [org.albaspazio.psysuite.model.summary.Summary].
+     * If a valid result or extra text is provided, it sets the response in the [TrialsManager]
+     * and adds the current trial data to the [Summary].
      *
      * @param result The numerical result of the answer (e.g., button index). Defaults to -1 (no answer).
      * @param elapsed The time elapsed for the answer in milliseconds. Defaults to -1.
@@ -819,7 +819,7 @@ abstract class TestBasic(protected val ctx: Context,
      */
     protected open var mDrawablesResource:MutableList<Int>  = mutableListOf()
 
-    /** Optional [org.albaspazio.psysuite.model.summary.Summary] object for collecting and storing summary data for the test. */
+    /** Optional [Summary] object for collecting and storing summary data for the test. */
     protected var mSummary: Summary?                        = null
 
     /**
