@@ -2,6 +2,7 @@
 <resources>
 
 
+
     <!--    parte comune-->
     <string name="lab_test_res">Test Results</string>
     <string name="start">start</string>
@@ -23,7 +24,6 @@
     <string name="training_ended">The training is over\nDo you want to repeat it or start the test?</string>
     <string name="block_ended_blind">This part of the test ended. Ask for assistance to continue</string>
     <string name="training_ended_blind">The training session is over...Ask for assistance to continue</string>
-
     <string name="test_ended">the Test is completed...thanks for your partecipation</string>
     <string name="test_want2abort">Do you really want to abort the test?</string>
     <string name="test_aborted">You decided to stop the test. Do you want to delete or preserve the results collected so far?</string>
@@ -67,6 +67,9 @@
     <string name="condition">condition</string>
     <string name="population">population</string>
 
+    <string name="correct_answer">right answer</string>
+    <string name="wrong_answer">wrong answer</string>
+
     <string name="warning">warning</string>
 
     <string name="subject_present">The selected name already exist. Do you want to go on using this name?</string>
@@ -98,6 +101,9 @@
 
     <string name="session">session</string>
 
+    <string name="trials_fixed">fixed</string>
+    <string name="trials_adaptive">adaptive</string>
+
     <string-array name="prepost_sessions3_array">
         <item>select...</item>
         <item>pre test</item>
@@ -123,6 +129,7 @@
 
 
 
+
     <string name="empty_subject_parcel">THE SUBJECT IS EMPTY</string>
     <string name="critical_error">NOT RECOVERABLE ERROR</string>
     <string name="restart_app_suggestion">It is advisable to restart the App</string>
@@ -137,7 +144,14 @@
     <string name="internal_error">The code generated the following error %1$s</string>
 
     <string name="run_test">Running test</string>
-
     <string name="start_test">start test</string>
-
+    <string name="abort_test">Abort Test</string>
+    <string name="do_training">Do Training</string>
+    <string name="repeat_trial">Repeat Trial</string>
+    <string name="trials_management">Trials Management</string>
+    <string name="show_result">Show Result</string>
+    <string name="nblocks">Number of Blocks</string>
+    <string name="durblock_sec">Block Duration (sec)</string>
+    <string name="firstcond">First Condition</string>
+    <string name="iti">Inter-Trial Interval</string>
 </resources>
