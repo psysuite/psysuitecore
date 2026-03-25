@@ -1,7 +1,6 @@
 pluginManagement {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -11,15 +10,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
 }
 
 include(":nativeaudio")
-
-//include(":nativeaudio")
-//project(":nativeaudio").projectDir = File(settingsDir, "../nativeaudio/nativeaudio")
-
 
 include(":psysuitepython")
 project(":psysuitepython").projectDir = File(settingsDir, "../psysuitepython/psysuitepython")
@@ -28,6 +22,3 @@ include(":core")
 project(":core").projectDir = File(settingsDir, "../core/core")
 
 include(":psysuitecore")
-
-//include(":psysuitetests")
-//project(":psysuitetests").projectDir = File(settingsDir, "../psysuitetests/psysuitetests")
