@@ -77,7 +77,8 @@ class ResultsManager private constructor(private var activity: Activity?) {
         get() {
             return try {
                 val resultsDir = fileSystemManager.getResultsFolder()
-                resultsDir.exists() && resultsDir.listFiles()?.isNotEmpty() == true
+                val validPairs = fileSystemManager.scanForValidResultPairs(resultsDir)
+                validPairs.isNotEmpty()
             } catch (e: Exception) {
                 false
             }
