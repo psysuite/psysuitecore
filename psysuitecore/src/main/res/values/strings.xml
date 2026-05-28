@@ -1,124 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="lab_test_res">Risultati Test</string>
+
 
     <!--    parte comune-->
-    <string name="start">inizia</string>
-    <string name="reset" translatable="false">reset</string>
-    <string name="next">prossimo</string>
-    <string name="session_text">sessione</string>
+    <string name="lab_test_res">Test Results</string>
+    <string name="start">start</string>
+    <string name="next">next</string>
+    <string name="session_text">session</string>
     <string name="trial_id">trial #%1$s</string>
-    <string name="abort">interrompi test</string>
-    <string name="pause">PAUSA</string>
-    <string name="resume">RIPRENDI</string>
-    <string name="delete">cancella</string>
-    <string name="keep">mantieni</string>
-    <string name="continue_txt">prosegui</string>
-    <string name="restart">ricomincia</string>
-    <string name="restart_training">ripeti il training</string>
+    <string name="abort">stop test</string>
+    <string name="pause">PAUSE</string>
+    <string name="resume">RESUME</string>
+    <string name="delete">cancel</string>
+    <string name="keep">keep</string>
+    <string name="continue_txt">continue</string>
+    <string name="restart">restart</string>
+    <string name="restart_training">repeat training</string>
     <string name="stop">STOP</string>
-    <string name="cancel">annulla</string>
-    <string name="continue_label">CONTINUA</string>
-    <string name="block_ended">Questa parte del test è terminata\nVuoi continuare o interrompere per poi proseguire un\'altra volta?</string>
-    <string name="training_ended">Il training è terminato\nVuoi ripeterlo o iniziare il test?</string>
-    <string name="block_ended_blind">Questa parte del test è terminata...Chiedi assistenza per continuare</string>
-    <string name="training_ended_blind">La parte di training è terminata...Chiedi assistenza per continuare</string>
-    <string name="test_ended">Il Test è terminato...grazie per aver partecipato</string>
-    <string name="test_want2abort">Sei sicuro di voler realmente interrompere il test?</string>
-    <string name="test_aborted">Hai deciso di interrompere il test. Vuoi cancellare i risultati fin qui scritti\n o li vuoi mantenere?</string>
+    <string name="cancel">cancel</string>
+    <string name="continue_label">CONTINUE</string>
+    <string name="block_ended">This part of the test ended. Do you want to continue or stop it and resume later?</string>
+    <string name="training_ended">The training is over\nDo you want to repeat it or start the test?</string>
+    <string name="block_ended_blind">This part of the test ended. Ask for assistance to continue</string>
+    <string name="training_ended_blind">The training session is over...Ask for assistance to continue</string>
+    <string name="test_ended">the Test is completed...thanks for your partecipation</string>
+    <string name="test_want2abort">Do you really want to abort the test?</string>
+    <string name="test_aborted">You decided to stop the test. Do you want to delete or preserve the results collected so far?</string>
 
-    <string name="test_aborted_blind">Hai deciso di interrompere il test. Chiedi assistenza per completare</string>
-    <string name="new_trial">Nuovo stimolo</string>
+    <string name="test_aborted_blind">You decided to stop the test. Ask assistance to complete</string>
+    <string name="new_trial">New stimulus</string>
 
-    <string name="name">nome</string>
-    <string name="gender">sesso</string>
-    <string name="age">età</string>
-    <string name="group">gruppo</string>
-    <string name="project">progetto</string>
+    <string name="name">name</string>
+    <string name="gender">gender</string>
+    <string name="age">age</string>
+    <string name="group">group</string>
+    <string name="project">project</string>
 
-    <string name="source">sorgente</string>
-    <string name="type">tipo</string>
+    <string name="source">source</string>
+    <string name="type">type</string>
     <string name="pattern">pattern</string>
     <string name="audio">audio</string>
-    <string name="tactile">tattile</string>
-    <string name="visual">visivo</string>
+    <string name="tactile">tactile</string>
+    <string name="visual">visual</string>
     <string name="audio_short">a</string>
     <string name="tactile_short">t</string>
     <string name="visual_short">v</string>
-    <string name="duration">durata</string>
-    <string name="single">singolo</string>
-    <string name="pair">coppia</string>
-    <string name="shifted">sfasato</string>
-    <string name="distance">distanza</string>
-    <string name="aligned">allineato</string>
-    <string name="repetitions_number">numero ripetizioni</string>
-    <string name="number">numero</string>
+    <string name="duration">duration</string>
+    <string name="single">single</string>
+    <string name="pair">pair</string>
+    <string name="shifted">shifted</string>
+    <string name="distance">distance</string>
+    <string name="aligned">aligned</string>
+    <string name="repetitions_number">repetitions number</string>
+    <string name="number">number</string>
     <string name="amplitude_short">Ampl.</string>
-    <string name="amplitude">Intensità</string>
-    <string name="end_trial_behaviour">Automatico</string>
+    <string name="amplitude">Intensity</string>
+    <string name="end_trial_behaviour">Automatic</string>
     <string name="volume">volume</string>
     <string name="volume_short">vol</string>
-    <string name="resource_name">nome</string>
-    <string name="interactivity">interattivo</string>
+    <string name="resource_name">name</string>
+    <string name="interactivity">interactive</string>
 
-    <string name="time">tempo</string>
-    <string name="frequency">frequenza</string>
-    <string name="condition">condizione</string>
-    <string name="population">popolazione</string>
+    <string name="time">time</string>
+    <string name="frequency">frequency</string>
+    <string name="condition">condition</string>
+    <string name="population">population</string>
 
-    <string name="correct_answer">risposta esatta</string>
-    <string name="wrong_answer">risposta sbagliata</string>
+    <string name="correct_answer">right answer</string>
+    <string name="wrong_answer">wrong answer</string>
 
-    <string name="warning">Attenzione</string>
+    <string name="warning">warning</string>
 
-    <string name="subject_present">Il nome scelto è già esistente. Vuoi continuare ad usare questo nome?</string>
-    <string name="subject_block_present">Esiste una precedente sessione di test Vuoi proseguirla o vuoi cancellare tutto e ricominciare da zero?</string>
-    <string name="select_subject_info">Indicare nome ed età</string>
-    <string name="select_gender">Indicare il sesso</string>
-    <string name="select_population">Seleziona una popolazione</string>
-    <string name="select_condition">Seleziona una condizione sperimentale</string>
-    <string name="select_session">Seleziona una sessione sperimentale</string>
-    <string name="select_spinner">Seleziona %1$s</string>
-    <string name="select_one_answer">Seleziona una risposta</string>
-    <string name="warning_dt_again2abort">Vuoi interrompere il test? esegui un altro tocco lungo per confermare o un tocco singolo per continuare il test</string>
+    <string name="subject_present">The selected name already exist. Do you want to go on using this name?</string>
+    <string name="subject_block_present">Previous sessions of this experiment already exist, do you want to continue them or do you prefer to delete everything and restart from the first one?</string>
+    <string name="select_subject_info">Insert name and age</string>
+    <string name="select_gender">Insert gender</string>
+    <string name="select_population">Select a population</string>
+    <string name="select_condition">Select an experimental condition</string>
+    <string name="select_session">Select an experimental session</string>
+    <string name="select_spinner">Select %1$s</string>
+    <string name="select_one_answer">Select an answer</string>
+    <string name="warning_dt_again2abort">Do you want to abort the test? do another long touch to confirm or a single touch to continue the test</string>
 
-    <string name="exp_intro_blind1">Benvenuto in questo esperimento ... Proverai ora come poter rispondere alla domanda che ti verrà posta </string>
-    <string name="exp_intro_blind2">La domanda è</string>
-    <string name="exp_intro_blind3">Scorri un dito verso l\'alto per scegliere l\'opzione</string>
-    <string name="exp_intro_blind4">scorri verso il basso per l\'opzione</string>
-    <string name="exp_intro_blind5">quando sei sicuro della scelta fai un doppio tap veloce</string>
+    <string name="exp_intro_blind1">Wellcome in this experiment ... You will now try how to answer to the given question</string>
+    <string name="exp_intro_blind2">The question is</string>
+    <string name="exp_intro_blind3">Swipe your finger upwards to select the option</string>
+    <string name="exp_intro_blind4">Swipe your finger downwards to select the option</string>
+    <string name="exp_intro_blind5">When you are sure of your selection, execute a double tap</string>
 
-    <string name="exp_intro_blind_assisted">Benvenuto in questo esperimento ... prova a rispondere e quando sei pronto per iniziare, fai un doppio tap veloce </string>
-    <string name="exp_letsstart_blind">L\'esperimento sta per iniziare</string>
+    <string name="exp_intro_blind_assisted">Wellcome in this experiment ... try to answer and when you are ready to start, do a double tap</string>
+    <string name="exp_letsstart_blind">The experiment is going to start</string>
 
-    <string name="answer_selected">risposta %1$s</string>
-    <string name="subject_info_notcorrected">Le seguenti informazioni del soggetto sono errate:\n\n%1$s</string>
+    <string name="answer_selected">answer %1$s</string>
+    <string name="subject_info_notcorrected">The following subject information are wrong:  %1$s</string>
 
-    <string name="yes">si</string>
+    <string name="yes">yes</string>
     <string name="no">no</string>
-    <string name="whitenoise">rumore</string>
+    <string name="whitenoise">w. noise</string>
 
-    <string name="session">sessione</string>
+    <string name="session">session</string>
 
-    <string name="trials_fixed">fissi</string>
-    <string name="trials_adaptive">adattativi</string>
+    <string name="trials_fixed">fixed</string>
+    <string name="trials_adaptive">adaptive</string>
 
-    <string name="rb1_text">primo</string>
-    <string name="rb2_text">secondo</string>
-    <string name="rb3_text">terzo</string>
+    <string name="rb1_text">first</string>
+    <string name="rb2_text">second</string>
+    <string name="rb3_text">third</string>
 
     <string name="rb_male_text">M</string>
     <string name="rb_female_text">F</string>
 
-    <string-array name="trial_manager_types">
-        <item>@string/trials_fixed</item>
-        <item>@string/trials_adaptive</item>
-    </string-array>
-
-
     <string-array name="prepost_sessions3_array">
-        <item>seleziona...</item>
+        <item>select...</item>
         <item>pre test</item>
         <item>session 1</item>
         <item>session 2</item>
@@ -127,7 +121,7 @@
     </string-array>
 
     <string-array name="sessions_array">
-        <item>seleziona...</item>
+        <item>select...</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -140,40 +134,31 @@
         <item>10</item>
     </string-array>
 
-    <string name= "main_email" translatable="false">antares.psysuite@gmail.com</string>
-
-    <string name="empty_subject_parcel">SOGGETTO E\' VUOTO</string>
-    <string name="critical_error">ERRORE IRRECUPERABILE</string>
-    <string name="restart_app_suggestion">E\' consigliabile riavviare l\'app</string>
-    <string name="contact_developer">E\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
-    <string name="test_failure">Questo test appare corrotto.\nE\' consigliabile riavviare l\'app\nin caso l\'errore persista, contattare lo sviluppatore all\'indirizzo:\npsysuite.uvip@gmail.com</string>
-
-    <string name="error">Errore</string>
-
-    <string name="error_audiomanager">gestore dell\'audio non valido</string>
-    <string name="error_tactilemanager">gestore dell\'tattile non valido</string>
-    <string name="error_visualmanager">gestore dell\'visuale non valido</string>
-    <string name="internal_error">Il codice ha generato il seguente errore\n%1$s</string>
 
 
-    <string name="pref_delay_a1" translatable="false">10</string>
-    <string name="pref_delay_a2" translatable="false">29</string>
-    <string name="pref_delay_a3" translatable="false">18</string>
-    <string name="pref_delay_t1" translatable="false">0</string>
-    <string name="pref_delay_t2" translatable="false">0</string>
-    <string name="pref_delay_v1" translatable="false">29</string>
-    <string name="pref_delay_v2" translatable="false">29</string>
 
-    <string name="run_test">Eseguendo il test</string>
-    <string name="start_test">incomincia il test</string>
-    <string name="abort_test">Interrompere Test</string>
-    <string name="do_training">Fare il Training</string>
-    <string name="repeat_trial">Ripetere il Trial</string>
-    <string name="trials_management">Gestione Trials</string>
-    <string name="show_result">Mostra i Risultati</string>
-    <string name="nblocks">Numero di blocchi</string>
-    <string name="durblock_sec">Durata Blocco (sec)</string>
-    <string name="firstcond">Prima Condizione</string>
+    <string name="empty_subject_parcel">THE SUBJECT IS EMPTY</string>
+    <string name="critical_error">NOT RECOVERABLE ERROR</string>
+    <string name="restart_app_suggestion">It is advisable to restart the App</string>
+    <string name="contact_developer">It is advisable to restart the App. In case the error persists, please contact the App developer at: psysuite.uvip@gmail.com</string>
+    <string name="test_failure">This test seems corrupted. It is advisable to restart the App. In case the error persists, please contanct the App developer at: psysuite.uvip@gmail.com</string>
+
+    <string name="error">Error</string>
+
+    <string name="error_audiomanager">the audio manager is not valid</string>
+    <string name="error_tactilemanager">the tactile manager is not valid</string>
+    <string name="error_visualmanager">the visual manager is not valid</string>
+    <string name="internal_error">The code generated the following error %1$s</string>
+
+    <string name="run_test">Running test</string>
+    <string name="start_test">start test</string>
+    <string name="abort_test">Abort Test</string>
+    <string name="do_training">Do Training</string>
+    <string name="repeat_trial">Repeat Trial</string>
+    <string name="trials_management">Trials Management</string>
+    <string name="show_result">Show Result</string>
+    <string name="nblocks">Number of Blocks</string>
+    <string name="durblock_sec">Block Duration (sec)</string>
+    <string name="firstcond">First Condition</string>
     <string name="iti">Inter-Trial Interval</string>
-
 </resources>
