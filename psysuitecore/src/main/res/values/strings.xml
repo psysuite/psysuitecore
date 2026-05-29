@@ -4,6 +4,8 @@
 
 
     <!--    parte comune-->
+    <string name="reset" translatable="false">Reset</string>
+
     <string name="lab_test_res">Test Results</string>
     <string name="start">start</string>
     <string name="next">next</string>
@@ -134,7 +136,10 @@
         <item>10</item>
     </string-array>
 
-
+    <string-array name="trial_manager_types">
+        <item>@string/trials_fixed</item>
+        <item>@string/trials_adaptive</item>
+    </string-array>
 
 
     <string name="empty_subject_parcel">THE SUBJECT IS EMPTY</string>

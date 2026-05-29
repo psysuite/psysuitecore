@@ -37,8 +37,7 @@ object ProjectPreferencesManager: SharedPreferenceWrapper() {
         // Note: "pref_delay_t2" currently points to R.integer.pref_delay_t1, this might be a typo
         "pref_delay_t2"     to R.integer.pref_delay_t1, 
         "pref_delay_v1"     to R.integer.pref_delay_v1,
-        "pref_delay_v2"     to R.integer.pref_delay_v2,
-        "pref_main_email"   to R.string.main_email)
+        "pref_delay_v2"     to R.integer.pref_delay_v2)
 
     /** Android [Resources] instance, initialized in [init]. Used to fetch default preference values. */
     private lateinit var resources: Resources
